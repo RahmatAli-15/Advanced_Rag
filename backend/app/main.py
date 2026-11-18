@@ -7,6 +7,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from redis.asyncio import Redis
 
+from app.answer.cache import AnswerCache, CorpusFingerprint
 from app.answer.service import AnswerService
 from app.api import ask, corpus, health, search
 from app.core.config import Settings, get_settings
@@ -32,8 +33,9 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         llm_provider = None
         if settings.groq_api_keys:
             gateway, llm_provider = build_gateway(settings)
+            cache = AnswerCache(app.state.redis, CorpusFingerprint(app.state.session_factory))
             app.state.answer_service = AnswerService(
-                app.state.retriever, gateway, app.state.session_factory
+                app.state.retriever, gateway, app.state.session_factory, cache=cache
             )
 
         # Loading the models takes ~20 s. Do it in the background so the process starts

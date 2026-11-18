@@ -33,6 +33,7 @@ function Progress({ turn }) {
 function Meta({ final }) {
   const t = final.timings_ms ?? {}
   const parts = [
+    final.cached && 'repeat question · served from cache',
     t.retrieval != null && `retrieval ${formatMs(t.retrieval)}`,
     t.first_token != null && `first token ${formatMs(t.first_token)}`,
     t.total != null && `total ${formatMs(t.total)}`,

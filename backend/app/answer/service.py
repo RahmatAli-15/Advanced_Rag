@@ -16,11 +16,11 @@ import logging
 import re
 import time
 import uuid
-from collections.abc import AsyncIterator
+from collections.abc import AsyncGenerator, AsyncIterator
 from contextlib import aclosing
 from dataclasses import dataclass, field
 from datetime import date
-from typing import Any, Literal
+from typing import Any, Literal, Protocol
 
 from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
@@ -127,6 +127,15 @@ class AnswerResult:
     timings_ms: dict[str, float] = field(default_factory=dict)
     usage: dict[str, int] = field(default_factory=dict)
     log_id: uuid.UUID | None = None
+    cached: bool = False  # served from the answer cache (see app/answer/cache.py)
+
+
+class AnswerCachePort(Protocol):
+    """What the service needs from a cache (implemented by app.answer.cache)."""
+
+    async def key(self, question: str, as_of: date, prompt_version: str) -> str: ...
+    async def get(self, key: str) -> "AnswerResult | None": ...
+    async def set(self, key: str, result: "AnswerResult") -> None: ...
 
 
 _CITE = re.compile(r"\[(S\d+)\]")
@@ -248,7 +257,9 @@ class AnswerService:
         *,
         k: int = 6,
         min_rerank_score: float = DEFAULT_MIN_RERANK_SCORE,
+        cache: AnswerCachePort | None = None,
     ) -> None:
+        self._cache = cache
         self._retriever = retriever
         self._gateway = gateway
         self._sf = session_factory
@@ -256,6 +267,61 @@ class AnswerService:
         self._min_score = min_rerank_score
 
     async def ask(self, question: str, as_of: date | None = None) -> AnswerResult:
+        t0 = time.perf_counter()
+        key = await self._cache_key(question, as_of, PROMPT_VERSION)
+        if key and (hit := await self._cache_hit(key, question, t0, PROMPT_VERSION)):
+            return hit
+        result = await self._ask(question, as_of)
+        if key and self._cache:
+            await self._cache.set(key, result)
+        return result
+
+    async def ask_stream(
+        self, question: str, as_of: date | None = None
+    ) -> AsyncIterator[AnswerEvent]:
+        """Same pipeline and the same checks as ask(), streamed:
+        stage → sources → stage → delta... → final (verified answer + status).
+        The deltas are a preview; only the final event's answer is verified.
+        A cache hit skips straight to the final event."""
+        t0 = time.perf_counter()
+        key = await self._cache_key(question, as_of, STREAM_PROMPT_VERSION)
+        if key and (hit := await self._cache_hit(key, question, t0, STREAM_PROMPT_VERSION)):
+            yield FinalEvent(hit)
+            return
+        async with aclosing(self._ask_stream(question, as_of)) as events:
+            async for ev in events:
+                if isinstance(ev, FinalEvent) and key and self._cache:
+                    await self._cache.set(key, ev.result)
+                yield ev
+
+    async def _cache_key(self, question: str, as_of: date | None, version: str) -> str | None:
+        if self._cache is None:
+            return None
+        try:
+            return await self._cache.key(question, as_of or date.today(), version)
+        except Exception as e:  # the cache may make answers faster, never break them
+            log.warning("answer cache key failed, skipping cache: %s", e)
+            return None
+
+    async def _cache_hit(
+        self, key: str, question: str, t0: float, version: str
+    ) -> AnswerResult | None:
+        assert self._cache is not None
+        try:
+            hit = await self._cache.get(key)
+        except Exception as e:  # e.g. an entry written by an older schema
+            log.warning("answer cache read failed, treating as miss: %s", e)
+            return None
+        if hit is None:
+            return None
+        hit.cached = True
+        hit.timings_ms = {"cache": _ms(t0), "total": _ms(t0)}
+        hit.usage = {}  # no tokens spent on this request
+        # Every answer shown is audited, including repeats served from the cache.
+        hit.log_id = await self._log(question, hit, [], 0.0, version)
+        return hit
+
+    async def _ask(self, question: str, as_of: date | None = None) -> AnswerResult:
         t0 = time.perf_counter()
         hits, trace = await self._retriever.search(
             question, k=self._k, filters=SearchFilters(as_of=as_of)
@@ -322,12 +388,9 @@ class AnswerService:
         result.log_id = await self._log(question, result, hits, top)
         return result
 
-    async def ask_stream(
+    async def _ask_stream(
         self, question: str, as_of: date | None = None
-    ) -> AsyncIterator[AnswerEvent]:
-        """Same pipeline and the same checks as ask(), streamed:
-        stage → sources → stage → delta... → final (verified answer + status).
-        The deltas are a preview; only the final event's answer is verified."""
+    ) -> AsyncGenerator[AnswerEvent]:
         t0 = time.perf_counter()
         yield StageEvent("retrieving")
         hits, trace = await self._retriever.search(
@@ -447,6 +510,7 @@ class AnswerService:
             top_rerank_score=top_score,
             usage=result.usage,
             timings_ms=result.timings_ms,
+            cached=result.cached,
         )
         async with self._sf() as s, s.begin():
             s.add(row)

@@ -52,6 +52,7 @@ class AskResponse(BaseModel):
     model: str | None
     timings_ms: dict[str, float]
     log_id: uuid.UUID | None
+    cached: bool = False
 
 
 def _citation_out(c: Citation) -> CitationOut:
@@ -77,6 +78,7 @@ def _response(r: AnswerResult) -> AskResponse:
         model=r.model,
         timings_ms=r.timings_ms,
         log_id=r.log_id,
+        cached=r.cached,
     )
 
 

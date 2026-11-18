@@ -14,6 +14,7 @@ from typing import Any, ClassVar
 
 from pgvector.sqlalchemy import Vector
 from sqlalchemy import (
+    Boolean,
     CheckConstraint,
     Computed,
     Date,
@@ -206,6 +207,7 @@ class AnswerLog(Base):
     top_rerank_score: Mapped[float | None] = mapped_column(Float)
     usage: Mapped[dict[str, Any]] = mapped_column(default=dict)
     timings_ms: Mapped[dict[str, Any]] = mapped_column(default=dict)
+    cached: Mapped[bool] = mapped_column(Boolean, default=False, server_default="false")
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), index=True
     )

@@ -118,6 +118,16 @@ Works in English, Hinglish and Hindi. Unanswerable or off-topic questions get an
 verified against the clauses actually retrieved, and every answer is written to an audit
 log ([ADR 0007](docs/adr/0007-grounded-answers.md)).
 
+### Caching
+
+Repeat questions are answered from an exact-match Redis cache: **~2.5 s → ~4 ms, zero
+LLM tokens**. The key is the normalised question + as-of date + prompt version + a
+corpus fingerprint, so any crawl or re-embed invalidates stale answers automatically.
+Only settled outcomes are cached; cache hits are still written to the audit log and
+labelled in the UI. There is deliberately no "semantic" cache: in compliance, "Can NBFCs
+do video KYC?" and "Can banks do video KYC?" are similar questions with different
+answers.
+
 ## Measured retrieval quality
 
 153 questions in English, Hinglish and Hindi over 45 RBI NBFC Master Directions
