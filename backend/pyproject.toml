@@ -19,6 +19,7 @@ dependencies = [
     "lxml>=5.0",
     "pgvector>=0.3",
     "prometheus-client>=0.21",
+    "mcp>=2.3,<3",  # MCP server (app/mcp_server.py); 2.x API (MCPServer)
 ]
 
 [project.optional-dependencies]
