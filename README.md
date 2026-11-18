@@ -272,10 +272,19 @@ npm run lint && npm test && npm run build
 - [x] Answer cache, multi-key LLM routing, background worker (queue, retries, DLQ, daily crawl), change detection
 - [x] Prometheus + Grafana monitoring, cost per answer, daily token budget with model downgrade
 - [x] MCP server: search, cited answers and recent changes as tools for AI assistants
-- [ ] **Phase 3 — Evaluation:** human review of the test set, exact-term questions, tracing
-- [ ] **Phase 4 — Compliance engine:** versioned rules ("as of date"), amendment diffs, citation graph, alerts, obligation register
-- [ ] **Phase 5 — Agent:** LangGraph impact analysis
-- [ ] **Phase 6 — Production:** semantic cache, rate limiting, RBAC + multi-tenancy, Helm
+- [x] Test set reviewed clause by clause against its gold clauses (AI review; v2)
+
+**Next**
+
+- [ ] Load test (throughput and p95 under concurrency) and per-client rate limiting
+- [ ] Change-impact agent (LangGraph): explains each detected RBI change and who it affects, citing old and new text
+- [ ] Exact-term test questions (e.g. "V-CIP", "NOF") to check the keyword-search weight
+- [ ] Human spot-check of the reviewed test set
+- [ ] On-demand AWS deployment (Terraform)
+
+**Deliberately not planned:** a semantic answer cache. In compliance, "Can NBFCs do
+video KYC?" and "Can banks do video KYC?" are similar questions with different answers,
+so only exact repeats are cached.
 
 ## Disclaimer
 
