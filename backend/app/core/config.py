@@ -27,6 +27,9 @@ class Settings(BaseSettings):
     # Fallback chain, best first. Override with LLM_MODELS='["a","b"]'.
     llm_models: list[str] = ["openai/gpt-oss-120b", "openai/gpt-oss-20b"]
     llm_requests_per_minute: float = 30.0
+    # Answer-evaluation judge: a different model family from the answer model, so the
+    # judge is not grading its own phrasing (self-preference bias).
+    judge_models: list[str] = ["qwen/qwen3.8-27b"]
 
     data_dir: Path = _REPO_ROOT / "data"
     eval_dir: Path = _REPO_ROOT / "eval"  # datasets and reports (committed)

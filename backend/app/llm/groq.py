@@ -38,7 +38,11 @@ class GroqProvider:
         base_url: str = "https://api.groq.com/openai/v1",
         timeout_s: float = 60.0,
         transport: httpx.AsyncBaseTransport | None = None,
+        max_stream_s: float = 180.0,
     ) -> None:
+        # httpx timeouts are per operation (connect, each read). A stream that keeps
+        # sending bytes slowly never trips them, so streams also get a total deadline.
+        self._max_stream_s = max_stream_s
         self._client = httpx.AsyncClient(
             base_url=base_url,
             headers={"Authorization": f"Bearer {api_key}"},
@@ -68,12 +72,17 @@ class GroqProvider:
         payload = {**self._payload(request, model), "stream": True}
         payload["stream_options"] = {"include_usage": True}
         answered_by, usage = model, Usage()
+        deadline = time.monotonic() + self._max_stream_s
         try:
             async with self._client.stream("POST", "/chat/completions", json=payload) as r:
                 if r.status_code != 200:
                     body = (await r.aread()).decode(errors="replace")
                     _raise_for_status(r.status_code, r.headers, body, model)
                 async for line in r.aiter_lines():
+                    if time.monotonic() > deadline:
+                        raise TransientError(
+                            f"{model}: stream exceeded {self._max_stream_s:.0f} s deadline"
+                        )
                     if not line.startswith("data:"):
                         continue
                     data = line[5:].strip()
@@ -89,9 +98,12 @@ class GroqProvider:
                         if text:
                             yield StreamEvent(text=text)
         except httpx.TimeoutException as e:
-            raise TransientError(f"timeout streaming {model}") from e
+            raise TransientError(f"timeout streaming {model} ({type(e).__name__})") from e
         except httpx.TransportError as e:
-            raise TransientError(f"network error streaming {model}: {e}") from e
+            # str(e) is often empty for dropped connections; the type says what happened.
+            raise TransientError(
+                f"network error streaming {model}: {type(e).__name__} {e}".rstrip()
+            ) from e
         yield StreamEvent(done=True, model=answered_by, usage=usage)
 
     async def complete(self, request: LLMRequest, model: str) -> LLMResponse:

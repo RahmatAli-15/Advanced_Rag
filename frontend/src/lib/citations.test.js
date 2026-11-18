@@ -8,6 +8,11 @@ describe('normaliseCitations (same cases as the backend tests)', () => {
     ['Two years [S1; S2]【S4】', 'Two years [S1][S2][S4]'],
     ['Two years [S1][S2].', 'Two years [S1][S2].'],
     ['Ratio [1] and [Section 3]', 'Ratio [1] and [Section 3]'],
+    ['Two years [\u200bS1\u200b].', 'Two years [S1].'],
+    ['Two years [**S1**].', 'Two years [S1].'],
+    ['Two years (S6).', 'Two years [S6].'],
+    ['Two years [ **S1**, S2 ]', 'Two years [S1][S2]'],
+    ['See para (1) and (iv)', 'See para (1) and (iv)'],
   ])('%s', (raw, expected) => {
     expect(normaliseCitations(raw)).toBe(expected)
   })

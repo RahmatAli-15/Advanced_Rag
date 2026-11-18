@@ -69,5 +69,6 @@ markers = ["integration: needs a running Postgres"]
 
 [tool.ruff.lint.per-file-ignores]
 # Regulatory text uses real en dashes and curly quotes; tests assert on them.
-"tests/*" = ["RUF001", "RUF003", "ASYNC240"]
+# Seeded random.Random in tests is for reproducibility, not security (S311).
+"tests/*" = ["RUF001", "RUF003", "ASYNC240", "S311"]
 "migrations/*" = ["E501"]

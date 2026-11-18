@@ -1,0 +1,20 @@
+{"id":"u01-en","question":"What is the maximum total expense ratio SEBI allows for equity mutual fund schemes?","language":"en","category":"other-regulator","reviewed":false}
+{"id":"u02-en","question":"What is the minimum net worth required to register as a SEBI investment adviser?","language":"en","category":"other-regulator","reviewed":false}
+{"id":"u03-en","question":"What free-look period does IRDAI require for life insurance policies?","language":"en","category":"other-regulator","reviewed":false}
+{"id":"u04-en","question":"What is the turnover threshold for GST registration for a services business?","language":"en","category":"other-regulator","reviewed":false}
+{"id":"u05-en","question":"How much home loan interest can be deducted under section 24(b) of the Income Tax Act?","language":"en","category":"other-regulator","reviewed":false}
+{"id":"u06-en","question":"What are the PFRDA rules for partial withdrawal from the National Pension System?","language":"en","category":"other-regulator","reviewed":false}
+{"id":"u07-en","question":"How many independent directors must a listed company have under SEBI LODR regulations?","language":"en","category":"near-domain-trap","reviewed":false}
+{"id":"u08-en","question":"What is the DICGC deposit insurance limit per depositor in a bank?","language":"en","category":"near-domain-trap","reviewed":false}
+{"id":"u09-en","question":"What minimum paid-up capital is required to get a universal banking licence?","language":"en","category":"bank-only","reviewed":false}
+{"id":"u10-en","question":"What is the stamp duty on a property sale agreement in Maharashtra?","language":"en","category":"other-regulator","reviewed":false}
+{"id":"u11-en","question":"What is the capital of Australia?","language":"en","category":"off-topic","reviewed":false}
+{"id":"u12-en","question":"Write a Python function to reverse a string.","language":"en","category":"off-topic","reviewed":false}
+{"id":"u13-en","question":"Who won the 2011 Cricket World Cup?","language":"en","category":"off-topic","reviewed":false}
+{"id":"u14-hinglish","question":"SEBI ke hisaab se mutual fund mein exit load kitna ho sakta hai?","language":"hinglish","category":"other-regulator","reviewed":false}
+{"id":"u15-hinglish","question":"Health insurance claim settle karne ke liye IRDAI ne kitne din diye hain?","language":"hinglish","category":"other-regulator","reviewed":false}
+{"id":"u16-hinglish","question":"UPI transaction ki daily limit kitni hai?","language":"hinglish","category":"other-regulator","reviewed":false}
+{"id":"u17-hinglish","question":"Aaj Mumbai mein mausam kaisa hai?","language":"hinglish","category":"off-topic","reviewed":false}
+{"id":"u18-hi","question":"सेबी के अनुसार डीमैट खाता खोलने के लिए कौन से दस्तावेज़ चाहिए?","language":"hi","category":"near-domain-trap","reviewed":false}
+{"id":"u19-hi","question":"आयकर रिटर्न भरने की अंतिम तिथि क्या है?","language":"hi","category":"other-regulator","reviewed":false}
+{"id":"u20-hi","question":"भारत के पहले प्रधानमंत्री कौन थे?","language":"hi","category":"off-topic","reviewed":false}

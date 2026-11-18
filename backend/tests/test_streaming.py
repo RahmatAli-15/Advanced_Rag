@@ -1,6 +1,7 @@
 """Streaming: gateway retry-before-first-token policy, Groq SSE parsing, and the
 streamed answer pipeline (events, NOT_IN_SOURCES marker, interruption, HTTP framing)."""
 
+import asyncio
 import json
 from collections.abc import AsyncGenerator, AsyncIterator
 from contextlib import asynccontextmanager
@@ -15,6 +16,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from app.answer.service import (
+    STREAM_PROMPT_VERSION,
     AnswerEvent,
     AnswerResult,
     AnswerService,
@@ -125,6 +127,16 @@ async def test_stream_failure_after_first_token_is_not_retried() -> None:
     assert seen == ["partial"] and p.calls == ["a"]  # no splice of a second model
 
 
+async def test_rate_limits_do_not_open_the_circuit_breaker() -> None:
+    # Regression: three 429s in a row used to open the breaker, so a healthy but
+    # busy judge model was skipped for every later request.
+    p = StreamingProvider({"a": [RateLimited("429", retry_after_s=1)] * 5 + [["ok"]]})
+    gw = _gateway(p, ["a"], max_retries=5, breaker_threshold=3)
+    events = await _collect(gw.stream(REQ))
+    assert events[0].text == "ok" and gw.breaker_state("a") == "closed"
+    assert p.calls == ["a"] * 6
+
+
 async def test_stream_raises_all_models_failed_when_none_start() -> None:
     p = StreamingProvider({"a": [TransientError("x")] * 2})
     with pytest.raises(AllModelsFailed):
@@ -178,6 +190,24 @@ async def test_groq_stream_maps_http_errors_before_any_text() -> None:
     assert exc.value.retry_after_s == 3
 
 
+async def test_groq_stream_enforces_a_total_deadline_on_a_trickling_stream() -> None:
+    async def trickle() -> AsyncIterator[bytes]:
+        for word in ["slow", "er", "and", "slower"]:
+            chunk = {"model": "m", "choices": [{"delta": {"content": word}}]}
+            yield f"data: {json.dumps(chunk)}\n\n".encode()
+            await asyncio.sleep(0.05)  # each read is quick, so httpx never times out
+
+    def handler(_: httpx.Request) -> httpx.Response:
+        return httpx.Response(200, content=trickle())
+
+    provider = GroqProvider("k", transport=httpx.MockTransport(handler), max_stream_s=0.08)
+    seen: list[str] = []
+    with pytest.raises(TransientError, match="deadline"):
+        async for e in provider.stream(REQ, "m"):
+            seen.append(e.text)
+    assert 0 < len(seen) < 4
+
+
 # --- streamed answers ----------------------------------------------------------------
 
 
@@ -227,7 +257,7 @@ async def test_stream_emits_sources_then_deltas_then_verified_final(
     assert "NOT_IN_SOURCES" in p.requests[0].messages[0].content
     async with session_factory() as s:
         row = await s.scalar(select(AnswerLog).where(AnswerLog.id == result.log_id))
-    assert row is not None and row.prompt_version == "answer-stream-v1"
+    assert row is not None and row.prompt_version == STREAM_PROMPT_VERSION
     assert row.usage == {"prompt_tokens": 50, "completion_tokens": 7}
 
 

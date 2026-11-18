@@ -9,6 +9,7 @@ python -m app.ingestion.cli search "video KYC for NBFCs" --as-of 2026-03-01
 import argparse
 import asyncio
 import json
+import random
 from dataclasses import asdict
 from datetime import UTC, date, datetime
 from pathlib import Path
@@ -149,6 +150,70 @@ async def _eval_retrieval(args: argparse.Namespace) -> int:
     return 0
 
 
+async def _eval_answers(args: argparse.Namespace) -> int:
+    from sqlalchemy import select
+
+    from app.answer.service import STREAM_PROMPT_VERSION, AnswerService
+    from app.db.models import Chunk, Document, DocumentVersion
+    from app.eval import faithfulness as fa
+
+    s = get_settings()
+    gold = fa.sample(
+        dataset.load(s.eval_dir / "datasets" / "retrieval_v1.jsonl"), args.n, args.seed
+    )
+    unanswerable = fa.load_unanswerable(s.eval_dir / "datasets" / "unanswerable_v1.jsonl")
+    if args.no_unanswerable:
+        unanswerable = []
+    engine = create_engine(s.database_url)
+    factory = create_session_factory(engine)
+    retriever = HybridRetriever(factory, build_embedder(s), build_reranker(s))
+    # Batch run: wait out rate limits instead of falling back, so every answer comes
+    # from the model being evaluated (a fallback model would skew the scores).
+    answer_gw, answer_provider = build_gateway(s, s.llm_models[:1], max_retries=10)
+    judge_gw, judge_provider = build_gateway(s, s.judge_models, max_retries=10)
+    service = AnswerService(retriever, answer_gw, factory)
+    rng = random.Random(args.seed)  # noqa: S311 - reproducible planting, not security
+    results: list[fa.ItemResult] = []
+    try:
+        async with factory() as session:
+            rows = await session.execute(
+                select(Chunk.id, Document.source_key)
+                .join(DocumentVersion, Chunk.version_id == DocumentVersion.id)
+                .join(Document, DocumentVersion.document_id == Document.id)
+            )
+            matcher = fa.GoldMatcher({str(cid): key for cid, key in rows})
+        await retriever.search("warm up")
+        total = len(gold) + len(unanswerable)
+        for i, item in enumerate(gold, start=1):
+            r = await fa.run_answerable(service, judge_gw, item, matcher, rng)
+            results.append(r)
+            verdicts = [c.verdict for c in r.claims]
+            print(f"[{i}/{total}] {item.id} {r.status} {verdicts}", flush=True)
+        for j, u in enumerate(unanswerable, start=len(gold) + 1):
+            r = await fa.run_unanswerable(service, u)
+            results.append(r)
+            print(f"[{j}/{total}] {u.id} {r.status}", flush=True)
+    finally:
+        await answer_provider.aclose()
+        await judge_provider.aclose()
+        await engine.dispose()
+
+    summary = fa.summarise(results)
+    meta: dict[str, object] = {
+        "answerable": f"{len(gold)} questions sampled from retrieval_v1.jsonl (seed {args.seed})",
+        "unanswerable": f"{len(unanswerable)} questions from unanswerable_v1.jsonl",
+        "answer_model": f"{s.llm_models[0]} (no fallback during evaluation)",
+        "answer_prompt": f"{STREAM_PROMPT_VERSION} (the one the UI uses)",
+        "judge_models": ", ".join(s.judge_models),
+        "judge_prompt": fa.JUDGE_PROMPT_VERSION,
+        "gateway_retries": answer_gw.stats.retries + judge_gw.stats.retries,
+        "generated": datetime.now(UTC).strftime("%Y-%m-%d %H:%M UTC"),
+    }
+    md, _ = fa.write_report(summary, results, meta, s.eval_dir / "reports")
+    print(md.read_text(encoding="utf-8"))
+    return 0
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(prog="advancedrag-ingest")
     sub = parser.add_subparsers(dest="command", required=True)
@@ -179,6 +244,11 @@ def main() -> int:
     er.add_argument("--dataset")
     er.add_argument("--language", choices=["en", "hinglish", "hi"])
 
+    ea = sub.add_parser("eval-answers", help="judge answer faithfulness and abstention")
+    ea.add_argument("-n", type=int, default=30, help="answerable questions to sample")
+    ea.add_argument("--seed", type=int, default=7)
+    ea.add_argument("--no-unanswerable", action="store_true")
+
     args = parser.parse_args()
     configure_logging(get_settings().log_level)
     commands = {
@@ -188,6 +258,7 @@ def main() -> int:
         "search": _search,
         "eval-generate": _eval_generate,
         "eval-retrieval": _eval_retrieval,
+        "eval-answers": _eval_answers,
     }
     return asyncio.run(commands[args.command](args))
 

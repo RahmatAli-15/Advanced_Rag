@@ -5,13 +5,17 @@
 // server does when it verifies the final answer, so the text does not jump when the
 // verified version replaces the preview.
 
-const CITE_ANY = /[[【]\s*(S\d+(?:\s*[,;]\s*S\d+)*)\s*[\]】]/g
+// Also: markdown bold inside the brackets "[**S1**]", parentheses "(S6)", and invisible
+// zero-width spaces "[\u200bS1\u200b]" (all observed in the answer evaluation).
+const ZERO_WIDTH = /[\u200b-\u200d\u2060\ufeff]/g
+const ID = String.raw`[*_\s]*S\d+[*_\s]*`
+const CITE_ANY = new RegExp(String.raw`[[【(](${ID}(?:[,;]${ID})*)[\]】)]`, 'g')
 
 export function normaliseCitations(text) {
-  return text.replace(CITE_ANY, (_, group) =>
+  return text.replace(ZERO_WIDTH, '').replace(CITE_ANY, (_, group) =>
     group
       .split(/[,;]/)
-      .map((id) => `[${id.trim()}]`)
+      .map((id) => `[${id.replace(/[*_\s]/g, '')}]`)
       .join(''),
   )
 }

@@ -171,10 +171,21 @@ class LLMGateway:
                 except FatalError as e:
                     errors.append(f"{route.model}: {e}")
                     breaker.record_failure()
+                    log.warning("%s failed, not retrying: %s", route.model, e)
                     break  # same request will fail again; try the next model
                 except (RateLimited, TransientError) as e:
-                    breaker.record_failure()
+                    # A 429 means "slow down", not "broken": it must not open the
+                    # breaker, or a burst of rate limits takes a healthy model offline.
+                    if not isinstance(e, RateLimited):
+                        breaker.record_failure()
                     errors.append(f"{route.model}: {e}")
+                    log.warning(
+                        "%s attempt %d failed (breaker %s): %s",
+                        route.model,
+                        attempt + 1,
+                        breaker.state,
+                        e,
+                    )
                     if attempt == self.max_retries or not breaker.allow():
                         break
                     self.stats.retries += 1
@@ -228,10 +239,21 @@ class LLMGateway:
                 except FatalError as e:
                     errors.append(f"{route.model}: {e}")
                     breaker.record_failure()
+                    log.warning("%s failed, not retrying: %s", route.model, e)
                     break
                 except (RateLimited, TransientError) as e:
-                    breaker.record_failure()
+                    # A 429 means "slow down", not "broken": it must not open the
+                    # breaker, or a burst of rate limits takes a healthy model offline.
+                    if not isinstance(e, RateLimited):
+                        breaker.record_failure()
                     errors.append(f"{route.model}: {e}")
+                    log.warning(
+                        "%s attempt %d failed (breaker %s): %s",
+                        route.model,
+                        attempt + 1,
+                        breaker.state,
+                        e,
+                    )
                     if attempt == self.max_retries or not breaker.allow():
                         break
                     self.stats.retries += 1

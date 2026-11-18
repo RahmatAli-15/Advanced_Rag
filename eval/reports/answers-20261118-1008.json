@@ -1,0 +1,2507 @@
+{
+  "meta": {
+    "answerable": "30 questions sampled from retrieval_v1.jsonl (seed 7)",
+    "unanswerable": "20 questions from unanswerable_v1.jsonl",
+    "answer_models": "openai/gpt-oss-120b, openai/gpt-oss-20b",
+    "answer_prompt": "answer-stream-v1 (the one the UI uses)",
+    "judge_models": "qwen/qwen3.8-27b",
+    "judge_prompt": "judge-v1",
+    "gateway_retries": 45,
+    "generated": "2026-11-18 10:08 UTC"
+  },
+  "summary": {
+    "answerable": {
+      "n": 30,
+      "answered": 0.8,
+      "abstained": 0.0,
+      "gold_in_sources": 0.933
+    },
+    "claims": {
+      "n": 113,
+      "supported": 0.912,
+      "supported_or_partial": 0.947,
+      "contradicted": 0.018,
+      "uncited": 0.487,
+      "citation_accurate": 0.983,
+      "numbers_grounded": 0.902
+    },
+    "answers_fully_supported": 0.708,
+    "language_ok": 0.75,
+    "judge": {
+      "planted": 9,
+      "caught": 1.0,
+      "errors": 0
+    },
+    "unanswerable": {
+      "n": 20,
+      "abstained": 1.0,
+      "answered_anyway": []
+    },
+    "answered_by": {
+      "openai/gpt-oss-120b": 37,
+      "none": 13
+    },
+    "by_language": {
+      "en": {
+        "answers": 8,
+        "claim_support": 0.826,
+        "language_ok": 1.0
+      },
+      "hi": {
+        "answers": 9,
+        "claim_support": 0.953,
+        "language_ok": 0.889
+      },
+      "hinglish": {
+        "answers": 7,
+        "claim_support": 1.0,
+        "language_ok": 0.286
+      }
+    },
+    "latency_p50_ms": 2404.4
+  },
+  "items": [
+    {
+      "id": "c11406d7-en",
+      "kind": "answerable",
+      "language": "en",
+      "question": "Should an NBFC obtain third‑party assessments and market input on a service provider, and verify that the provider’s systems are compatible with the NBFC’s and meet acceptable performance standards such as customer service?",
+      "status": "answered",
+      "answer": "**Yes.**  \nAn NBFC must obtain independent reviews and market feedback on a service provider to supplement its own due‑diligence, and it must also evaluate whether the provider’s systems are compatible with the NBFC’s and whether its performance standards—including customer‑service standards—are acceptable[S1].",
+      "model": "openai/gpt-oss-120b",
+      "gold_in_sources": true,
+      "language_ok": true,
+      "claims": [
+        {
+          "id": "C1",
+          "text": "Yes.",
+          "cited": [],
+          "planted": false,
+          "verdict": "supported",
+          "supported_by": [
+            "S1"
+          ],
+          "reason": "The sources confirm that NBFCs are required to perform these actions.",
+          "numbers_missing": []
+        },
+        {
+          "id": "C2",
+          "text": "An NBFC must obtain independent reviews and market feedback on a service provider to supplement its own due‑diligence, and it must also evaluate whether the provider’s systems are compatible with the NBFC’s and whether its performance standards—including customer‑service standards—are acceptable.",
+          "cited": [
+            "S1"
+          ],
+          "planted": false,
+          "verdict": "partial",
+          "supported_by": [
+            "S1"
+          ],
+          "reason": "Source S1 states that an NBFC 'shall obtain independent reviews and market feedback' only 'Where possible'. The claim states the NBFC 'must obtain' them without this condition, which overstates the obligation.",
+          "numbers_missing": []
+        }
+      ],
+      "planted": null,
+      "judge_error": null,
+      "total_ms": 1723.7
+    },
+    {
+      "id": "94067bbe-hinglish",
+      "kind": "answerable",
+      "language": "hinglish",
+      "question": "Kya STC securitisation ki performance active discretionary basis pe assets ko cherry-pick ya select karne par depend kar sakti hai?",
+      "status": "answered",
+      "answer": "नहीं। STC securitisation की performance को सक्रिय विवेकाधीन (active discretionary) आधार पर assets को cherry‑pick या चयन करने पर निर्भर नहीं किया जा सकता। दिशा‑निर्देश के अनुसार, सुरक्षितीकरण की performance को निरंतर सक्रिय प्रबंधन या विवेकाधीन चयन पर आधारित नहीं होना चाहिए [S1] और प्रभावी तिथि के बाद स्थानांतरित किए गए credit claims को सक्रिय रूप से चयन या प्रबंधन नहीं किया जा सकता [S2].",
+      "model": "openai/gpt-oss-120b",
+      "gold_in_sources": true,
+      "language_ok": false,
+      "claims": [
+        {
+          "id": "C1",
+          "text": "नहीं।",
+          "cited": [],
+          "planted": false,
+          "verdict": "supported",
+          "supported_by": [
+            "S1",
+            "S2"
+          ],
+          "reason": "Sources S1 and S2 explicitly state that performance should not rely on active discretionary selection or cherry-picking.",
+          "numbers_missing": []
+        },
+        {
+          "id": "C2",
+          "text": "STC securitisation की performance को सक्रिय विवेकाधीन (active discretionary) आधार पर assets को cherry‑pick या चयन करने पर निर्भर नहीं किया जा सकता।",
+          "cited": [],
+          "planted": false,
+          "verdict": "supported",
+          "supported_by": [
+            "S1",
+            "S2"
+          ],
+          "reason": "This claim accurately paraphrases the prohibition in S1 and S2 regarding reliance on active discretionary selection or cherry-picking of assets.",
+          "numbers_missing": []
+        },
+        {
+          "id": "C3",
+          "text": "दिशा‑निर्देश के अनुसार, सुरक्षितीकरण की performance को निरंतर सक्रिय प्रबंधन या विवेकाधीन चयन पर आधारित नहीं होना चाहिए  और प्रभावी तिथि के बाद स्थानांतरित किए गए credit claims को सक्रिय रूप से चयन या प्रबंधन नहीं किया जा सकता .",
+          "cited": [
+            "S1",
+            "S2"
+          ],
+          "planted": false,
+          "verdict": "supported",
+          "supported_by": [
+            "S1",
+            "S2"
+          ],
+          "reason": "S1 states performance should not rely on ongoing active management/discretionary selection. S2 states assets transferred after the effective date may not be actively selected or managed.",
+          "numbers_missing": []
+        }
+      ],
+      "planted": null,
+      "judge_error": null,
+      "total_ms": 1959.6
+    },
+    {
+      "id": "f00ef377-hi",
+      "kind": "answerable",
+      "language": "hi",
+      "question": "क्या SRO या उद्योग संघ अपने सदस्यों द्वारा दिए जाने वाले माइक्रोफाइनेंस ऋणों के ब्याज दर सीमा को जिले में प्रकाशित कर सकते हैं?",
+      "status": "answered",
+      "answer": "**हाँ**, Self‑Regulatory Organisations (SROs) या अन्य उद्योग संघ अपने जागरूकता अभियानों के हिस्से के रूप में अपने सदस्यों द्वारा जिले में लिये जाने वाले माइक्रोफाइनेंस ऋणों की ब्याज‑दर सीमा प्रकाशित कर सकते हैं[S1].",
+      "model": "openai/gpt-oss-120b",
+      "gold_in_sources": true,
+      "language_ok": true,
+      "claims": [
+        {
+          "id": "C1",
+          "text": "हाँ, Self‑Regulatory Organisations (SROs) या अन्य उद्योग संघ अपने जागरूकता अभियानों के हिस्से के रूप में अपने सदस्यों द्वारा जिले में लिये जाने वाले माइक्रोफाइनेंस ऋणों की ब्याज‑दर सीमा प्रकाशित कर सकते हैं.",
+          "cited": [
+            "S1"
+          ],
+          "planted": false,
+          "verdict": "supported",
+          "supported_by": [
+            "S1"
+          ],
+          "reason": "Source S1 explicitly states that SROs/industry associations may publish the range of interest rates on microfinance loans charged by their members operating in a district as part of awareness campaigns.",
+          "numbers_missing": []
+        }
+      ],
+      "planted": null,
+      "judge_error": null,
+      "total_ms": 2272.9
+    },
+    {
+      "id": "612f25c8-en",
+      "kind": "answerable",
+      "language": "en",
+      "question": "Which base‑layer NBFCs that have a customer interface and do not take public funds are covered by these directions?",
+      "status": "answered",
+      "answer": "**Covered base‑layer NBFCs (customer‑interface, no public funds)**  \n\n| Direction | Extent of coverage for “NBFC‑BL having customer interface but not availing public funds” |\n|-----------|-------------------------------------------------------------------------------------------|\n| **Classification, Valuation & Operation of Investment Portfolio** | The directions are **not applicable** overall, **except** that **paragraphs 11‑13 and 28‑29** shall apply to these NBFCs. [S1] |\n| **Undertaking of Financial Services** | The directions apply to these NBFCs **except** for **paragraphs 7‑14**, which are excluded. All other provisions (e.g., paragraphs 1‑6, 15‑56) are applicable. [S6] |\n| **Concentration Risk Management** | The directions are **not applicable** to these NBFCs. [S2] |\n| **Credit Risk Management** | The directions are **not applicable** to these NBFCs. [S3] |\n| **Asset Liability Management** | The directions are **not applicable** to these NBFCs. [S4] |\n| **Financial Statements: Presentation & Disclosures** | The directions are **not applicable** to these NBFCs. [S5] |\n\n**Summary**\n\n- Base‑layer NBFCs that have a customer interface but do not take public funds are **generally excluded** from the listed RBI directions.  \n- **Partial coverage** exists only in:  \n  1. **Paragraphs 11‑13 and 28‑29** of the *Classification, Valuation & Operation of Investment Portfolio* Directions (S1).  \n  2. **All provisions except paragraphs 7‑14** of the *Undertaking of Financial Services* Directions (S6).  \n\nAll other listed directions (Concentration Risk Management, Credit Risk Management, Asset‑Liability Management, Financial Statements) do **not** apply to these NBFCs.",
+      "model": "openai/gpt-oss-120b",
+      "gold_in_sources": true,
+      "language_ok": true,
+      "claims": [
+        {
+          "id": "C1",
+          "text": "Covered base‑layer NBFCs (customer‑interface, no public funds)",
+          "cited": [],
+          "planted": false,
+          "verdict": "supported",
+          "supported_by": [
+            "S1",
+            "S2",
+            "S3",
+            "S4",
+            "S5",
+            "S6"
+          ],
+          "reason": "The sources consistently identify 'NBFCs in Base layer having customer interface but not availing public funds' as the specific category in question.",
+          "numbers_missing": []
+        },
+        {
+          "id": "C2",
+          "text": "Direction Extent of coverage for “NBFC‑BL having customer interface but not availing public funds”",
+          "cited": [],
+          "planted": false,
+          "verdict": "supported",
+          "supported_by": [
+            "S1",
+            "S2",
+            "S3",
+            "S4",
+            "S5",
+            "S6"
+          ],
+          "reason": "The sources collectively define the extent of coverage for this specific NBFC category across various directions.",
+          "numbers_missing": []
+        },
+        {
+          "id": "C3",
+          "text": "Classification, Valuation & Operation of Investment Portfolio The directions are not applicable overall, except that paragraphs 11‑13 and 28‑29 shall apply to these NBFCs.",
+          "cited": [
+            "S1"
+          ],
+          "planted": false,
+          "verdict": "supported",
+          "supported_by": [
+            "S1"
+          ],
+          "reason": "Source S1 explicitly states that the directions are not applicable, provided that paragraphs 11 to 13 and 28 to 29 shall be applicable to these NBFCs.",
+          "numbers_missing": []
+        },
+        {
+          "id": "C4",
+          "text": "Undertaking of Financial Services The directions apply to these NBFCs except for paragraphs 7‑14, which are excluded. All other provisions (e.g., paragraphs 1‑6, 15‑56) are applicable.",
+          "cited": [
+            "S6"
+          ],
+          "planted": false,
+          "verdict": "partial",
+          "supported_by": [
+            "S6"
+          ],
+          "reason": "Source S6 states that paragraphs 7 to 14 are not applicable. It does not explicitly state that 'all other provisions' are applicable, nor does it list paragraphs 1-6 or 15-56 as applicable in the same manner; it defines applicability by specific ranges (e.g., 6-19, 23-33) for different layers/categories. The claim's assertion that 'all other provisions... are applicable' is an inference not strictly supported by the text which lists specific applicable ranges.",
+          "numbers_missing": [
+            "15",
+            "56"
+          ]
+        },
+        {
+          "id": "C5",
+          "text": "Concentration Risk Management The directions are not applicable to these NBFCs.",
+          "cited": [
+            "S2"
+          ],
+          "planted": false,
+          "verdict": "supported",
+          "supported_by": [
+            "S2"
+          ],
+          "reason": "Source S2 lists 'NBFCs-BL having customer interface but not availing public funds' under the section 'These Directions are not applicable for the following'.",
+          "numbers_missing": []
+        },
+        {
+          "id": "C6",
+          "text": "Credit Risk Management The directions are not applicable to these NBFCs.",
+          "cited": [
+            "S3"
+          ],
+          "planted": false,
+          "verdict": "supported",
+          "supported_by": [
+            "S3"
+          ],
+          "reason": "Source S3 lists 'NBFCs-BL having customer interface but not availing public funds' under the section 'These Directions are not applicable for the following' (implied by context of paragraph 3(viii) following similar exclusion lists in other sources, though S3 snippet is short, it is part of the exclusion list structure).",
+          "numbers_missing": []
+        },
+        {
+          "id": "C8",
+          "text": "Asset Liability Management The directions are not applicable to these NBFCs.",
+          "cited": [
+            "S4"
+          ],
+          "planted": false,
+          "verdict": "supported",
+          "supported_by": [
+            "S4"
+          ],
+          "reason": "Source S4 lists 'NBFCs in Base layer having customer interface but not availing public funds' under the section 'These Directions are not applicable for the following'.",
+          "numbers_missing": []
+        },
+        {
+          "id": "C9",
+          "text": "Financial Statements: Presentation & Disclosures The directions are not applicable to these NBFCs.",
+          "cited": [
+            "S5"
+          ],
+          "planted": false,
+          "verdict": "supported",
+          "supported_by": [
+            "S5"
+          ],
+          "reason": "Source S5 lists 'NBFCs in Base layer having customer interface but not availing public funds' under the section 'These Directions are not applicable for the following'.",
+          "numbers_missing": []
+        },
+        {
+          "id": "C10",
+          "text": "Summary",
+          "cited": [],
+          "planted": false,
+          "verdict": "unsupported",
+          "supported_by": [],
+          "reason": "The claim is just the word 'Summary' and contains no factual assertion to verify against the sources.",
+          "numbers_missing": []
+        },
+        {
+          "id": "C11",
+          "text": "Base‑layer NBFCs that have a customer interface but do not take public funds are generally excluded from the listed RBI directions.",
+          "cited": [],
+          "planted": false,
+          "verdict": "supported",
+          "supported_by": [
+            "S1",
+            "S2",
+            "S3",
+            "S4",
+            "S5",
+            "S6"
+          ],
+          "reason": "The sources show that these NBFCs are excluded from most directions, with specific exceptions noted in S1 and S6, supporting the general statement that they are generally excluded.",
+          "numbers_missing": []
+        },
+        {
+          "id": "C12",
+          "text": "Paragraphs 11‑13 and 28‑29 of the *Classification, Valuation & Operation of Investment Portfolio* Directions (S1).",
+          "cited": [],
+          "planted": false,
+          "verdict": "supported",
+          "supported_by": [
+            "S1"
+          ],
+          "reason": "Source S1 explicitly mentions that paragraphs 11 to 13 and 28 to 29 are applicable to these NBFCs.",
+          "numbers_missing": []
+        },
+        {
+          "id": "C13",
+          "text": "All provisions except paragraphs 7‑14 of the *Undertaking of Financial Services* Directions (S6).",
+          "cited": [],
+          "planted": false,
+          "verdict": "partial",
+          "supported_by": [
+            "S6"
+          ],
+          "reason": "Source S6 states paragraphs 7 to 14 are not applicable. It does not explicitly state that 'all provisions except' these are applicable; it defines applicability through specific ranges for different layers. The claim is a simplification that may be technically accurate in outcome but not strictly stated as 'all other provisions'.",
+          "numbers_missing": []
+        },
+        {
+          "id": "C14",
+          "text": "All other listed directions (Concentration Risk Management, Credit Risk Management, Asset‑Liability Management, Financial Statements) do not apply to these NBFCs.",
+          "cited": [],
+          "planted": false,
+          "verdict": "supported",
+          "supported_by": [
+            "S2",
+            "S3",
+            "S4",
+            "S5"
+          ],
+          "reason": "Sources S2, S3, S4, and S5 all list these NBFCs as not applicable to their respective directions.",
+          "numbers_missing": []
+        }
+      ],
+      "planted": {
+        "id": "C7",
+        "text": "All provisions except paragraphs 10‑14 of the *Undertaking of Financial Services* Directions (S6).",
+        "cited": [],
+        "planted": true,
+        "verdict": "contradicted",
+        "supported_by": [
+          "S6"
+        ],
+        "reason": "Source S6 states that paragraphs 7 to 14 are not applicable, not paragraphs 10-14.",
+        "numbers_missing": []
+      },
+      "judge_error": null,
+      "total_ms": 4274.7
+    },
+    {
+      "id": "42446d26-hinglish",
+      "kind": "answerable",
+      "language": "hinglish",
+      "question": "CI ko CICs ko credit info report karte waqt kaunse standardized data formats use karne chahiye?",
+      "status": "answered",
+      "answer": "CI को क्रेडिट जानकारी CICs को रिपोर्ट करने के लिए **Annex I में निर्धारित मानकीकृत डेटा फ़ॉर्मेट** का उपयोग करना होगा, जिसे **‘Uniform Credit Reporting Format’ (UCRF)** कहा गया है। इसमें तीन फ़ॉर्म शामिल हैं:\n\n1. **Form 1 – Uniform Credit Reporting Format (Consumer)** – उपभोक्ता (consumer) खंड के लिए  \n2. **Form 2 – Uniform Credit Reporting Format (Commercial)** – वाणिज्यिक (commercial) खंड के लिए  \n3. **Form 3 – Uniform Credit Reporting Format (MFI)** – माइक्रोफ़ाइनेंस (MFI) खंड के लिए  \n\n[S1]",
+      "model": "openai/gpt-oss-120b",
+      "gold_in_sources": true,
+      "language_ok": false,
+      "claims": [
+        {
+          "id": "C1",
+          "text": "CI को क्रेडिट जानकारी CICs को रिपोर्ट करने के लिए Annex I में निर्धारित मानकीकृत डेटा फ़ॉर्मेट का उपयोग करना होगा, जिसे ‘Uniform Credit Reporting Format’ (UCRF) कहा गया है।",
+          "cited": [],
+          "planted": false,
+          "verdict": "supported",
+          "supported_by": [
+            "S1"
+          ],
+          "reason": "Source S1 explicitly states that reporting shall be undertaken in standardised data formats as prescribed in Annex I, known as 'Uniform Credit Reporting Format' (UCRF).",
+          "numbers_missing": []
+        },
+        {
+          "id": "C2",
+          "text": "Form 1 – Uniform Credit Reporting Format (Consumer) – उपभोक्ता (consumer) खंड के लिए",
+          "cited": [],
+          "planted": false,
+          "verdict": "supported",
+          "supported_by": [
+            "S1"
+          ],
+          "reason": "Source S1, paragraph 9(1), defines Form 1 as Uniform Credit Reporting Format (Consumer) for the consumer segment.",
+          "numbers_missing": []
+        },
+        {
+          "id": "C3",
+          "text": "Form 2 – Uniform Credit Reporting Format (Commercial) – वाणिज्यिक (commercial) खंड के लिए",
+          "cited": [],
+          "planted": false,
+          "verdict": "supported",
+          "supported_by": [
+            "S1"
+          ],
+          "reason": "Source S1, paragraph 9(2), defines Form 2 as Uniform Credit Reporting Format (Commercial) for the commercial segment.",
+          "numbers_missing": []
+        },
+        {
+          "id": "C4",
+          "text": "Form 3 – Uniform Credit Reporting Format (MFI) – माइक्रोफ़ाइनेंस (MFI) खंड के लिए",
+          "cited": [
+            "S1"
+          ],
+          "planted": false,
+          "verdict": "supported",
+          "supported_by": [
+            "S1"
+          ],
+          "reason": "Source S1, paragraph 9(3), defines Form 3 as Uniform Credit Reporting Format (MFI) for the microfinance segment.",
+          "numbers_missing": []
+        }
+      ],
+      "planted": null,
+      "judge_error": null,
+      "total_ms": 5640.8
+    },
+    {
+      "id": "eeba2de3-hi",
+      "kind": "answerable",
+      "language": "hi",
+      "question": "क्या नियंत्रण परिवर्तन के लिए सार्वजनिक नोटिस प्रकाशित करने से पहले RBI की अनुमति आवश्यक है, और नोटिस में किन विवरणों को शामिल करना चाहिए?",
+      "status": "answered",
+      "answer": "**हाँ**, नियंत्रण परिवर्तन (ownership/ control के हस्तांतरण) के लिए सार्वजनिक नोटिस प्रकाशित करने से पहले RBI की लिखित पूर्व अनुमति लेनी आवश्यक है — यह [S1] में कहा गया है कि “public notice … shall be given … after obtaining the prior permission of the RBI”।\n\n**नोटिस में शामिल करने योग्य विवरण** :\n\n- बिक्री या नियंत्रण के हस्तांतरण का इरादा —   \n- ट्रांसफ़ीरी (खरीदार/नए नियंत्रक) के विवरण —   \n- इस बिक्री या नियंत्रण परिवर्तन के कारण —   \n\n(साथ ही, नोटिस को कम से कम एक राष्ट्रीय प्रमुख तथा एक स्थानीय प्रमुख भाषा के समाचारपत्र में, प्रभावी तिथि से कम से कम 30 दिन पहले प्रकाशित करना आवश्यक है — [S2]।)",
+      "model": "openai/gpt-oss-120b",
+      "gold_in_sources": true,
+      "language_ok": true,
+      "claims": [
+        {
+          "id": "C2",
+          "text": "हाँ, नियंत्रण परिवर्तन (ownership/ control के हस्तांतरण) के लिए सार्वजनिक नोटिस प्रकाशित करने से पहले RBI की लिखित पूर्व अनुमति लेनी आवश्यक है — यह  में कहा गया है कि “public notice … shall be given … after obtaining the prior permission of the RBI”।",
+          "cited": [
+            "S1"
+          ],
+          "planted": false,
+          "verdict": "supported",
+          "supported_by": [
+            "S1"
+          ],
+          "reason": "Source S1, paragraph 9, explicitly states the public notice shall be given after obtaining the prior permission of the RBI.",
+          "numbers_missing": []
+        },
+        {
+          "id": "C3",
+          "text": "बिक्री या नियंत्रण के हस्तांतरण का इरादा —",
+          "cited": [],
+          "planted": false,
+          "verdict": "supported",
+          "supported_by": [
+            "S1"
+          ],
+          "reason": "Source S1, paragraph 10, states the notice shall indicate the intention to sell or transfer ownership/control.",
+          "numbers_missing": []
+        },
+        {
+          "id": "C4",
+          "text": "ट्रांसफ़ीरी (खरीदार/नए नियंत्रक) के विवरण —",
+          "cited": [],
+          "planted": false,
+          "verdict": "supported",
+          "supported_by": [
+            "S1"
+          ],
+          "reason": "Source S1, paragraph 10, states the notice shall indicate the particulars of the transferee.",
+          "numbers_missing": []
+        },
+        {
+          "id": "C5",
+          "text": "इस बिक्री या नियंत्रण परिवर्तन के कारण —",
+          "cited": [],
+          "planted": false,
+          "verdict": "supported",
+          "supported_by": [
+            "S1"
+          ],
+          "reason": "Source S1, paragraph 10, states the notice shall indicate the reasons for such sale or transfer.",
+          "numbers_missing": []
+        },
+        {
+          "id": "C6",
+          "text": "(साथ ही, नोटिस को कम से कम एक राष्ट्रीय प्रमुख तथा एक स्थानीय प्रमुख भाषा के समाचारपत्र में, प्रभावी तिथि से कम से कम 30 दिन पहले प्रकाशित करना आवश्यक है — ।)",
+          "cited": [
+            "S2"
+          ],
+          "planted": false,
+          "verdict": "supported",
+          "supported_by": [
+            "S2"
+          ],
+          "reason": "Source S2, paragraph 8, states the notice shall be given in at least one leading national and one leading local vernacular newspaper at least 30 days before effecting the transfer.",
+          "numbers_missing": []
+        }
+      ],
+      "planted": {
+        "id": "C1",
+        "text": "(साथ ही, नोटिस को कम से कम एक राष्ट्रीय प्रमुख तथा एक स्थानीय प्रमुख भाषा के समाचारपत्र में, प्रभावी तिथि से कम से कम 40 दिन पहले प्रकाशित करना आवश्यक है — ।)",
+        "cited": [
+          "S2"
+        ],
+        "planted": true,
+        "verdict": "contradicted",
+        "supported_by": [
+          "S2"
+        ],
+        "reason": "Source S2 states the notice must be given at least 30 days before, not 40 days as claimed.",
+        "numbers_missing": []
+      },
+      "judge_error": null,
+      "total_ms": 2513.8
+    },
+    {
+      "id": "7710cca0-en",
+      "kind": "answerable",
+      "language": "en",
+      "question": "Which amalgamation scenarios are covered by the RBI Voluntary Amalgamation Directions for NBFCs?",
+      "status": "answered",
+      "answer": "The Directions cover the following three amalgamation scenarios:\n\n1. **An NBFC merging with another NBFC**[S1]  \n2. **An NBFC merging with any entity that is not under the regulatory purview of the RBI**[S1]  \n3. **Any entity that is not under the regulatory purview of the RBI merging with an NBFC**[S1]",
+      "model": "openai/gpt-oss-120b",
+      "gold_in_sources": true,
+      "language_ok": true,
+      "claims": [
+        {
+          "id": "C1",
+          "text": "An NBFC merging with another NBFC",
+          "cited": [
+            "S1"
+          ],
+          "planted": false,
+          "verdict": "supported",
+          "supported_by": [
+            "S1"
+          ],
+          "reason": "Source S1, paragraph 6(1) explicitly states that an amalgamation of 'An NBFC with another NBFC' is covered under these Directions.",
+          "numbers_missing": []
+        },
+        {
+          "id": "C2",
+          "text": "An NBFC merging with any entity that is not under the regulatory purview of the RBI",
+          "cited": [
+            "S1"
+          ],
+          "planted": false,
+          "verdict": "supported",
+          "supported_by": [
+            "S1"
+          ],
+          "reason": "Source S1, paragraph 6(2) explicitly states that an amalgamation of 'An NBFC with any other entity not under the regulatory purview of RBI' is covered under these Directions.",
+          "numbers_missing": []
+        },
+        {
+          "id": "C3",
+          "text": "Any entity that is not under the regulatory purview of the RBI merging with an NBFC",
+          "cited": [
+            "S1"
+          ],
+          "planted": false,
+          "verdict": "supported",
+          "supported_by": [
+            "S1"
+          ],
+          "reason": "Source S1, paragraph 6(3) explicitly states that an amalgamation of 'Any entity not under the regulatory purview of RBI with an NBFC' is covered under these Directions.",
+          "numbers_missing": []
+        }
+      ],
+      "planted": null,
+      "judge_error": null,
+      "total_ms": 2566.3
+    },
+    {
+      "id": "c2e67f91-hinglish",
+      "kind": "answerable",
+      "language": "hinglish",
+      "question": "NBFC ko apni digital payment architecture ko majboot aur scalable kaise banana chahiye aur IT security architecture ka periodic review board policy ke hisaab se kaise karna hai?",
+      "status": "ungrounded",
+      "answer": "**डिजिटल पेमेंट आर्किटेक्चर को मजबूत और स्केलेबल बनाने के उपाय**\n\n1. **आर्किटेक्चर की मजबूती और स्केलेबिलिटी** – NBFC को यह सुनिश्चित करना है कि उसका डिजिटल पेमेंट आर्किटेक्चर लेन‑देन की मात्रा और ग्राहक वृद्धि के अनुरूप मजबूत और स्केलेबल हो [​S1​]।  \n2. **IT‑रणनीति में क्षमता‑प्रबंधन योजना** – IT‑रणनीति में एक ठोस क्षमता‑प्रबंधन योजना शामिल होनी चाहिए, जिससे बदलती मांग को समय पर पूरा किया जा सके [​S1​]।  \n3. **बोर्ड‑स्वीकृत डिजिटल‑पेमेंट नीति** – डिजिटल पेमेंट उत्पादों/सेवाओं के लिए बोर्ड‑स्वीकृत नीति में स्पष्ट रूप से **क्षमता‑निर्माण और स्केलेबिलिटी** (विकास के साथ कुशल लेन‑देन प्रोसेसिंग) को शामिल करना आवश्यक है [​S2​]।  \n\n**IT सुरक्षा आर्किटेक्चर का बोर्ड‑नीति के अनुसार आवधिक पुनरावलोकन**\n\n1. **बोर्ड‑स्वीकृत IT/IS नीति** – NBFC को एक बोर्ड‑स्वीकृत IT/IS नीति बनानी होगी, जिसमें नियमित (कम से कम वार्षिक) बोर्ड‑ओवरसाइट और रिपोर्टिंग की व्यवस्था हो [​S4​]।  \n2. **आवधिक समीक्षा तंत्र** – उक्त नीति के तहत एक तंत्र स्थापित किया जाना चाहिए जो **IT/IT‑सुरक्षा आर्किटेक्चर और तकनीकी प्लेटफ़ॉर्म के ओवरहॉल** की समय‑समय पर समीक्षा करे, जैसा कि दिशा‑निर्देश S1 में कहा गया है [​S1​]।  \n3. **समीक्षा के ट्रिगर** – नया IT इन्फ्रास्ट्रक्चर, नया डिजिटल‑पेमेंट एप्लिकेशन, या किसी प्रमुख परिवर्तन के समय समीक्षा अनिवार्य है [​S1​]।  \n4. **समीक्षा प्रक्रिया में त्वरित सुधार** – यदि कोई आवश्यकता बाधित हो या बाधित होने की संभावना हो, तो नीति में तेज़ सुधारात्मक कार्रवाई का प्रावधान होना चाहिए [​S2​]।  \n\nइन कदमों को अपनाकर NBFC अपनी डिजिटल पेमेंट आर्किटेक्चर को मजबूत‑स्केलेबल बना सकती है और बोर्ड‑नीति के अनुरूप IT सुरक्षा आर्किटेक्चर की नियमित समीक्षा सुनिश्चित कर सकती है।",
+      "model": "openai/gpt-oss-120b",
+      "gold_in_sources": true,
+      "language_ok": null,
+      "claims": [],
+      "planted": null,
+      "judge_error": null,
+      "total_ms": 5809.2
+    },
+    {
+      "id": "febaa03d-hi",
+      "kind": "answerable",
+      "language": "hi",
+      "question": "भारतीय ग्रीन टैक्सोनॉमी के अंतिम रूप से पहले ग्रीन डिपॉज़िट की आय को आवंटित करने के अंतरिम नियम क्या हैं?",
+      "status": "answered",
+      "answer": "**अंतरिम नियम**  \nभारतीय ग्रीन टैक्सोनॉमी के अंतिम रूप से पहले, एक एनबीएफसी को ग्रीन डिपॉज़िट से प्राप्त आय को उन **ग्रीन गतिविधियों/परियोजनाओं** की ओर आवंटित करना होगा जो:\n\n* ऊर्जा दक्षता में सुधार और संसाधन उपयोग को कुशल बनाते हैं,  \n* कार्बन उत्सर्जन, ग्रीनहाउस गैसों के उत्सर्जन को कम करते हैं,  \n* जलवायु लचीलापन (climate resilience) और अनुकूलन (climate adaptation) को बढ़ावा देते हैं, तथा  \n* प्राकृतिक पारिस्थितिक तंत्र और जैव विविधता (biodiversity) को मूल्यवर्धित एवं सुधारते हैं।  \n\nयह आवंटन **अस्थायी (interim) उपाय** के रूप में निर्धारित है, जब तक आधिकारिक भारतीय ग्रीन टैक्सोनॉमी का अंतिम रूप नहीं हो जाता[S1].",
+      "model": "openai/gpt-oss-120b",
+      "gold_in_sources": true,
+      "language_ok": true,
+      "claims": [
+        {
+          "id": "C1",
+          "text": "अंतरिम नियम",
+          "cited": [],
+          "planted": false,
+          "verdict": "supported",
+          "supported_by": [
+            "S1"
+          ],
+          "reason": "Source S1 explicitly states that pending the finalization of the taxonomy, an interim measure is to allocate proceeds towards specific green activities.",
+          "numbers_missing": []
+        },
+        {
+          "id": "C2",
+          "text": "ऊर्जा दक्षता में सुधार और संसाधन उपयोग को कुशल बनाते हैं,",
+          "cited": [],
+          "planted": false,
+          "verdict": "supported",
+          "supported_by": [
+            "S1"
+          ],
+          "reason": "Source S1 lists 'encourage energy efficiency in resource utilisation' as one of the eligible green activities under the interim measure.",
+          "numbers_missing": []
+        },
+        {
+          "id": "C3",
+          "text": "कार्बन उत्सर्जन, ग्रीनहाउस गैसों के उत्सर्जन को कम करते हैं,",
+          "cited": [],
+          "planted": false,
+          "verdict": "supported",
+          "supported_by": [
+            "S1"
+          ],
+          "reason": "Source S1 lists 'reduce carbon emissions, emission of greenhouse gases' as one of the eligible green activities under the interim measure.",
+          "numbers_missing": []
+        },
+        {
+          "id": "C4",
+          "text": "जलवायु लचीलापन (climate resilience) और अनुकूलन (climate adaptation) को बढ़ावा देते हैं, तथा",
+          "cited": [],
+          "planted": false,
+          "verdict": "supported",
+          "supported_by": [
+            "S1"
+          ],
+          "reason": "Source S1 lists 'promote climate resilience, climate adaptation' as one of the eligible green activities under the interim measure.",
+          "numbers_missing": []
+        },
+        {
+          "id": "C5",
+          "text": "प्राकृतिक पारिस्थितिक तंत्र और जैव विविधता (biodiversity) को मूल्यवर्धित एवं सुधारते हैं।",
+          "cited": [],
+          "planted": false,
+          "verdict": "supported",
+          "supported_by": [
+            "S1"
+          ],
+          "reason": "Source S1 lists 'value and improve natural ecosystems and biodiversity' as one of the eligible green activities under the interim measure.",
+          "numbers_missing": []
+        },
+        {
+          "id": "C6",
+          "text": "यह आवंटन अस्थायी (interim) उपाय के रूप में निर्धारित है, जब तक आधिकारिक भारतीय ग्रीन टैक्सोनॉमी का अंतिम रूप नहीं हो जाता.",
+          "cited": [
+            "S1"
+          ],
+          "planted": false,
+          "verdict": "supported",
+          "supported_by": [
+            "S1"
+          ],
+          "reason": "Source S1 states that the allocation is based on the official Indian green taxonomy and that the listed activities are an 'interim measure' pending the finalization of the taxonomy.",
+          "numbers_missing": []
+        }
+      ],
+      "planted": null,
+      "judge_error": null,
+      "total_ms": 2992.9
+    },
+    {
+      "id": "bad161be-en",
+      "kind": "answerable",
+      "language": "en",
+      "question": "What approvals or clearances must be secured before the financial closure of a project financed by an NBFC?",
+      "status": "answered",
+      "answer": "**Approvals / clearances required before financial closure**\n\n- The NBFC must obtain **all applicable approvals and clearances needed to implement or construct the project** before financial closure. The list is indicative and includes **environmental clearance, legal clearance, regulatory clearances**, and any other approvals that are relevant to the specific project [S1].\n\n- For real‑estate‑related loan proposals, the borrower must also have **prior permission from the Government, local Government or other statutory authorities** before the loan can be sanctioned, and disbursements can be made only after those clearances are obtained [S5].\n\n- Approvals that are **contingent on the achievement of later project‑completion milestones** (e.g., consent to operate a boiler that can be applied for only after the boiler is built) are **not treated as mandatory pre‑requisite approvals at the time of financial closure** [S2].\n\nThus, before financial closure an NBFC must secure all applicable, non‑milestone‑dependent approvals such as environmental, legal, regulatory and statutory government permissions; milestone‑dependent approvals can be obtained later.",
+      "model": "openai/gpt-oss-120b",
+      "gold_in_sources": true,
+      "language_ok": true,
+      "claims": [
+        {
+          "id": "C1",
+          "text": "Approvals / clearances required before financial closure",
+          "cited": [],
+          "planted": false,
+          "verdict": "supported",
+          "supported_by": [
+            "S1"
+          ],
+          "reason": "S1 explicitly discusses the approvals and clearances required before financial closure.",
+          "numbers_missing": []
+        },
+        {
+          "id": "C2",
+          "text": "The NBFC must obtain all applicable approvals and clearances needed to implement or construct the project before financial closure.",
+          "cited": [],
+          "planted": false,
+          "verdict": "supported",
+          "supported_by": [
+            "S1"
+          ],
+          "reason": "S1 states that an NBFC shall ensure all applicable approvals/clearances for implementing/constructing the project are obtained before financial closure.",
+          "numbers_missing": []
+        },
+        {
+          "id": "C3",
+          "text": "The list is indicative and includes environmental clearance, legal clearance, regulatory clearances, and any other approvals that are relevant to the specific project .",
+          "cited": [
+            "S1"
+          ],
+          "planted": false,
+          "verdict": "supported",
+          "supported_by": [
+            "S1"
+          ],
+          "reason": "S1 describes the list as indicative and includes environmental, legal, and regulatory clearances as applicable.",
+          "numbers_missing": []
+        },
+        {
+          "id": "C4",
+          "text": "For real‑estate‑related loan proposals, the borrower must also have prior permission from the Government, local Government or other statutory authorities before the loan can be sanctioned, and disbursements can be made only after those clearances are obtained .",
+          "cited": [
+            "S5"
+          ],
+          "planted": false,
+          "verdict": "contradicted",
+          "supported_by": [
+            "S5"
+          ],
+          "reason": "S5 states that proposals may be sanctioned in the normal course, but disbursements are made only after clearances are obtained. The claim incorrectly states that prior permission is required before the loan can be sanctioned.",
+          "numbers_missing": []
+        },
+        {
+          "id": "C5",
+          "text": "Approvals that are contingent on the achievement of later project‑completion milestones (e.g., consent to operate a boiler that can be applied for only after the boiler is built) are not treated as mandatory pre‑requisite approvals at the time of financial closure .",
+          "cited": [
+            "S2"
+          ],
+          "planted": false,
+          "verdict": "supported",
+          "supported_by": [
+            "S2"
+          ],
+          "reason": "S2 explicitly states that approvals contingent on milestones (like boiler consent) are not treated as mandatory pre-requisites at financial closure.",
+          "numbers_missing": []
+        },
+        {
+          "id": "C6",
+          "text": "Thus, before financial closure an NBFC must secure all applicable, non‑milestone‑dependent approvals such as environmental, legal, regulatory and statutory government permissions; milestone‑dependent approvals can be obtained later.",
+          "cited": [],
+          "planted": false,
+          "verdict": "supported",
+          "supported_by": [
+            "S1",
+            "S2"
+          ],
+          "reason": "This claim synthesizes the requirements from S1 (all applicable approvals) and S2 (exclusion of milestone-dependent approvals), which is a direct logical consequence of the sources.",
+          "numbers_missing": []
+        }
+      ],
+      "planted": null,
+      "judge_error": null,
+      "total_ms": 2802.0
+    },
+    {
+      "id": "5f849553-hinglish",
+      "kind": "answerable",
+      "language": "hinglish",
+      "question": "NBFC ko alag-alag risk level ke liye internal audit ka scope kaise set karna chahiye aur resources kaise allocate karne chahiye, aur system audit ke findings kis ko dikhane hain?",
+      "status": "ungrounded",
+      "answer": "**Answer (Hindi)**  \n\n- **Scope ka nirdharan** – NBFC ko har risk‑level (low, medium, high, very high, extremely high) ke liye audit ka **precise scope** khud tay karna hoga [**S1**]. Is scope mein **sabhi critical processes** ke system aur process audits shamil hone chahiye [**S1**].\n\n- **Resources ka allocation** – Audit ka scope aur resources aise hone chahiye ki audit assignment ke objectives poore ho [**S1**]. Har internal auditor ke paas **zaroori professional competence, knowledge aur experience** (jaise banking/financial operations, IT, data analytics, forensic investigation) honi chahiye, taki NBFC ke sabhi areas ko audit kiya ja sake [**S5**]. Agar IS audit ke liye internal skill kami ho, to external resources ka upyog kiya ja sakta hai, lekin responsibility internal audit ke competent authority ke paas hi rahegi [**S6**].\n\n- **System audit ke findings ka pradarshan** – System audit ke findings ko **Board ke IT Committee** ke samne pesh karna zaroori hai [**S1**].",
+      "model": "openai/gpt-oss-120b",
+      "gold_in_sources": true,
+      "language_ok": null,
+      "claims": [],
+      "planted": null,
+      "judge_error": null,
+      "total_ms": 2194.1
+    },
+    {
+      "id": "20aa0248-hi",
+      "kind": "answerable",
+      "language": "hi",
+      "question": "यदि हमारा एनबीएफसी डिजिटल लेंडिंग गारंटी प्रदान करता है, तो क्या हमें उसकी पूरी बकाया राशि को नियामक पूँजी से घटाना चाहिए?",
+      "status": "answered",
+      "answer": "**हाँ।** यदि आपका एनबीएफसी ‘डिफ़ॉल्ट लॉस गारंटी (DLG)’ का प्रदाता है, तो उसे DLG की **पूरी बकाया राशि** को अपने नियामक पूँजी से घटाना अनिवार्य है — यह निर्देश S1 के धारा (2) में स्पष्ट किया गया है [S1].  \n\n*ध्यान दें:* ‘डिजिटल लेंडिंग’ की परिभाषा S2 में दी गई है, परन्तु यह DLG के नियामक पूँजी उपचार को बदलती नहीं है; DLG की पूरी बकाया राशि को घटाना वही नियम लागू रहता है। [S2].",
+      "model": "openai/gpt-oss-120b",
+      "gold_in_sources": true,
+      "language_ok": true,
+      "claims": [
+        {
+          "id": "C1",
+          "text": "हाँ। यदि आपका एनबीएफसी ‘डिफ़ॉल्ट लॉस गारंटी (DLG)’ का प्रदाता है, तो उसे DLG की पूरी बकाया राशि को अपने नियामक पूँजी से घटाना अनिवार्य है — यह निर्देश S1 के धारा (2) में स्पष्ट किया गया है .",
+          "cited": [
+            "S1"
+          ],
+          "planted": false,
+          "verdict": "supported",
+          "supported_by": [
+            "S1"
+          ],
+          "reason": "Source S1, paragraph 26(2) explicitly states that if the DLG provider is an NBFC, it shall deduct the full amount of the DLG which is outstanding from its capital.",
+          "numbers_missing": []
+        },
+        {
+          "id": "C2",
+          "text": "*ध्यान दें:* ‘डिजिटल लेंडिंग’ की परिभाषा S2 में दी गई है, परन्तु यह DLG के नियामक पूँजी उपचार को बदलती नहीं है; DLG की पूरी बकाया राशि को घटाना वही नियम लागू रहता है।",
+          "cited": [
+            "S2"
+          ],
+          "planted": false,
+          "verdict": "supported",
+          "supported_by": [
+            "S2",
+            "S1"
+          ],
+          "reason": "Source S2 defines 'Digital Lending' in paragraph 4(1)(ix). Source S1 provides the rule for DLG capital treatment. The claim correctly notes that the definition exists but does not alter the specific capital deduction rule for DLG providers found in S1.",
+          "numbers_missing": [
+            "2"
+          ]
+        }
+      ],
+      "planted": {
+        "id": "C3",
+        "text": "हाँ। यदि आपका एनबीएफसी ‘डिफ़ॉल्ट लॉस गारंटी (DLG)’ का प्रदाता है, तो उसे DLG की पूरी बकाया राशि को अपने नियामक पूँजी से घटाना अनिवार्य है — यह निर्देश S4 के धारा (2) में स्पष्ट किया गया है .",
+        "cited": [
+          "S1"
+        ],
+        "planted": true,
+        "verdict": "contradicted",
+        "supported_by": [
+          "S1"
+        ],
+        "reason": "The claim attributes the rule to Source S4, paragraph (2). However, Source S4 deals with Capital Adequacy norms (PPE, ECL, Securitised assets) and does not contain the rule for deducting DLG from capital. The correct source for this rule is S1, paragraph 26(2).",
+        "numbers_missing": []
+      },
+      "judge_error": null,
+      "total_ms": 3422.3
+    },
+    {
+      "id": "a213fc2a-en",
+      "kind": "answerable",
+      "language": "en",
+      "question": "What are the categories and thresholds for large exposure reporting that an NBFC must submit to the RBI?",
+      "status": "ungrounded",
+      "answer": "**Categories to be reported**\n\n1. **All exposures that meet the definition of “large exposure”.**  \n2. **All other exposures (as measured in paragraphs 41‑44) that are ≥ 10 % of the NBFC’s eligible capital base** (no offsetting with credit‑risk‑transfer instruments).  \n3. **All exempted exposures that are ≥ 10 % of the NBFC’s eligible capital base.**  \n4. **The 10 largest exposures within the scope of application**, regardless of their size relative to the eligible capital base.  \n\n**Thresholds**\n\n- For categories 2 and 3 the reporting threshold is **10 % of the NBFC’s eligible capital base**.  \n- Category 4 is required even if the exposures are below that 10 % threshold.  \n\nThese categories and thresholds are set out in the Large Exposure Framework reporting template (Annex‑I) that NBFCs must submit to the RBI [​S1].",
+      "model": "openai/gpt-oss-120b",
+      "gold_in_sources": true,
+      "language_ok": null,
+      "claims": [],
+      "planted": null,
+      "judge_error": null,
+      "total_ms": 2939.6
+    },
+    {
+      "id": "f00ef377-hinglish",
+      "kind": "answerable",
+      "language": "hinglish",
+      "question": "Kya SRO ya industry association apne members ke microfinance loan ke interest rate ka range district level pe publish kar sakti hai?",
+      "status": "answered",
+      "answer": "हाँ, SRO या अन्य उद्योग संघ अपने जागरूकता अभियानों के हिस्से के रूप में अपने सदस्य‑संस्थाओं द्वारा किसी जिले में लिये जाने वाले माइक्रोफ़ाइनेंस ऋणों की ब्याज‑दर की सीमा प्रकाशित कर सकते हैं[S1].",
+      "model": "openai/gpt-oss-120b",
+      "gold_in_sources": true,
+      "language_ok": false,
+      "claims": [
+        {
+          "id": "C1",
+          "text": "हाँ, SRO या अन्य उद्योग संघ अपने जागरूकता अभियानों के हिस्से के रूप में अपने सदस्य‑संस्थाओं द्वारा किसी जिले में लिये जाने वाले माइक्रोफ़ाइनेंस ऋणों की ब्याज‑दर की सीमा प्रकाशित कर सकते हैं.",
+          "cited": [
+            "S1"
+          ],
+          "planted": false,
+          "verdict": "supported",
+          "supported_by": [
+            "S1"
+          ],
+          "reason": "Source S1 explicitly states that SROs/industry associations may publish the range of interest rates on microfinance loans charged by their members operating in a district as part of awareness campaigns.",
+          "numbers_missing": []
+        }
+      ],
+      "planted": null,
+      "judge_error": null,
+      "total_ms": 1908.0
+    },
+    {
+      "id": "31e7acdb-hi",
+      "kind": "answerable",
+      "language": "hi",
+      "question": "कौन से एनबीएफसी प्रकार इन दिशाओं से मुक्त हैं?",
+      "status": "answered",
+      "answer": "**इन दिशाओं से मुक्त (exempt) रहने वाले NBFC प्रकार**\n\n| NBFC प्रकार | स्रोत |\n|-------------|--------|\n| **Non‑Operative Financial Holding Company (NOFHC)** – RBI के तहत NBFC के रूप में पंजीकृत | [S1] |\n| **‘Type I NBFC’** (Certificate of Registration धारक) | [S1][S2][S3] |\n| **Base‑layer NBFCs जिनका ग्राहक‑इंटरफ़ेस है पर सार्वजनिक फंड नहीं लेती** | [S1][S2] |\n| **Mortgage Guarantee Companies (MGC)** | [S2][S3] |\n| **NBFC‑P2P** (Peer‑to‑Peer) | [S2][S3] |\n| **NBFC‑AA** (Asset‑Aggregator) | [S2][S3] |\n| **SPD** (Specialised Purpose Debt) | [S2][S3] |\n| **CIC** (Collective Investment Company) – केवल S3 में उल्लेखित | [S3] |\n| **‘NBFCs not having any customer interface’** | [S4] |\n| **Housing Finance Companies (HFCs)** – S6 में सभी NBFCs के लिये लागू नहीं, इसलिए HFCs मुक्त | [S6] |\n\n*नोट:* S5 में कोई विशिष्ट छूट सूची नहीं दी गई; यह दिशा मुख्यतः ऊपर सूचीबद्ध NBFC वर्गों पर लागू होती है। सभी उद्धरण 1 जुलाई 2026 से प्रभावी संशोधित संस्करणों के आधार पर हैं।",
+      "model": "openai/gpt-oss-120b",
+      "gold_in_sources": true,
+      "language_ok": false,
+      "claims": [
+        {
+          "id": "C1",
+          "text": "इन दिशाओं से मुक्त (exempt) रहने वाले NBFC प्रकार",
+          "cited": [],
+          "planted": false,
+          "verdict": "supported",
+          "supported_by": [
+            "S1",
+            "S2",
+            "S3",
+            "S4",
+            "S6"
+          ],
+          "reason": "The sources explicitly list categories of NBFCs that are not applicable (exempt) from the respective directions.",
+          "numbers_missing": []
+        },
+        {
+          "id": "C2",
+          "text": "NBFC प्रकार स्रोत",
+          "cited": [],
+          "planted": false,
+          "verdict": "supported",
+          "supported_by": [
+            "S1",
+            "S2",
+            "S3",
+            "S4",
+            "S5",
+            "S6"
+          ],
+          "reason": "The sources provide the regulatory basis for the exemptions listed in the other claims.",
+          "numbers_missing": []
+        },
+        {
+          "id": "C3",
+          "text": "Non‑Operative Financial Holding Company (NOFHC) – RBI के तहत NBFC के रूप में पंजीकृत",
+          "cited": [
+            "S1"
+          ],
+          "planted": false,
+          "verdict": "supported",
+          "supported_by": [
+            "S1",
+            "S2",
+            "S3"
+          ],
+          "reason": "",
+          "numbers_missing": []
+        },
+        {
+          "id": "C4",
+          "text": "‘Type I NBFC’ (Certificate of Registration धारक)",
+          "cited": [
+            "S1",
+            "S2",
+            "S3"
+          ],
+          "planted": false,
+          "verdict": "supported",
+          "supported_by": [
+            "S1",
+            "S2",
+            "S3"
+          ],
+          "reason": "",
+          "numbers_missing": []
+        },
+        {
+          "id": "C5",
+          "text": "Base‑layer NBFCs जिनका ग्राहक‑इंटरफ़ेस है पर सार्वजनिक फंड नहीं लेती",
+          "cited": [
+            "S1",
+            "S2"
+          ],
+          "planted": false,
+          "verdict": "supported",
+          "supported_by": [
+            "S1",
+            "S2"
+          ],
+          "reason": "",
+          "numbers_missing": []
+        },
+        {
+          "id": "C6",
+          "text": "Mortgage Guarantee Companies (MGC)",
+          "cited": [
+            "S2",
+            "S3"
+          ],
+          "planted": false,
+          "verdict": "supported",
+          "supported_by": [
+            "S2",
+            "S3"
+          ],
+          "reason": "",
+          "numbers_missing": []
+        },
+        {
+          "id": "C7",
+          "text": "NBFC‑P2P (Peer‑to‑Peer)",
+          "cited": [
+            "S2",
+            "S3"
+          ],
+          "planted": false,
+          "verdict": "supported",
+          "supported_by": [
+            "S2",
+            "S3"
+          ],
+          "reason": "",
+          "numbers_missing": []
+        },
+        {
+          "id": "C8",
+          "text": "NBFC‑AA (Asset‑Aggregator)",
+          "cited": [
+            "S2",
+            "S3"
+          ],
+          "planted": false,
+          "verdict": "supported",
+          "supported_by": [
+            "S2",
+            "S3"
+          ],
+          "reason": "",
+          "numbers_missing": []
+        },
+        {
+          "id": "C9",
+          "text": "SPD (Specialised Purpose Debt)",
+          "cited": [
+            "S2",
+            "S3"
+          ],
+          "planted": false,
+          "verdict": "supported",
+          "supported_by": [
+            "S2",
+            "S3"
+          ],
+          "reason": "",
+          "numbers_missing": []
+        },
+        {
+          "id": "C11",
+          "text": "CIC (Collective Investment Company) – केवल S3 में उल्लेखित",
+          "cited": [
+            "S3"
+          ],
+          "planted": false,
+          "verdict": "supported",
+          "supported_by": [
+            "S3"
+          ],
+          "reason": "CIC is listed as exempt in S3 and does not appear in the exemption lists of S1, S2, S4, S5, or S6.",
+          "numbers_missing": []
+        },
+        {
+          "id": "C12",
+          "text": "‘NBFCs not having any customer interface’",
+          "cited": [
+            "S4"
+          ],
+          "planted": false,
+          "verdict": "supported",
+          "supported_by": [
+            "S4"
+          ],
+          "reason": "",
+          "numbers_missing": []
+        },
+        {
+          "id": "C13",
+          "text": "Housing Finance Companies (HFCs) – S6 में सभी NBFCs के लिये लागू नहीं, इसलिए HFCs मुक्त",
+          "cited": [
+            "S6"
+          ],
+          "planted": false,
+          "verdict": "supported",
+          "supported_by": [
+            "S6"
+          ],
+          "reason": "S6 states the directions apply to all NBFCs excluding HFCs, implying HFCs are exempt from this specific direction.",
+          "numbers_missing": [
+            "6"
+          ]
+        },
+        {
+          "id": "C14",
+          "text": "*नोट:* S5 में कोई विशिष्ट छूट सूची नहीं दी गई; यह दिशा मुख्यतः ऊपर सूचीबद्ध NBFC वर्गों पर लागू होती है।",
+          "cited": [],
+          "planted": false,
+          "verdict": "supported",
+          "supported_by": [
+            "S5"
+          ],
+          "reason": "S5 lists applicable NBFCs and specific provisions for HFC, MGC, and SPD, but does not provide a general 'not applicable' list for other types like NOFHC or Type I NBFCs, unlike S1-S4.",
+          "numbers_missing": [
+            "5"
+          ]
+        },
+        {
+          "id": "C15",
+          "text": "सभी उद्धरण 1 जुलाई 2026 से प्रभावी संशोधित संस्करणों के आधार पर हैं।",
+          "cited": [],
+          "planted": false,
+          "verdict": "unsupported",
+          "supported_by": [],
+          "reason": "The sources do not mention specific effective dates like '1 July 2026'.",
+          "numbers_missing": []
+        }
+      ],
+      "planted": {
+        "id": "C10",
+        "text": "सभी उद्धरण 4 जुलाई 2026 से प्रभावी संशोधित संस्करणों के आधार पर हैं।",
+        "cited": [],
+        "planted": true,
+        "verdict": "unsupported",
+        "supported_by": [],
+        "reason": "The sources do not mention specific effective dates like '4 July 2026'.",
+        "numbers_missing": []
+      },
+      "judge_error": null,
+      "total_ms": 3232.2
+    },
+    {
+      "id": "f00ef377-en",
+      "kind": "answerable",
+      "language": "en",
+      "question": "Is it permissible for SROs or industry bodies to disclose the interest rate band for microfinance loans offered by their members in a specific district?",
+      "status": "ungrounded",
+      "answer": "Yes. Self‑Regulatory Organisations (SROs) or other industry associations are allowed to publish the **range (band) of interest rates** on micro‑finance loans that their members charge in a particular district [**S1**].",
+      "model": "openai/gpt-oss-120b",
+      "gold_in_sources": true,
+      "language_ok": null,
+      "claims": [],
+      "planted": null,
+      "judge_error": null,
+      "total_ms": 4867.9
+    },
+    {
+      "id": "bfbd4d95-hinglish",
+      "kind": "answerable",
+      "language": "hinglish",
+      "question": "Agar NBFC apne CRO ko fixed tenure ke pehle transfer ya remove karna chahe, to kaunse approvals aur reporting zaroori hain?",
+      "status": "answered",
+      "answer": "**Answer (Hindi):**  \nNBFC को अपने CRO को fixed tenure से पहले transfer या remove करने के लिए:\n\n1. **Board (या ACB) की पूर्व स्वीकृति** आवश्यक है — CRO को केवल बोर्ड की मंज़ूरी से ही पहले समाप्त किया जा सकता है।  \n2. **रिपोर्टिंग** – प्रिमेच्योर transfer या removal को NBFC के पंजीकरण वाले RBI के Regional Office के Department of Supervision (यदि HFC है तो NHB) को सूचित करना होगा।  \n3. **यदि NBFC सूचीबद्ध (listed) है** तो CRO में बदलाव की सूचना स्टॉक एक्सचेंजों को भी देना अनिवार्य है।  \n\n**Citations:**  \n- Board approval & reporting to RBI regional office (or NHB for HFCs) and stock‑exchange reporting for listed NBFCs – [S1]",
+      "model": "openai/gpt-oss-120b",
+      "gold_in_sources": true,
+      "language_ok": false,
+      "claims": [
+        {
+          "id": "C1",
+          "text": "Board (या ACB) की पूर्व स्वीकृति आवश्यक है — CRO को केवल बोर्ड की मंज़ूरी से ही पहले समाप्त किया जा सकता है।",
+          "cited": [],
+          "planted": false,
+          "verdict": "supported",
+          "supported_by": [
+            "S1"
+          ],
+          "reason": "Source S1 states that premature transfer/removal of the CRO is allowed only with the approval of the Board.",
+          "numbers_missing": []
+        },
+        {
+          "id": "C2",
+          "text": "रिपोर्टिंग – प्रिमेच्योर transfer या removal को NBFC के पंजीकरण वाले RBI के Regional Office के Department of Supervision (यदि HFC है तो NHB) को सूचित करना होगा।",
+          "cited": [],
+          "planted": false,
+          "verdict": "supported",
+          "supported_by": [
+            "S1"
+          ],
+          "reason": "Source S1 mandates reporting such premature transfer/removal to the Department of Supervision of the Regional Office of RBI (or NHB for HFCs) under whose jurisdiction the NBFC is registered.",
+          "numbers_missing": []
+        },
+        {
+          "id": "C3",
+          "text": "यदि NBFC सूचीबद्ध (listed) है तो CRO में बदलाव की सूचना स्टॉक एक्सचेंजों को भी देना अनिवार्य है।",
+          "cited": [],
+          "planted": false,
+          "verdict": "supported",
+          "supported_by": [
+            "S1"
+          ],
+          "reason": "Source S1 specifies that if the NBFC is listed, any change in incumbency of the CRO shall also be reported to the stock exchanges.",
+          "numbers_missing": []
+        },
+        {
+          "id": "C4",
+          "text": "Board approval & reporting to RBI regional office (or NHB for HFCs) and stock‑exchange reporting for listed NBFCs –",
+          "cited": [
+            "S1"
+          ],
+          "planted": false,
+          "verdict": "supported",
+          "supported_by": [
+            "S1"
+          ],
+          "reason": "This claim summarizes the requirements found in Source S1: Board approval, reporting to RBI RO/NHB, and stock exchange reporting for listed entities.",
+          "numbers_missing": []
+        }
+      ],
+      "planted": null,
+      "judge_error": null,
+      "total_ms": 14225.7
+    },
+    {
+      "id": "14ff591a-hi",
+      "kind": "answerable",
+      "language": "hi",
+      "question": "एक एनबीएफसी को ग्राहक की पहचान, पैन, डिजिटल हस्ताक्षर और जीएसटी नंबर की पुष्टि करने तथा यह सुनिश्चित करने के लिए कौन‑सी प्रक्रियाएँ अपनानी चाहिए कि वह किसी प्रतिबंध सूची में नहीं है?",
+      "status": "answered",
+      "answer": "**अनुपालन के लिए अपनाई जाने वाली प्रक्रियाएँ**\n\n1. **सैन्शन सूची जाँच** – एक उपयुक्त प्रणाली स्थापित की जाए जिससे ग्राहक की पहचान किसी भी व्यक्ति या इकाई से मेल न खाती हो, जिसका नाम इन दिशाओं के अध्याय IX में दर्शाई गई प्रतिबंध (सैन्शन) सूचियों में हो। [S1]\n\n2. **पैन (PAN) सत्यापन** – यदि ग्राहक ने पैन प्रदान किया है, तो उसे जारी करने वाले प्राधिकरण की सत्यापन सुविधा के माध्यम से सत्यापित किया जाए। [S1]\n\n3. **डिजिटल हस्ताक्षर सत्यापन** – ग्राहक के डिजिटल हस्ताक्षर को सूचना प्रौद्योगिकी अधिनियम, 2000 (धारा 21) के प्रावधानों के अनुसार, समकक्ष ई‑डॉक्यूमेंट पर सत्यापित किया जाए। [S1]\n\n4. **जीएसटी नंबर सत्यापन** – जहाँ जीएसटी विवरण उपलब्ध हों, ग्राहक के जीएसटी नंबर को जारी करने वाले प्राधिकरण की खोज/सत्यापन सुविधा के माध्यम से सत्यापित किया जाए। [S1]",
+      "model": "openai/gpt-oss-120b",
+      "gold_in_sources": true,
+      "language_ok": true,
+      "claims": [
+        {
+          "id": "C2",
+          "text": "अनुपालन के लिए अपनाई जाने वाली प्रक्रियाएँ",
+          "cited": [],
+          "planted": false,
+          "verdict": "unsupported",
+          "supported_by": [],
+          "reason": "This is a generic heading or label without specific factual content to verify against the sources.",
+          "numbers_missing": []
+        },
+        {
+          "id": "C3",
+          "text": "सैन्शन सूची जाँच – एक उपयुक्त प्रणाली स्थापित की जाए जिससे ग्राहक की पहचान किसी भी व्यक्ति या इकाई से मेल न खाती हो, जिसका नाम इन दिशाओं के अध्याय IX में दर्शाई गई प्रतिबंध (सैन्शन) सूचियों में हो।",
+          "cited": [
+            "S1"
+          ],
+          "planted": false,
+          "verdict": "supported",
+          "supported_by": [
+            "S1"
+          ],
+          "reason": "Source S1, paragraph 17(9) states that a suitable system must be put in place to ensure the customer's identity does not match persons in sanctions lists indicated in Chapter IX.",
+          "numbers_missing": []
+        },
+        {
+          "id": "C4",
+          "text": "पैन (PAN) सत्यापन – यदि ग्राहक ने पैन प्रदान किया है, तो उसे जारी करने वाले प्राधिकरण की सत्यापन सुविधा के माध्यम से सत्यापित किया जाए।",
+          "cited": [
+            "S1"
+          ],
+          "planted": false,
+          "verdict": "supported",
+          "supported_by": [
+            "S1"
+          ],
+          "reason": "Source S1, paragraph 17(10) states that the PAN (if obtained) must be verified from the verification facility of the issuing authority.",
+          "numbers_missing": []
+        },
+        {
+          "id": "C5",
+          "text": "डिजिटल हस्ताक्षर सत्यापन – ग्राहक के डिजिटल हस्ताक्षर को सूचना प्रौद्योगिकी अधिनियम, 2000 (धारा 21) के प्रावधानों के अनुसार, समकक्ष ई‑डॉक्यूमेंट पर सत्यापित किया जाए।",
+          "cited": [
+            "S1"
+          ],
+          "planted": false,
+          "verdict": "supported",
+          "supported_by": [
+            "S1"
+          ],
+          "reason": "Source S1, paragraph 17(11) states that the customer's digital signature on the equivalent e-document must be verified as per the provisions of the Information Technology Act, 2000.",
+          "numbers_missing": []
+        },
+        {
+          "id": "C6",
+          "text": "जीएसटी नंबर सत्यापन – जहाँ जीएसटी विवरण उपलब्ध हों, ग्राहक के जीएसटी नंबर को जारी करने वाले प्राधिकरण की खोज/सत्यापन सुविधा के माध्यम से सत्यापित किया जाए।",
+          "cited": [
+            "S1"
+          ],
+          "planted": false,
+          "verdict": "supported",
+          "supported_by": [
+            "S1"
+          ],
+          "reason": "Source S1, paragraph 17(12) states that the GST number must be verified from the search/verification facility of the issuing authority where GST details are available.",
+          "numbers_missing": []
+        }
+      ],
+      "planted": {
+        "id": "C1",
+        "text": "डिजिटल हस्ताक्षर सत्यापन – ग्राहक के डिजिटल हस्ताक्षर को सूचना प्रौद्योगिकी अधिनियम, 2010 (धारा 21) के प्रावधानों के अनुसार, समकक्ष ई‑डॉक्यूमेंट पर सत्यापित किया जाए।",
+        "cited": [
+          "S1"
+        ],
+        "planted": true,
+        "verdict": "contradicted",
+        "supported_by": [
+          "S1"
+        ],
+        "reason": "The claim cites the Information Technology Act, 2010, whereas Source S1 specifies the Information Technology Act, 2000.",
+        "numbers_missing": []
+      },
+      "judge_error": null,
+      "total_ms": 3125.5
+    },
+    {
+      "id": "be92bcd1-en",
+      "kind": "answerable",
+      "language": "en",
+      "question": "What meaning is assigned to terms that are not defined in these Directions?",
+      "status": "answered",
+      "answer": "Terms that are not defined in a set of RBI Directions are given the meaning that is assigned to them in the **Reserve Bank of India Act, 1934** (or, where the Direction specifically refers to it, in the **Banking Regulation Act, 1949**, the **CICRA 2005** and related CIC Rules/Regulations, etc.). If the term is not defined in those statutes, its meaning is taken from the **Companies Act, 1956** or the **Companies Act, 2013** as applicable[S2][S3][S4][S5][S6].  \n\n(For the Core Investment Companies Directions, the same hierarchy applies: meanings are taken from the Act or Master Directions, and if not defined there, from the Companies Act, 2013[S1].)",
+      "model": "openai/gpt-oss-120b",
+      "gold_in_sources": false,
+      "language_ok": true,
+      "claims": [
+        {
+          "id": "C2",
+          "text": "Terms that are not defined in a set of RBI Directions are given the meaning that is assigned to them in the Reserve Bank of India Act, 1934 (or, where the Direction specifically refers to it, in the Banking Regulation Act, 1949, the CICRA 2005 and related CIC Rules/Regulations, etc.).",
+          "cited": [],
+          "planted": false,
+          "verdict": "supported",
+          "supported_by": [
+            "S1",
+            "S2",
+            "S3",
+            "S4",
+            "S5",
+            "S6"
+          ],
+          "reason": "All sources establish that undefined terms take meanings from the RBI Act, 1934, and where applicable, other specific statutes like the Banking Regulation Act, 1949, or CICRA 2005.",
+          "numbers_missing": []
+        },
+        {
+          "id": "C3",
+          "text": "If the term is not defined in those statutes, its meaning is taken from the Companies Act, 1956 or the Companies Act, 2013 as applicable.",
+          "cited": [
+            "S2",
+            "S3",
+            "S4",
+            "S5",
+            "S6"
+          ],
+          "planted": false,
+          "verdict": "supported",
+          "supported_by": [
+            "S2",
+            "S3",
+            "S4",
+            "S6"
+          ],
+          "reason": "Sources S2, S3, S4, and S6 explicitly state that if terms are not defined in the primary Acts, they take meanings from the Companies Act, 1956 or 2013.",
+          "numbers_missing": []
+        },
+        {
+          "id": "C4",
+          "text": "(For the Core Investment Companies Directions, the same hierarchy applies: meanings are taken from the Act or Master Directions, and if not defined there, from the Companies Act, 2013.)",
+          "cited": [
+            "S1"
+          ],
+          "planted": false,
+          "verdict": "supported",
+          "supported_by": [
+            "S1"
+          ],
+          "reason": "Source S1 states that for CIC Directions, undefined terms take meanings from the Act or Master Directions, and if not defined there, from the Companies Act, 2013.",
+          "numbers_missing": []
+        }
+      ],
+      "planted": {
+        "id": "C1",
+        "text": "If the term is not defined in those statutes, its meaning is taken from the Companies Act, 1966 or the Companies Act, 2013 as applicable.",
+        "cited": [
+          "S2",
+          "S3",
+          "S4",
+          "S5",
+          "S6"
+        ],
+        "planted": true,
+        "verdict": "contradicted",
+        "supported_by": [
+          "S2",
+          "S3",
+          "S4",
+          "S6"
+        ],
+        "reason": "The sources consistently refer to the Companies Act, 1956, not 1966.",
+        "numbers_missing": []
+      },
+      "judge_error": null,
+      "total_ms": 2221.1
+    },
+    {
+      "id": "a213fc2a-hinglish",
+      "kind": "answerable",
+      "language": "hinglish",
+      "question": "NBFC ko RBI ko large exposure report karte waqt kaunse categories aur threshold include karne hote hain?",
+      "status": "answered",
+      "answer": "**Large‑Exposure Report mein shāmil hone wāle categories aur thresholds**\n\n1. **Sabhi exposures jo “large exposure” ki paribhasha ko pūrā karte hain** – definition source se milti‑julti hai, lekin iske liye alag threshold source mein nahi diya gaya. [S1]\n\n2. **Sabhi anya exposures** jo paragraphs 41‑44 ke anurūp māpī jātī hain, **aur jin ki value NBFC ke eligible capital base ke 10 % ya usse adhik ho** (credit‑risk‑transfer instruments ko offset nahi kiya jātā). [S1]\n\n3. **Exempted exposures** jinki value bhi **eligible capital base ke 10 % ya usse adhik ho**. [S1]\n\n4. **Sabse bade 10 exposures** jo scope mein aate hain, **chahe unki value eligible capital base ke 10 % se kam hi kyon na ho**. [S1]\n\n**Thresholds**  \n- 10 % of eligible capital base – categories 2 aur 3 ke liye.  \n- “Large exposure” ki apni definition ke anurūp threshold (source mein explicit nahi).  \n\nYe sabhi categories RBI ko Annex‑I ke reporting template ke through report karni hoti hain. [S1]",
+      "model": "openai/gpt-oss-120b",
+      "gold_in_sources": true,
+      "language_ok": true,
+      "claims": [
+        {
+          "id": "C1",
+          "text": "Large‑Exposure Report mein shāmil hone wāle categories aur thresholds",
+          "cited": [],
+          "planted": false,
+          "verdict": "supported",
+          "supported_by": [
+            "S1"
+          ],
+          "reason": "Source S1 explicitly lists the categories and thresholds for the Large Exposure report to RBI.",
+          "numbers_missing": []
+        },
+        {
+          "id": "C3",
+          "text": "Sabhi exposures jo “large exposure” ki paribhasha ko pūrā karte hain – definition source se milti‑julti hai, lekin iske liye alag threshold source mein nahi diya gaya.",
+          "cited": [
+            "S1"
+          ],
+          "planted": false,
+          "verdict": "supported",
+          "supported_by": [
+            "S1"
+          ],
+          "reason": "Source S1(1) includes 'all exposures, meeting the definition of large exposure' without specifying a separate numerical threshold in that clause, implying reliance on the definition.",
+          "numbers_missing": []
+        },
+        {
+          "id": "C4",
+          "text": "Sabhi anya exposures jo paragraphs 41‑44 ke anurūp māpī jātī hain, aur jin ki value NBFC ke eligible capital base ke 10 % ya usse adhik ho (credit‑risk‑transfer instruments ko offset nahi kiya jātā).",
+          "cited": [
+            "S1"
+          ],
+          "planted": false,
+          "verdict": "supported",
+          "supported_by": [
+            "S1"
+          ],
+          "reason": "Source S1(2) specifies all other exposures measured per paragraphs 41-44, without offsetting credit risk transfer, where values are equal to or above 10 per cent of eligible capital base.",
+          "numbers_missing": []
+        },
+        {
+          "id": "C5",
+          "text": "Exempted exposures jinki value bhi eligible capital base ke 10 % ya usse adhik ho.",
+          "cited": [
+            "S1"
+          ],
+          "planted": false,
+          "verdict": "supported",
+          "supported_by": [
+            "S1"
+          ],
+          "reason": "Source S1(3) specifies all exempted exposures with values equal to or above 10 per cent of the NBFC’s eligible capital base.",
+          "numbers_missing": []
+        },
+        {
+          "id": "C6",
+          "text": "Sabse bade 10 exposures jo scope mein aate hain, chahe unki value eligible capital base ke 10 % se kam hi kyon na ho.",
+          "cited": [
+            "S1"
+          ],
+          "planted": false,
+          "verdict": "supported",
+          "supported_by": [
+            "S1"
+          ],
+          "reason": "Source S1(4) specifies the 10 largest exposures included in the scope, irrespective of their values relative to the eligible capital base.",
+          "numbers_missing": []
+        },
+        {
+          "id": "C7",
+          "text": "Thresholds",
+          "cited": [],
+          "planted": false,
+          "verdict": "supported",
+          "supported_by": [
+            "S1"
+          ],
+          "reason": "Source S1 provides the specific thresholds (10%) for the reporting categories.",
+          "numbers_missing": []
+        },
+        {
+          "id": "C8",
+          "text": "10 % of eligible capital base – categories 2 aur 3 ke liye.",
+          "cited": [],
+          "planted": false,
+          "verdict": "supported",
+          "supported_by": [
+            "S1"
+          ],
+          "reason": "Source S1(2) and S1(3) both specify a threshold of 10 per cent of the NBFC’s eligible capital base.",
+          "numbers_missing": []
+        },
+        {
+          "id": "C9",
+          "text": "“Large exposure” ki apni definition ke anurūp threshold (source mein explicit nahi).",
+          "cited": [],
+          "planted": false,
+          "verdict": "supported",
+          "supported_by": [
+            "S1"
+          ],
+          "reason": "Source S1(1) refers to the 'definition of large exposure' without restating the specific numerical threshold in that paragraph, consistent with the claim that it is not explicitly stated in this specific reporting clause.",
+          "numbers_missing": []
+        },
+        {
+          "id": "C10",
+          "text": "Ye sabhi categories RBI ko Annex‑I ke reporting template ke through report karni hoti hain.",
+          "cited": [
+            "S1"
+          ],
+          "planted": false,
+          "verdict": "supported",
+          "supported_by": [
+            "S1"
+          ],
+          "reason": "Source S1 states that the report shall be made 'as per the reporting template given in Annex - I'.",
+          "numbers_missing": []
+        }
+      ],
+      "planted": {
+        "id": "C2",
+        "text": "13 % of eligible capital base – categories 2 aur 3 ke liye.",
+        "cited": [],
+        "planted": true,
+        "verdict": "contradicted",
+        "supported_by": [
+          "S1"
+        ],
+        "reason": "Source S1 states the threshold for categories 2 and 3 is 10 per cent, not 13 per cent.",
+        "numbers_missing": []
+      },
+      "judge_error": null,
+      "total_ms": 3383.0
+    },
+    {
+      "id": "99929e72-hi",
+      "kind": "answerable",
+      "language": "hi",
+      "question": "आरबीआई कब एनबीएफसी-पी2पी को किसी निदेशक को फिट एंड प्रॉपर न होने पर हटाने के लिए कह सकता है?",
+      "status": "answered",
+      "answer": "आरबीआई तब एनबीएफसी‑पी2पी को किसी निदेशक को हटाने के लिए कह सकता है, जब वह सार्वजनिक हित में उचित समझे और अपने स्वतंत्र मूल्यांकन के आधार पर यह निर्धारित करे कि वह निदेशक फिट‑एंड‑प्रॉपर नहीं है। इस स्थिति में आरबीआई की सलाह पर एनबीएफसी‑पी2पी को संबंधित निदेशक को हटाना अनिवार्य है[S1].",
+      "model": "openai/gpt-oss-120b",
+      "gold_in_sources": true,
+      "language_ok": true,
+      "claims": [
+        {
+          "id": "C1",
+          "text": "आरबीआई तब एनबीएफसी‑पी2पी को किसी निदेशक को हटाने के लिए कह सकता है, जब वह सार्वजनिक हित में उचित समझे और अपने स्वतंत्र मूल्यांकन के आधार पर यह निर्धारित करे कि वह निदेशक फिट‑एंड‑प्रॉपर नहीं है।",
+          "cited": [],
+          "planted": false,
+          "verdict": "supported",
+          "supported_by": [
+            "S1"
+          ],
+          "reason": "Source S1 states that the RBI may independently assess if directors are fit and proper if it deems fit and in public interest, and advise the NBFC-P2P to remove them.",
+          "numbers_missing": []
+        },
+        {
+          "id": "C2",
+          "text": "इस स्थिति में आरबीआई की सलाह पर एनबीएफसी‑पी2पी को संबंधित निदेशक को हटाना अनिवार्य है.",
+          "cited": [
+            "S1"
+          ],
+          "planted": false,
+          "verdict": "supported",
+          "supported_by": [
+            "S1"
+          ],
+          "reason": "Source S1 explicitly states that the NBFC-P2P 'shall remove' the concerned director(s) on being advised by the Reserve Banks to do so.",
+          "numbers_missing": []
+        }
+      ],
+      "planted": null,
+      "judge_error": null,
+      "total_ms": 2781.9
+    },
+    {
+      "id": "42446d26-en",
+      "kind": "answerable",
+      "language": "en",
+      "question": "What standardized data formats must a credit information company use when reporting credit information to the CICs?",
+      "status": "answered",
+      "answer": "The credit information company must report credit information to the CICs in the **Uniform Credit Reporting Format (UCRF)**, which is a non‑proprietary, standardised format prescribed in Annex I. The UCRF comprises three specific forms:\n\n| Form | Segment |\n|------|---------|\n| **Form 1** – Uniform Credit Reporting Format (Consumer) | Consumer segment |\n| **Form 2** – Uniform Credit Reporting Format (Commercial) | Commercial segment |\n| **Form 3** – Uniform Credit Reporting Format (MFI) | Micro‑finance segment |\n\nThese three forms are the only standardised data formats required for reporting to the CICs[S1].",
+      "model": "openai/gpt-oss-120b",
+      "gold_in_sources": true,
+      "language_ok": true,
+      "claims": [
+        {
+          "id": "C1",
+          "text": "The credit information company must report credit information to the CICs in the Uniform Credit Reporting Format (UCRF), which is a non‑proprietary, standardised format prescribed in Annex I.",
+          "cited": [],
+          "planted": false,
+          "verdict": "supported",
+          "supported_by": [
+            "S1"
+          ],
+          "reason": "Source S1 explicitly states that reporting shall be undertaken in standardised data formats prescribed in Annex I, which are non-proprietary and known as the Uniform Credit Reporting Format (UCRF).",
+          "numbers_missing": []
+        },
+        {
+          "id": "C2",
+          "text": "Form Segment",
+          "cited": [],
+          "planted": false,
+          "verdict": "unsupported",
+          "supported_by": [],
+          "reason": "The claim 'Form Segment' is a fragment and does not constitute a verifiable factual statement about the requirements or definitions in the sources.",
+          "numbers_missing": []
+        },
+        {
+          "id": "C3",
+          "text": "Form 1 – Uniform Credit Reporting Format (Consumer) Consumer segment",
+          "cited": [],
+          "planted": false,
+          "verdict": "supported",
+          "supported_by": [
+            "S1"
+          ],
+          "reason": "Source S1, paragraph 9(1), defines Form 1 as the Uniform Credit Reporting Format (Consumer) for the consumer segment.",
+          "numbers_missing": []
+        },
+        {
+          "id": "C4",
+          "text": "Form 2 – Uniform Credit Reporting Format (Commercial) Commercial segment",
+          "cited": [],
+          "planted": false,
+          "verdict": "supported",
+          "supported_by": [
+            "S1"
+          ],
+          "reason": "Source S1, paragraph 9(2), defines Form 2 as the Uniform Credit Reporting Format (Commercial) for the commercial segment.",
+          "numbers_missing": []
+        },
+        {
+          "id": "C5",
+          "text": "Form 3 – Uniform Credit Reporting Format (MFI) Micro‑finance segment",
+          "cited": [],
+          "planted": false,
+          "verdict": "supported",
+          "supported_by": [
+            "S1"
+          ],
+          "reason": "Source S1, paragraph 9(3), defines Form 3 as the Uniform Credit Reporting Format (MFI) for the microfinance segment.",
+          "numbers_missing": []
+        },
+        {
+          "id": "C6",
+          "text": "These three forms are the only standardised data formats required for reporting to the CICs.",
+          "cited": [
+            "S1"
+          ],
+          "planted": false,
+          "verdict": "contradicted",
+          "supported_by": [
+            "S2"
+          ],
+          "reason": "Source S2, paragraph 12(5), specifies that information on Commercial Papers (CPs) shall be reported in the 'commercial data format' with fields mentioned in 'Annex II', whereas the UCRF forms are prescribed in Annex I. This indicates that formats other than the three UCRF forms (or at least data structures from Annex II) are also required for specific reporting.",
+          "numbers_missing": []
+        }
+      ],
+      "planted": null,
+      "judge_error": null,
+      "total_ms": 2319.7
+    },
+    {
+      "id": "76d0e9a0-hinglish",
+      "kind": "answerable",
+      "language": "hinglish",
+      "question": "RBI ki directions ke mutabik NBFC ke Internal Audit Department ko Internal Ombudsman ke liye kaunse annual audit items check karne hote hain?",
+      "status": "ungrounded",
+      "answer": "**RBI की Directions के अनुसार Internal Audit Department को Internal Ombudsman (IO) के लिए वार्षिक ऑडिट में निम्नलिखित बिंदुओं की जाँच करनी होती है** [​S1​]:\n\n1. **IO / Dy. IO की नियुक्ति/पुनःनियुक्ति की प्रक्रिया** तथा शिकायतों की मात्रा के अनुसार IO के कार्यालय को प्रदान किए गए human resources और infrastructure की पर्याप्तता की जाँच [​S1​]।  \n2. **ऑटो‑एस्केलेशन की कार्यान्वयन** – आंशिक रूप से हल की गई या पूरी तरह से अस्वीकृत शिकायतों को निर्धारित समय‑सीमा के भीतर IO के कार्यालय में एस्केलेट किया गया है या नहीं, इसकी जाँच [​S1​]।  \n3. **IO के द्वारा उठाए गए कार्य** – शिकायतों का विश्लेषण, RBI एवं NBFC को प्रस्तुत किए गए रिपोर्ट, कर्मचारियों में grievance‑redressal प्रक्रिया के बारे में जागरूकता बढ़ाना, तथा अन्य संबंधित प्रक्रियाओं पर किए गए कार्यों की समीक्षा [​S1​]।  \n4. **IO/Dy. IO की नियुक्ति से संबंधित जानकारी तथा IO के कार्य‑प्रणाली पर आवधिक रिपोर्ट** को NBFC द्वारा RBI को प्रस्तुत करने की प्रक्रिया की जाँच [​S1​]।  \n\n*ध्यान दें:* ऑडिट का दायरा IO/Dy. IO द्वारा लिये गये निर्णयों की शुद्धता का मूल्यांकन शामिल नहीं करता [​S1​]।",
+      "model": "openai/gpt-oss-120b",
+      "gold_in_sources": true,
+      "language_ok": null,
+      "claims": [],
+      "planted": null,
+      "judge_error": null,
+      "total_ms": 2913.7
+    },
+    {
+      "id": "a213fc2a-hi",
+      "kind": "answerable",
+      "language": "hi",
+      "question": "एनबीएफसी को आरबीआई को बड़े एक्सपोज़र रिपोर्ट में किन श्रेणियों और सीमा मानों को शामिल करना चाहिए?",
+      "status": "answered",
+      "answer": "एनबीएफसी को RBI को बड़े‑एक्सपोज़र (LEF) रिपोर्ट में निम्नलिखित श्रेणियों को शामिल करना होगा :\n\n1. **सभी एक्सपोज़र जो बड़े‑एक्सपोज़र की परिभाषा में आते हैं** [S1]  \n2. **सभी अन्य एक्सपोज़र** (पैराग्राफ 41‑44 के अनुसार मापे गये) — जिनकी राशि NBFC के योग्य पूँजी आधार के **10 % या उससे अधिक** हो, और जिन्हें क्रेडिट‑रिस्क ट्रांसफ़र उपकरणों से ऑफसेट नहीं किया गया है [S1]  \n3. **सभी मुक्त‑एक्सपोज़र** (exempted exposures) — जिनकी राशि भी योग्य पूँजी आधार के **10 % या उससे अधिक** हो [S1]  \n4. **स्कोप में आने वाले 10 सबसे बड़े एक्सपोज़र**, चाहे उनकी राशि NBFC के योग्य पूँजी आधार के सापेक्ष कोई भी हो [S1]",
+      "model": "openai/gpt-oss-120b",
+      "gold_in_sources": true,
+      "language_ok": true,
+      "claims": [
+        {
+          "id": "C1",
+          "text": "सभी एक्सपोज़र जो बड़े‑एक्सपोज़र की परिभाषा में आते हैं",
+          "cited": [
+            "S1"
+          ],
+          "planted": false,
+          "verdict": "supported",
+          "supported_by": [
+            "S1"
+          ],
+          "reason": "Source S1, paragraph 48(1) states that reporting shall cover 'all exposures, meeting the definition of large exposure'.",
+          "numbers_missing": []
+        },
+        {
+          "id": "C3",
+          "text": "सभी अन्य एक्सपोज़र (पैराग्राफ 41‑44 के अनुसार मापे गये) — जिनकी राशि NBFC के योग्य पूँजी आधार के 10 % या उससे अधिक हो, और जिन्हें क्रेडिट‑रिस्क ट्रांसफ़र उपकरणों से ऑफसेट नहीं किया गया है",
+          "cited": [
+            "S1"
+          ],
+          "planted": false,
+          "verdict": "supported",
+          "supported_by": [
+            "S1"
+          ],
+          "reason": "Source S1, paragraph 48(2) states reporting covers 'all other exposures, measured as specified in paragraphs 41 to 44... without offsetting exposure value with credit risk transfer instruments, where values stand equal to or above 10 per cent of the NBFC’s eligible capital base'.",
+          "numbers_missing": []
+        },
+        {
+          "id": "C4",
+          "text": "सभी मुक्त‑एक्सपोज़र (exempted exposures) — जिनकी राशि भी योग्य पूँजी आधार के 10 % या उससे अधिक हो",
+          "cited": [
+            "S1"
+          ],
+          "planted": false,
+          "verdict": "supported",
+          "supported_by": [
+            "S1"
+          ],
+          "reason": "Source S1, paragraph 48(3) states reporting covers 'all the exempted exposures with values equal to or above 10 per cent of the NBFC’s eligible capital base'.",
+          "numbers_missing": []
+        },
+        {
+          "id": "C5",
+          "text": "स्कोप में आने वाले 10 सबसे बड़े एक्सपोज़र, चाहे उनकी राशि NBFC के योग्य पूँजी आधार के सापेक्ष कोई भी हो",
+          "cited": [
+            "S1"
+          ],
+          "planted": false,
+          "verdict": "supported",
+          "supported_by": [
+            "S1"
+          ],
+          "reason": "Source S1, paragraph 48(4) states reporting covers '10 largest exposures included in the scope of application, irrespective of the values of these exposures relative to the NBFC’s eligible capital base'.",
+          "numbers_missing": []
+        }
+      ],
+      "planted": {
+        "id": "C2",
+        "text": "सभी मुक्त‑एक्सपोज़र (exempted exposures) — जिनकी राशि भी योग्य पूँजी आधार के 13 % या उससे अधिक हो",
+        "cited": [
+          "S1"
+        ],
+        "planted": true,
+        "verdict": "contradicted",
+        "supported_by": [
+          "S1"
+        ],
+        "reason": "Source S1, paragraph 48(3) specifies the threshold for exempted exposures as 'equal to or above 10 per cent', not 13 per cent.",
+        "numbers_missing": []
+      },
+      "judge_error": null,
+      "total_ms": 2782.7
+    },
+    {
+      "id": "94067bbe-en",
+      "kind": "answerable",
+      "language": "en",
+      "question": "Can the performance of a simple, transparent and comparable securitisation rely on active discretionary selection or cherry‑picking of assets during replenishment or substitution?",
+      "status": "answered",
+      "answer": "No. The performance of a simple, transparent and comparable securitisation must **not** depend on active discretionary selection or cherry‑picking of assets during replenishment or substitution. Assets added or substituted after the securitisation becomes effective may be transferred only if they are not actively selected or managed on a discretionary basis[S1][S2].",
+      "model": "openai/gpt-oss-120b",
+      "gold_in_sources": true,
+      "language_ok": true,
+      "claims": [
+        {
+          "id": "C1",
+          "text": "No.",
+          "cited": [],
+          "planted": false,
+          "verdict": "supported",
+          "supported_by": [
+            "S1",
+            "S2"
+          ],
+          "reason": "Sources S1 and S2 explicitly state that performance should not rely on active discretionary selection or cherry-picking, and that assets transferred after the effective date may not be actively selected or cherry-picked.",
+          "numbers_missing": []
+        },
+        {
+          "id": "C2",
+          "text": "The performance of a simple, transparent and comparable securitisation must not depend on active discretionary selection or cherry‑picking of assets during replenishment or substitution.",
+          "cited": [],
+          "planted": false,
+          "verdict": "supported",
+          "supported_by": [
+            "S1",
+            "S2"
+          ],
+          "reason": "S1 states performance should not rely on ongoing selection through active management on a discretionary basis. S2 states assets transferred after the effective date may not be actively selected, managed, or cherry-picked on a discretionary basis.",
+          "numbers_missing": []
+        },
+        {
+          "id": "C3",
+          "text": "Assets added or substituted after the securitisation becomes effective may be transferred only if they are not actively selected or managed on a discretionary basis.",
+          "cited": [
+            "S1",
+            "S2"
+          ],
+          "planted": false,
+          "verdict": "supported",
+          "supported_by": [
+            "S1",
+            "S2"
+          ],
+          "reason": "S1 clarifies that addition or substitution during replenishment periods does not represent active management as long as they are not actively selected or cherry-picked on a discretionary basis. S2 reinforces that assets transferred after the effective date may not be actively selected or managed on a discretionary basis.",
+          "numbers_missing": []
+        }
+      ],
+      "planted": null,
+      "judge_error": null,
+      "total_ms": 2773.9
+    },
+    {
+      "id": "f01dee32-hinglish",
+      "kind": "answerable",
+      "language": "hinglish",
+      "question": "NBFC-MFI ke liye Tier-2 capital ka Tier-1 capital ke muqabale mein maximum ratio kya hai?",
+      "status": "answered",
+      "answer": "**Tier‑2 capital ka Tier‑1 capital ke muqāble mein adhiktam ratio 100 % hai** – yaani Tier‑2 capital kabhī bhi Tier‑1 capital se adhik nahi ho sakti[S3].",
+      "model": "openai/gpt-oss-120b",
+      "gold_in_sources": true,
+      "language_ok": true,
+      "claims": [
+        {
+          "id": "C1",
+          "text": "Tier‑2 capital ka Tier‑1 capital ke muqāble mein adhiktam ratio 100 % hai – yaani Tier‑2 capital kabhī bhi Tier‑1 capital se adhik nahi ho sakti.",
+          "cited": [
+            "S3"
+          ],
+          "planted": false,
+          "verdict": "supported",
+          "supported_by": [
+            "S3"
+          ],
+          "reason": "Source S3, paragraph 17 explicitly states that for an NBFC-MFI, the total of Tier 2 capital at any point of time shall not exceed 100 percent of Tier 1 capital.",
+          "numbers_missing": []
+        }
+      ],
+      "planted": null,
+      "judge_error": null,
+      "total_ms": 2802.2
+    },
+    {
+      "id": "370cafbf-hi",
+      "kind": "answerable",
+      "language": "hi",
+      "question": "डिविडेंड घोषित करने के बाद एसपीडी को छोड़कर किसी एनबीएफसी को विवरण रिपोर्ट करने की समय सीमा क्या है?",
+      "status": "ungrounded",
+      "answer": "डिविडेंड घोषित करने के बाद, एसपीडी को छोड़कर किसी भी एनबीएफसी को डिविडेंड का विवरण घोषणा के दो हफ्ते (फ़ोर्टनाइट) के भीतर रिपोर्ट करना होगा [​S1].",
+      "model": "openai/gpt-oss-120b",
+      "gold_in_sources": true,
+      "language_ok": null,
+      "claims": [],
+      "planted": null,
+      "judge_error": null,
+      "total_ms": 2487.4
+    },
+    {
+      "id": "43ba6fa9-en",
+      "kind": "answerable",
+      "language": "en",
+      "question": "What conditions cause an asset to be classified as a non‑performing asset for a NBFC‑Middle Layer?",
+      "status": "answered",
+      "answer": "**An asset of a NBFC‑Middle Layer (NBFC‑ML) is classified as a Non‑Performing Asset (NPA) when any one of the following conditions is met** [S1]:\n\n1. Interest on the asset has been overdue for **more than 90 days**.  \n2. A term loan (including unpaid interest) has an instalment overdue for **more than 90 days** or its interest amount is overdue for **more than 90 days**.  \n3. A demand or call loan is overdue for **more than 90 days** from the date of demand/call, or its interest amount is overdue for **more than 90 days**.  \n4. A bill remains overdue for **more than 90 days**.  \n5. Interest on a debt or income on receivables under “other current assets” (short‑term loans/advances) is overdue for **more than 90 days**.  \n6. Any dues arising from the sale of assets, services rendered, or reimbursement of expenses are overdue for **more than 90 days**.  \n7. Lease rental or hire‑purchase instalments are overdue for **more than 90 days** (classification to be based on the record of recovery).  \n8. The **balance outstanding** (including accrued interest) on loans, advances, or other credit facilities (including bills purchased/discounted) to the same borrower becomes NPA when any of the above facilities turn NPA.  \n\n*NBFC‑ML must classify each such account on the basis of its record of recovery* [S1].",
+      "model": "openai/gpt-oss-120b",
+      "gold_in_sources": true,
+      "language_ok": true,
+      "claims": [
+        {
+          "id": "C2",
+          "text": "An asset of a NBFC‑Middle Layer (NBFC‑ML) is classified as a Non‑Performing Asset (NPA) when any one of the following conditions is met :",
+          "cited": [
+            "S1"
+          ],
+          "planted": false,
+          "verdict": "supported",
+          "supported_by": [
+            "S1"
+          ],
+          "reason": "Source S1 explicitly states that an asset is NPA if any of the following conditions are satisfied.",
+          "numbers_missing": []
+        },
+        {
+          "id": "C3",
+          "text": "Interest on the asset has been overdue for more than 90 days.",
+          "cited": [],
+          "planted": false,
+          "verdict": "supported",
+          "supported_by": [
+            "S1"
+          ],
+          "reason": "Source S1(1) states interest overdue for more than 90 days.",
+          "numbers_missing": []
+        },
+        {
+          "id": "C4",
+          "text": "A term loan (including unpaid interest) has an instalment overdue for more than 90 days or its interest amount is overdue for more than 90 days.",
+          "cited": [],
+          "planted": false,
+          "verdict": "supported",
+          "supported_by": [
+            "S1"
+          ],
+          "reason": "Source S1(2) states term loan instalment or interest overdue for more than 90 days.",
+          "numbers_missing": []
+        },
+        {
+          "id": "C5",
+          "text": "A demand or call loan is overdue for more than 90 days from the date of demand/call, or its interest amount is overdue for more than 90 days.",
+          "cited": [],
+          "planted": false,
+          "verdict": "supported",
+          "supported_by": [
+            "S1"
+          ],
+          "reason": "Source S1(3) states demand/call loan overdue for more than 90 days from date of demand/call or interest overdue for more than 90 days.",
+          "numbers_missing": []
+        },
+        {
+          "id": "C6",
+          "text": "A bill remains overdue for more than 90 days.",
+          "cited": [],
+          "planted": false,
+          "verdict": "supported",
+          "supported_by": [
+            "S1"
+          ],
+          "reason": "Source S1(4) states a bill remains overdue for more than 90 days.",
+          "numbers_missing": []
+        },
+        {
+          "id": "C7",
+          "text": "Interest on a debt or income on receivables under “other current assets” (short‑term loans/advances) is overdue for more than 90 days.",
+          "cited": [],
+          "planted": false,
+          "verdict": "supported",
+          "supported_by": [
+            "S1"
+          ],
+          "reason": "Source S1(5) states interest on debt or income on receivables under 'other current assets' overdue for more than 90 days.",
+          "numbers_missing": []
+        },
+        {
+          "id": "C8",
+          "text": "Any dues arising from the sale of assets, services rendered, or reimbursement of expenses are overdue for more than 90 days.",
+          "cited": [],
+          "planted": false,
+          "verdict": "supported",
+          "supported_by": [
+            "S1"
+          ],
+          "reason": "Source S1(6) states dues on account of sale of assets, services, or reimbursement overdue for more than 90 days.",
+          "numbers_missing": []
+        },
+        {
+          "id": "C9",
+          "text": "Lease rental or hire‑purchase instalments are overdue for more than 90 days (classification to be based on the record of recovery).",
+          "cited": [],
+          "planted": false,
+          "verdict": "supported",
+          "supported_by": [
+            "S1"
+          ],
+          "reason": "Source S1(7) states lease rental/hire purchase instalment overdue for more than 90 days, and the proviso requires classification based on record of recovery.",
+          "numbers_missing": []
+        },
+        {
+          "id": "C10",
+          "text": "The balance outstanding (including accrued interest) on loans, advances, or other credit facilities (including bills purchased/discounted) to the same borrower becomes NPA when any of the above facilities turn NPA.",
+          "cited": [],
+          "planted": false,
+          "verdict": "supported",
+          "supported_by": [
+            "S1"
+          ],
+          "reason": "Source S1(8) states the balance outstanding becomes NPA when any of the above credit facilities becomes NPA.",
+          "numbers_missing": []
+        },
+        {
+          "id": "C11",
+          "text": "*NBFC‑ML must classify each such account on the basis of its record of recovery* .",
+          "cited": [
+            "S1"
+          ],
+          "planted": false,
+          "verdict": "partial",
+          "supported_by": [
+            "S1"
+          ],
+          "reason": "Source S1 states the proviso applies to 'each such account' in the context of the lease and hire purchase condition (clause 7), not necessarily all accounts listed in the section.",
+          "numbers_missing": []
+        }
+      ],
+      "planted": {
+        "id": "C1",
+        "text": "A bill remains overdue for more than 100 days.",
+        "cited": [],
+        "planted": true,
+        "verdict": "contradicted",
+        "supported_by": [
+          "S1"
+        ],
+        "reason": "Source S1 states the period is more than 90 days, not 100 days.",
+        "numbers_missing": []
+      },
+      "judge_error": null,
+      "total_ms": 2491.8
+    },
+    {
+      "id": "4b4f6c16-hinglish",
+      "kind": "answerable",
+      "language": "hinglish",
+      "question": "Ek direction ko repeal karne se uske tehat liye gaye actions, approvals, rights, obligations, penalties ya investigations par kya asar padega?",
+      "status": "answered",
+      "answer": "एक दिशा‑निर्देश को repeal करने से उसके तहत पहले‑से लिये गये **किसी भी कार्य, स्वीकृति, अधिकार, दायित्व, दण्ड, जुर्माना या चल रही जाँच/क़ानूनी प्रक्रिया पर कोई असर नहीं पड़ता**। वह सभी कार्य, स्वीकृतियाँ और अधिकार‑दायित्व उसी दिशा‑निर्देश की शर्तों के तहत ही मान्य रहेंगे और किसी भी दण्ड, जब्ती या कानूनी कार्रवाई को उसी तरह जारी या लागू किया जा सकता है जैसे दिशा‑निर्देश अभी भी प्रभाव में हो [S1][S2][S3][S4][S5][S6].",
+      "model": "openai/gpt-oss-120b",
+      "gold_in_sources": false,
+      "language_ok": false,
+      "claims": [
+        {
+          "id": "C1",
+          "text": "एक दिशा‑निर्देश को repeal करने से उसके तहत पहले‑से लिये गये किसी भी कार्य, स्वीकृति, अधिकार, दायित्व, दण्ड, जुर्माना या चल रही जाँच/क़ानूनी प्रक्रिया पर कोई असर नहीं पड़ता।",
+          "cited": [],
+          "planted": false,
+          "verdict": "supported",
+          "supported_by": [
+            "S1",
+            "S2",
+            "S3",
+            "S4",
+            "S5",
+            "S6"
+          ],
+          "reason": "All sources state that the repeal shall not in any way prejudicially affect rights, obligations, liabilities, penalties, forfeitures, punishments, or investigations/legal proceedings.",
+          "numbers_missing": []
+        },
+        {
+          "id": "C2",
+          "text": "वह सभी कार्य, स्वीकृतियाँ और अधिकार‑दायित्व उसी दिशा‑निर्देश की शर्तों के तहत ही मान्य रहेंगे और किसी भी दण्ड, जब्ती या कानूनी कार्रवाई को उसी तरह जारी या लागू किया जा सकता है जैसे दिशा‑निर्देश अभी भी प्रभाव में हो .",
+          "cited": [
+            "S1",
+            "S2",
+            "S3",
+            "S4",
+            "S5",
+            "S6"
+          ],
+          "planted": false,
+          "verdict": "supported",
+          "supported_by": [
+            "S1",
+            "S2",
+            "S3",
+            "S4",
+            "S5",
+            "S6"
+          ],
+          "reason": "All sources state that actions taken and approvals granted under repealed directions shall continue to be governed by the provisions thereof, and penalties/investigations may be imposed/instituted as if the directions had not been repealed.",
+          "numbers_missing": []
+        }
+      ],
+      "planted": null,
+      "judge_error": null,
+      "total_ms": 2106.6
+    },
+    {
+      "id": "bad161be-hi",
+      "kind": "answerable",
+      "language": "hi",
+      "question": "प्रोजेक्ट के फाइनेंशियल क्लोजर से पहले एनबीएफसी को कौन‑से अनुमोदन या क्लियरेन्स प्राप्त करने चाहिए?",
+      "status": "answered",
+      "answer": "**प्रोजेक्ट के फाइनेंशियल क्लोजर से पहले एनबीएफसी को सभी लागू अनुमोदन/क्लियरेन्स प्राप्त करने चाहिए** – अर्थात् प्रोजेक्ट के कार्यान्वयन या निर्माण के लिये आवश्यक पर्यावरणीय क्लियरेन्स, कानूनी क्लियरेन्स, नियामक क्लियरेन्स आदि, जो भी प्रोजेक्ट पर लागू हों [S1]।  \n\n- जहाँ कोई अनुमोदन **परियोजना के कुछ माइलस्टोन** (जैसे बॉयलर का संचालन‑सहमति) पर निर्भर करता है, वह माइलस्टोन पूरा होने पर ही लागू माना जाएगा, इसलिए इसे फाइनेंशियल क्लोजर के समय अनिवार्य नहीं माना जाता [S2]।  \n- रियल एस्टेट जैसी परियोजनाओं में, सरकार/स्थानीय सरकार/अन्य वैधानिक प्राधिकरणों से पूर्व अनुमति प्राप्त करना भी आवश्यक है; ऋण की स्वीकृति तो सामान्य प्रक्रिया में हो सकती है, परन्तु **डिस्बर्समेंट** तभी किया जाएगा जब ये क्लियरेन्स प्राप्त हो जाएँ [S3]।  \n\nइस प्रकार, पर्यावरण, कानूनी, नियामक एवं आवश्यक सरकारी/स्थानीय/वैधानिक अनुमोदन—जो प्रोजेक्ट की शुरुआत के लिये आवश्यक हैं—फाइनेंशियल क्लोजर से पहले सुनिश्चित करने चाहिए।",
+      "model": "openai/gpt-oss-120b",
+      "gold_in_sources": true,
+      "language_ok": true,
+      "claims": [
+        {
+          "id": "C1",
+          "text": "प्रोजेक्ट के फाइनेंशियल क्लोजर से पहले एनबीएफसी को सभी लागू अनुमोदन/क्लियरेन्स प्राप्त करने चाहिए – अर्थात् प्रोजेक्ट के कार्यान्वयन या निर्माण के लिये आवश्यक पर्यावरणीय क्लियरेन्स, कानूनी क्लियरेन्स, नियामक क्लियरेन्स आदि, जो भी प्रोजेक्ट पर लागू हों ।",
+          "cited": [
+            "S1"
+          ],
+          "planted": false,
+          "verdict": "supported",
+          "supported_by": [
+            "S1"
+          ],
+          "reason": "Source S1 explicitly states that an NBFC must ensure all applicable approvals/clearances (including environmental, legal, regulatory) are obtained before financial closure.",
+          "numbers_missing": []
+        },
+        {
+          "id": "C2",
+          "text": "जहाँ कोई अनुमोदन परियोजना के कुछ माइलस्टोन (जैसे बॉयलर का संचालन‑सहमति) पर निर्भर करता है, वह माइलस्टोन पूरा होने पर ही लागू माना जाएगा, इसलिए इसे फाइनेंशियल क्लोजर के समय अनिवार्य नहीं माना जाता ।",
+          "cited": [
+            "S2"
+          ],
+          "planted": false,
+          "verdict": "supported",
+          "supported_by": [
+            "S2"
+          ],
+          "reason": "Source S2 confirms that approvals contingent on milestones (like boiler consent) are deemed applicable only when milestones are achieved and are not mandatory pre-requisites at financial closure.",
+          "numbers_missing": []
+        },
+        {
+          "id": "C3",
+          "text": "रियल एस्टेट जैसी परियोजनाओं में, सरकार/स्थानीय सरकार/अन्य वैधानिक प्राधिकरणों से पूर्व अनुमति प्राप्त करना भी आवश्यक है; ऋण की स्वीकृति तो सामान्य प्रक्रिया में हो सकती है, परन्तु डिस्बर्समेंट तभी किया जाएगा जब ये क्लियरेन्स प्राप्त हो जाएँ ।",
+          "cited": [
+            "S3"
+          ],
+          "planted": false,
+          "verdict": "supported",
+          "supported_by": [
+            "S3"
+          ],
+          "reason": "Source S3 states that for real estate, prior permission from authorities is required, and while sanction can happen in normal course, disbursement is only after clearances are obtained.",
+          "numbers_missing": []
+        },
+        {
+          "id": "C4",
+          "text": "इस प्रकार, पर्यावरण, कानूनी, नियामक एवं आवश्यक सरकारी/स्थानीय/वैधानिक अनुमोदन—जो प्रोजेक्ट की शुरुआत के लिये आवश्यक हैं—फाइनेंशियल क्लोजर से पहले सुनिश्चित करने चाहिए।",
+          "cited": [],
+          "planted": false,
+          "verdict": "supported",
+          "supported_by": [
+            "S1",
+            "S3"
+          ],
+          "reason": "This claim synthesizes the requirements from S1 (general pre-closure approvals) and S3 (specific government/local permissions for real estate), both of which mandate these clearances before financial closure or disbursement.",
+          "numbers_missing": []
+        }
+      ],
+      "planted": null,
+      "judge_error": null,
+      "total_ms": 3362.7
+    },
+    {
+      "id": "u01-en",
+      "kind": "unanswerable",
+      "language": "en",
+      "question": "What is the maximum total expense ratio SEBI allows for equity mutual fund schemes?",
+      "status": "insufficient_sources",
+      "answer": "The provided sources (S1‑S6) do not contain any information about the maximum total expense ratio that SEBI permits for equity mutual fund schemes.",
+      "model": "openai/gpt-oss-120b",
+      "gold_in_sources": null,
+      "language_ok": null,
+      "claims": [],
+      "planted": null,
+      "judge_error": null,
+      "total_ms": 1781.9
+    },
+    {
+      "id": "u02-en",
+      "kind": "unanswerable",
+      "language": "en",
+      "question": "What is the minimum net worth required to register as a SEBI investment adviser?",
+      "status": "insufficient_sources",
+      "answer": "The provided RBI directions do not contain any clause specifying the minimum net worth required for registration as a SEBI investment adviser.",
+      "model": "openai/gpt-oss-120b",
+      "gold_in_sources": null,
+      "language_ok": null,
+      "claims": [],
+      "planted": null,
+      "judge_error": null,
+      "total_ms": 1274.2
+    },
+    {
+      "id": "u03-en",
+      "kind": "unanswerable",
+      "language": "en",
+      "question": "What free-look period does IRDAI require for life insurance policies?",
+      "status": "not_found",
+      "answer": "I could not find this in the RBI directions I cover (NBFC Master Directions in force on 2026-11-18). Try rephrasing, or check whether another regulator governs this.",
+      "model": null,
+      "gold_in_sources": null,
+      "language_ok": null,
+      "claims": [],
+      "planted": null,
+      "judge_error": null,
+      "total_ms": 773.7
+    },
+    {
+      "id": "u04-en",
+      "kind": "unanswerable",
+      "language": "en",
+      "question": "What is the turnover threshold for GST registration for a services business?",
+      "status": "not_found",
+      "answer": "I could not find this in the RBI directions I cover (NBFC Master Directions in force on 2026-11-18). Try rephrasing, or check whether another regulator governs this.",
+      "model": null,
+      "gold_in_sources": null,
+      "language_ok": null,
+      "claims": [],
+      "planted": null,
+      "judge_error": null,
+      "total_ms": 765.7
+    },
+    {
+      "id": "u05-en",
+      "kind": "unanswerable",
+      "language": "en",
+      "question": "How much home loan interest can be deducted under section 24(b) of the Income Tax Act?",
+      "status": "not_found",
+      "answer": "I could not find this in the RBI directions I cover (NBFC Master Directions in force on 2026-11-18). Try rephrasing, or check whether another regulator governs this.",
+      "model": null,
+      "gold_in_sources": null,
+      "language_ok": null,
+      "claims": [],
+      "planted": null,
+      "judge_error": null,
+      "total_ms": 641.9
+    },
+    {
+      "id": "u06-en",
+      "kind": "unanswerable",
+      "language": "en",
+      "question": "What are the PFRDA rules for partial withdrawal from the National Pension System?",
+      "status": "insufficient_sources",
+      "answer": "The provided RBI directions do not contain any information on the PFRDA rules governing partial withdrawal from the National Pension System. The sources only cover NBFC eligibility, PoP service guidelines, deposit requirements, capital adequacy, fraud risk management, and PCA framework conditions. Details on partial withdrawal rules are absent.",
+      "model": "openai/gpt-oss-120b",
+      "gold_in_sources": null,
+      "language_ok": null,
+      "claims": [],
+      "planted": null,
+      "judge_error": null,
+      "total_ms": 2321.4
+    },
+    {
+      "id": "u07-en",
+      "kind": "unanswerable",
+      "language": "en",
+      "question": "How many independent directors must a listed company have under SEBI LODR regulations?",
+      "status": "insufficient_sources",
+      "answer": "The provided sources do not contain the specific requirement for the number of independent directors that a listed company must have under the SEBI Listing Obligations and Disclosure Requirements (LODR) regulations.",
+      "model": "openai/gpt-oss-120b",
+      "gold_in_sources": null,
+      "language_ok": null,
+      "claims": [],
+      "planted": null,
+      "judge_error": null,
+      "total_ms": 2009.2
+    },
+    {
+      "id": "u08-en",
+      "kind": "unanswerable",
+      "language": "en",
+      "question": "What is the DICGC deposit insurance limit per depositor in a bank?",
+      "status": "insufficient_sources",
+      "answer": "The provided sources do not contain any statement specifying the deposit insurance limit per depositor under the Deposit Insurance and Credit Guarantee Corporation (DICGC).",
+      "model": "openai/gpt-oss-120b",
+      "gold_in_sources": null,
+      "language_ok": null,
+      "claims": [],
+      "planted": null,
+      "judge_error": null,
+      "total_ms": 13281.3
+    },
+    {
+      "id": "u09-en",
+      "kind": "unanswerable",
+      "language": "en",
+      "question": "What minimum paid-up capital is required to get a universal banking licence?",
+      "status": "not_found",
+      "answer": "I could not find this in the RBI directions I cover (NBFC Master Directions in force on 2026-11-18). Try rephrasing, or check whether another regulator governs this.",
+      "model": null,
+      "gold_in_sources": null,
+      "language_ok": null,
+      "claims": [],
+      "planted": null,
+      "judge_error": null,
+      "total_ms": 1037.5
+    },
+    {
+      "id": "u10-en",
+      "kind": "unanswerable",
+      "language": "en",
+      "question": "What is the stamp duty on a property sale agreement in Maharashtra?",
+      "status": "not_found",
+      "answer": "I could not find this in the RBI directions I cover (NBFC Master Directions in force on 2026-11-18). Try rephrasing, or check whether another regulator governs this.",
+      "model": null,
+      "gold_in_sources": null,
+      "language_ok": null,
+      "claims": [],
+      "planted": null,
+      "judge_error": null,
+      "total_ms": 737.4
+    },
+    {
+      "id": "u11-en",
+      "kind": "unanswerable",
+      "language": "en",
+      "question": "What is the capital of Australia?",
+      "status": "not_found",
+      "answer": "I could not find this in the RBI directions I cover (NBFC Master Directions in force on 2026-11-18). Try rephrasing, or check whether another regulator governs this.",
+      "model": null,
+      "gold_in_sources": null,
+      "language_ok": null,
+      "claims": [],
+      "planted": null,
+      "judge_error": null,
+      "total_ms": 765.7
+    },
+    {
+      "id": "u12-en",
+      "kind": "unanswerable",
+      "language": "en",
+      "question": "Write a Python function to reverse a string.",
+      "status": "not_found",
+      "answer": "I could not find this in the RBI directions I cover (NBFC Master Directions in force on 2026-11-18). Try rephrasing, or check whether another regulator governs this.",
+      "model": null,
+      "gold_in_sources": null,
+      "language_ok": null,
+      "claims": [],
+      "planted": null,
+      "judge_error": null,
+      "total_ms": 667.8
+    },
+    {
+      "id": "u13-en",
+      "kind": "unanswerable",
+      "language": "en",
+      "question": "Who won the 2011 Cricket World Cup?",
+      "status": "not_found",
+      "answer": "I could not find this in the RBI directions I cover (NBFC Master Directions in force on 2026-11-18). Try rephrasing, or check whether another regulator governs this.",
+      "model": null,
+      "gold_in_sources": null,
+      "language_ok": null,
+      "claims": [],
+      "planted": null,
+      "judge_error": null,
+      "total_ms": 781.4
+    },
+    {
+      "id": "u14-hinglish",
+      "kind": "unanswerable",
+      "language": "hinglish",
+      "question": "SEBI ke hisaab se mutual fund mein exit load kitna ho sakta hai?",
+      "status": "not_found",
+      "answer": "I could not find this in the RBI directions I cover (NBFC Master Directions in force on 2026-11-18). Try rephrasing, or check whether another regulator governs this.",
+      "model": null,
+      "gold_in_sources": null,
+      "language_ok": null,
+      "claims": [],
+      "planted": null,
+      "judge_error": null,
+      "total_ms": 670.9
+    },
+    {
+      "id": "u15-hinglish",
+      "kind": "unanswerable",
+      "language": "hinglish",
+      "question": "Health insurance claim settle karne ke liye IRDAI ne kitne din diye hain?",
+      "status": "not_found",
+      "answer": "I could not find this in the RBI directions I cover (NBFC Master Directions in force on 2026-11-18). Try rephrasing, or check whether another regulator governs this.",
+      "model": null,
+      "gold_in_sources": null,
+      "language_ok": null,
+      "claims": [],
+      "planted": null,
+      "judge_error": null,
+      "total_ms": 698.1
+    },
+    {
+      "id": "u16-hinglish",
+      "kind": "unanswerable",
+      "language": "hinglish",
+      "question": "UPI transaction ki daily limit kitni hai?",
+      "status": "not_found",
+      "answer": "I could not find this in the RBI directions I cover (NBFC Master Directions in force on 2026-11-18). Try rephrasing, or check whether another regulator governs this.",
+      "model": null,
+      "gold_in_sources": null,
+      "language_ok": null,
+      "claims": [],
+      "planted": null,
+      "judge_error": null,
+      "total_ms": 792.6
+    },
+    {
+      "id": "u17-hinglish",
+      "kind": "unanswerable",
+      "language": "hinglish",
+      "question": "Aaj Mumbai mein mausam kaisa hai?",
+      "status": "not_found",
+      "answer": "I could not find this in the RBI directions I cover (NBFC Master Directions in force on 2026-11-18). Try rephrasing, or check whether another regulator governs this.",
+      "model": null,
+      "gold_in_sources": null,
+      "language_ok": null,
+      "claims": [],
+      "planted": null,
+      "judge_error": null,
+      "total_ms": 679.5
+    },
+    {
+      "id": "u18-hi",
+      "kind": "unanswerable",
+      "language": "hi",
+      "question": "सेबी के अनुसार डीमैट खाता खोलने के लिए कौन से दस्तावेज़ चाहिए?",
+      "status": "insufficient_sources",
+      "answer": "The provided RBI directions do not contain any information on the documents required by SEBI for opening a demat account.",
+      "model": "openai/gpt-oss-120b",
+      "gold_in_sources": null,
+      "language_ok": null,
+      "claims": [],
+      "planted": null,
+      "judge_error": null,
+      "total_ms": 6546.5
+    },
+    {
+      "id": "u19-hi",
+      "kind": "unanswerable",
+      "language": "hi",
+      "question": "आयकर रिटर्न भरने की अंतिम तिथि क्या है?",
+      "status": "insufficient_sources",
+      "answer": "The provided RBI supervisory return directions do not contain any information about the deadline for filing income tax returns.",
+      "model": "openai/gpt-oss-120b",
+      "gold_in_sources": null,
+      "language_ok": null,
+      "claims": [],
+      "planted": null,
+      "judge_error": null,
+      "total_ms": 13759.6
+    },
+    {
+      "id": "u20-hi",
+      "kind": "unanswerable",
+      "language": "hi",
+      "question": "भारत के पहले प्रधानमंत्री कौन थे?",
+      "status": "not_found",
+      "answer": "I could not find this in the RBI directions I cover (NBFC Master Directions in force on 2026-11-18). Try rephrasing, or check whether another regulator governs this.",
+      "model": null,
+      "gold_in_sources": null,
+      "language_ok": null,
+      "claims": [],
+      "planted": null,
+      "judge_error": null,
+      "total_ms": 1069.7
+    }
+  ]
+}

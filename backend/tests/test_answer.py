@@ -8,7 +8,7 @@ import pytest
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
-from app.answer.service import AnswerService, normalise_citations
+from app.answer.service import PROMPT_VERSION, AnswerService, normalise_citations
 from app.db.models import AnswerLog
 from app.llm.gateway import LLMGateway, ModelRoute
 from app.llm.types import FatalError, LLMRequest, LLMResponse, Usage
@@ -101,7 +101,7 @@ async def test_answer_with_valid_citations_is_logged(
     async with session_factory() as s:
         row = await s.scalar(select(AnswerLog).where(AnswerLog.id == r.log_id))
     assert row is not None and row.status == "answered" and len(row.cited_chunk_ids) == 2
-    assert row.prompt_version == "answer-v1"
+    assert row.prompt_version == PROMPT_VERSION
 
 
 async def test_low_retrieval_score_abstains_without_calling_llm(
@@ -173,6 +173,12 @@ async def test_sources_are_fenced_and_injection_stays_inside_them(
         ("Two years [S1; S2]【S4】", "Two years [S1][S2][S4]"),
         ("Two years [S1][S2].", "Two years [S1][S2]."),
         ("Ratio [1] and [Section 3]", "Ratio [1] and [Section 3]"),  # not citations
+        # Seen in the answer evaluation (each made a correct answer "ungrounded"):
+        ("Two years [\u200bS1\u200b].", "Two years [S1]."),  # zero-width spaces
+        ("Two years [**S1**].", "Two years [S1]."),  # markdown bold inside
+        ("Two years (S6).", "Two years [S6]."),  # parentheses
+        ("Two years [ **S1**, S2 ]", "Two years [S1][S2]"),
+        ("See para (1) and (iv)", "See para (1) and (iv)"),  # paragraph refs untouched
     ],
 )
 def test_citation_styles_are_normalised(raw: str, expected: str) -> None:
