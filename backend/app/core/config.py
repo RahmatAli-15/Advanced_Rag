@@ -7,8 +7,9 @@ from typing import Literal
 from pydantic import SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-# .env lives at the repo root, one level above backend/
-_ENV_FILE = Path(__file__).resolve().parents[3] / ".env"
+# .env and data/ live at the repo root, one level above backend/
+_REPO_ROOT = Path(__file__).resolve().parents[3]
+_ENV_FILE = _REPO_ROOT / ".env"
 
 
 class Settings(BaseSettings):
@@ -23,6 +24,11 @@ class Settings(BaseSettings):
     # SecretStr keeps the key out of logs, reprs and tracebacks.
     groq_api_key: SecretStr | None = None
     groq_base_url: str = "https://api.groq.com/openai/v1"
+
+    data_dir: Path = _REPO_ROOT / "data"
+    # Identify the crawler honestly. Add a contact URL here once the repo is public.
+    crawler_user_agent: str = "AdvancedRagBot/0.1"
+    crawler_min_interval_s: float = 3.0
 
 
 @lru_cache

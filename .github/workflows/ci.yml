@@ -11,6 +11,20 @@ jobs:
     defaults:
       run:
         working-directory: backend
+    services:
+      postgres:
+        image: pgvector/pgvector:pg17
+        env:
+          POSTGRES_USER: advancedrag
+          POSTGRES_PASSWORD: advancedrag
+          POSTGRES_DB: advancedrag
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U advancedrag"
+          --health-interval 5s --health-timeout 3s --health-retries 10
+    env:
+      DATABASE_URL: postgresql+asyncpg://advancedrag:advancedrag@localhost:5432/advancedrag
+      TEST_DATABASE_URL: postgresql+asyncpg://advancedrag:advancedrag@localhost:5432/advancedrag_test
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -23,7 +37,9 @@ jobs:
         run: ruff check . && ruff format --check .
       - name: Type check
         run: mypy app
-      - name: Tests
+      - name: Migrations apply cleanly (up, down, up)
+        run: alembic upgrade head && alembic downgrade base && alembic upgrade head
+      - name: Tests (unit + integration)
         run: pytest -q
       - name: Docker build
         run: docker build -t advancedrag-api .

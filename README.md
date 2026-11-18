@@ -44,6 +44,19 @@ uvicorn app.main:app --reload
 
 Then open http://localhost:8000/health/ready and http://localhost:8000/docs.
 
+### Ingest RBI Master Directions
+
+```bash
+cd backend
+alembic upgrade head
+python -m app.ingestion.cli rbi-master-directions --match "Non-Banking" --history
+```
+
+The crawler obeys robots.txt (RFC 9309), waits 3 s between requests, stops on any
+bot-protection challenge, and is idempotent. See [ADR 0003](docs/adr/0003-crawling-policy.md).
+Each Master Direction is stored with its version history, so you can ask which version
+was in force on a given date.
+
 Run the whole stack in containers instead: `docker compose --profile full up --build`.
 
 ## Development
@@ -52,13 +65,14 @@ Run the whole stack in containers instead: `docker compose --profile full up --b
 cd backend
 ruff check . && ruff format --check .
 mypy app
-pytest
+pytest            # integration tests use a separate advancedrag_test database
 ```
 
 ## Roadmap
 
 - [x] **Phase 1 — Foundation:** FastAPI skeleton, Postgres + pgvector, Redis, CI
-- [ ] RBI crawler, parsing, clause-aware chunking
+- [x] Polite RBI crawler, structure-preserving parser, versioned (bitemporal) storage
+- [ ] Clause-aware chunking
 - [ ] **Phase 2 — Core RAG:** local embeddings, hybrid search + RRF, reranking, cited answers, chat UI
 - [ ] **Phase 3 — Evaluation:** golden dataset, retrieval + faithfulness metrics gating CI, tracing
 - [ ] **Phase 4 — Compliance engine:** versioned rules ("as of date"), amendment diffs, citation graph, alerts, obligation register
