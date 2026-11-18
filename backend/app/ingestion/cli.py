@@ -169,8 +169,10 @@ async def _eval_answers(args: argparse.Namespace) -> int:
     retriever = HybridRetriever(factory, build_embedder(s), build_reranker(s))
     # Batch run: wait out rate limits instead of falling back, so every answer comes
     # from the model being evaluated (a fallback model would skew the scores).
-    answer_gw, answer_provider = build_gateway(s, s.llm_models[:1], max_retries=10)
-    judge_gw, judge_provider = build_gateway(s, s.judge_models, max_retries=10)
+    answer_gw, answer_provider = build_gateway(
+        s, s.llm_models[:1], max_retries=10, max_backoff_s=900
+    )
+    judge_gw, judge_provider = build_gateway(s, s.judge_models, max_retries=10, max_backoff_s=900)
     service = AnswerService(retriever, answer_gw, factory)
     rng = random.Random(args.seed)  # noqa: S311 - reproducible planting, not security
     results: list[fa.ItemResult] = []

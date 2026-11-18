@@ -137,6 +137,27 @@ async def test_rate_limits_do_not_open_the_circuit_breaker() -> None:
     assert p.calls == ["a"] * 6
 
 
+async def test_long_retry_after_moves_to_the_next_model_without_retrying() -> None:
+    # Regression: a daily-quota 429 said "retry in 378 s"; the gateway retried every
+    # 30 s anyway, failing 11 times before giving up.
+    p = StreamingProvider({"a": [RateLimited("daily", retry_after_s=378)], "b": [["from b"]]})
+    gw = _gateway(p, ["a", "b"], max_retries=10, max_backoff_s=30)
+    events = await _collect(gw.stream(REQ))
+    assert p.calls == ["a", "b"] and events[0].text == "from b"
+
+
+async def test_batch_gateway_waits_out_a_long_retry_after() -> None:
+    slept: list[float] = []
+
+    async def sleep(s: float) -> None:
+        slept.append(s)
+
+    p = StreamingProvider({"a": [RateLimited("daily", retry_after_s=378), ["ok"]]})
+    gw = LLMGateway([ModelRoute(p, "a", requests_per_minute=6000)], sleep=sleep, max_backoff_s=900)
+    events = await _collect(gw.stream(REQ))
+    assert events[0].text == "ok" and 378 in slept
+
+
 async def test_stream_raises_all_models_failed_when_none_start() -> None:
     p = StreamingProvider({"a": [TransientError("x")] * 2})
     with pytest.raises(AllModelsFailed):

@@ -186,10 +186,20 @@ class LLMGateway:
                         breaker.state,
                         e,
                     )
+                    retry_after = e.retry_after_s if isinstance(e, RateLimited) else None
+                    if retry_after is not None and retry_after > self.max_backoff_s:
+                        # e.g. a daily quota: retrying sooner than the provider asks
+                        # is guaranteed to fail. Move on to the next model at once.
+                        log.warning(
+                            "%s asks to wait %.0f s (limit %.0f s): skipping",
+                            route.model,
+                            retry_after,
+                            self.max_backoff_s,
+                        )
+                        break
                     if attempt == self.max_retries or not breaker.allow():
                         break
                     self.stats.retries += 1
-                    retry_after = e.retry_after_s if isinstance(e, RateLimited) else None
                     await self._sleep(self._backoff(attempt, retry_after))
                     continue
                 breaker.record_success()
@@ -254,10 +264,20 @@ class LLMGateway:
                         breaker.state,
                         e,
                     )
+                    retry_after = e.retry_after_s if isinstance(e, RateLimited) else None
+                    if retry_after is not None and retry_after > self.max_backoff_s:
+                        # e.g. a daily quota: retrying sooner than the provider asks
+                        # is guaranteed to fail. Move on to the next model at once.
+                        log.warning(
+                            "%s asks to wait %.0f s (limit %.0f s): skipping",
+                            route.model,
+                            retry_after,
+                            self.max_backoff_s,
+                        )
+                        break
                     if attempt == self.max_retries or not breaker.allow():
                         break
                     self.stats.retries += 1
-                    retry_after = e.retry_after_s if isinstance(e, RateLimited) else None
                     await self._sleep(self._backoff(attempt, retry_after))
                     continue
 
