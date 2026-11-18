@@ -58,6 +58,23 @@ bot-protection challenge, and is idempotent. See [ADR 0003](docs/adr/0003-crawli
 Each Master Direction is stored with its version history, so you can ask which version
 was in force on a given date.
 
+### Embed and search (local models)
+
+```bash
+# GPU (NVIDIA): install CUDA PyTorch first, then the ml extra
+pip install torch --index-url https://download.pytorch.org/whl/cu128
+pip install -e ".[ml]"
+
+python -m app.ingestion.cli embed          # BAAI/bge-m3, fp16 on GPU
+python -m app.ingestion.cli search "can customers be verified over video" --as-of 2026-03-01
+```
+
+Or via the API: `POST /search {"query": "...", "as_of": "2026-03-01"}`. Retrieval is
+hybrid: pgvector HNSW + Postgres full-text, fused with RRF, reranked by
+`bge-reranker-v2-m3`, restricted to the versions in force on the as-of date
+([ADR 0005](docs/adr/0005-hybrid-retrieval.md)). Set `MODELS_BACKEND=fake` to run
+without downloading models.
+
 Chunking follows the regulation's own structure ([ADR 0004](docs/adr/0004-clause-aware-chunking.md)):
 one clause per chunk, exact paragraph references (`63(9)(iv)`), parent context repeated
 when a clause is split, and every amendment footnote linked to the paragraph it changed.
@@ -78,7 +95,8 @@ pytest            # integration tests use a separate advancedrag_test database
 - [x] **Phase 1 — Foundation:** FastAPI skeleton, Postgres + pgvector, Redis, CI
 - [x] Polite RBI crawler, structure-preserving parser, versioned (bitemporal) storage
 - [x] Clause-aware chunking with amendment tracking and full-text index
-- [ ] **Phase 2 — Core RAG:** local embeddings, hybrid search + RRF, reranking, cited answers, chat UI
+- [x] Local embeddings (bge-m3), hybrid search + RRF, cross-encoder reranking, as-of-date filtering
+- [ ] **Phase 2 — Core RAG:** cited answers via the LLM gateway, chat UI
 - [ ] **Phase 3 — Evaluation:** golden dataset, retrieval + faithfulness metrics gating CI, tracing
 - [ ] **Phase 4 — Compliance engine:** versioned rules ("as of date"), amendment diffs, citation graph, alerts, obligation register
 - [ ] **Phase 5 — Agent:** LangGraph impact analysis, MCP server

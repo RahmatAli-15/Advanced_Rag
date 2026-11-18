@@ -14,6 +14,7 @@ import asyncpg
 import pytest
 from alembic import command
 from alembic.config import Config
+from sqlalchemy import text
 from sqlalchemy.engine import make_url
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
@@ -76,3 +77,19 @@ async def session(
 ) -> AsyncIterator[AsyncSession]:
     async with session_factory() as s:
         yield s
+
+
+@pytest.fixture
+async def committing_session_factory(
+    test_database_url: str,
+) -> AsyncIterator[async_sessionmaker[AsyncSession]]:
+    """Real connections and real commits, for code that runs queries concurrently
+    (one shared connection cannot interleave transactions). The dedicated test
+    database is wiped afterwards."""
+    engine = create_async_engine(test_database_url)
+    try:
+        yield async_sessionmaker(engine, expire_on_commit=False)
+    finally:
+        async with engine.begin() as conn:
+            await conn.execute(text("TRUNCATE documents, crawl_runs CASCADE"))
+        await engine.dispose()

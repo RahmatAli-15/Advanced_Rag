@@ -72,3 +72,35 @@ def test_ready_reports_failing_dependency() -> None:
     r = _client(db_fail=True).get("/health/ready")
     assert r.status_code == 503
     assert r.json()["checks"] == {"postgres": "fail", "redis": "ok"}
+
+
+def _client_with_warmup(state: str) -> TestClient:
+    import asyncio
+
+    client = _client()
+    app = client.app
+    loop = asyncio.new_event_loop()
+    fut: asyncio.Future[None] = loop.create_future()
+    if state == "ok":
+        fut.set_result(None)
+    elif state == "fail":
+        fut.set_exception(RuntimeError("model download failed"))
+    app.state.models_warmup = fut  # type: ignore[attr-defined]
+    return client
+
+
+def test_ready_waits_for_models_to_load() -> None:
+    r = _client_with_warmup("loading").get("/health/ready")
+    assert r.status_code == 503
+    assert r.json()["checks"]["models"] == "loading"
+
+
+def test_ready_ok_once_models_loaded() -> None:
+    r = _client_with_warmup("ok").get("/health/ready")
+    assert r.status_code == 200
+    assert r.json()["checks"] == {"postgres": "ok", "redis": "ok", "models": "ok"}
+
+
+def test_ready_reports_failed_model_load() -> None:
+    r = _client_with_warmup("fail").get("/health/ready")
+    assert r.status_code == 503 and r.json()["checks"]["models"] == "fail"

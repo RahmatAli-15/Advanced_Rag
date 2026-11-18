@@ -30,6 +30,13 @@ class Settings(BaseSettings):
     crawler_user_agent: str = "AdvancedRagBot/0.1"
     crawler_min_interval_s: float = 3.0
 
+    # Local models (optional `ml` extra). "auto" = CUDA if available, else CPU.
+    embedding_model: str = "BAAI/bge-m3"
+    reranker_model: str = "BAAI/bge-reranker-v2-m3"
+    ml_device: str = "auto"
+    # "real" loads the models above; "fake" uses tiny test doubles (no downloads).
+    models_backend: Literal["real", "fake"] = "real"
+
 
 @lru_cache
 def get_settings() -> Settings:

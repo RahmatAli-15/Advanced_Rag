@@ -12,6 +12,7 @@ from datetime import date, datetime
 from enum import StrEnum
 from typing import Any, ClassVar
 
+from pgvector.sqlalchemy import Vector
 from sqlalchemy import (
     CheckConstraint,
     Computed,
@@ -149,6 +150,35 @@ class Chunk(Base):
         TSVECTOR,
         Computed("to_tsvector('english', context || ' ' || text)", persisted=True),
     )
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
+EMBEDDING_DIM = 1024  # BAAI/bge-m3. A model with another size needs a new column/table.
+
+
+class ChunkEmbedding(Base):
+    """One vector per (chunk, model).
+
+    Keyed by model so a new embedding model can be backfilled next to the old one and
+    switched over by configuration, with no window where search has no vectors.
+    """
+
+    __tablename__ = "chunk_embeddings"
+    __table_args__ = (
+        Index(
+            "ix_chunk_embeddings_hnsw",
+            "embedding",
+            postgresql_using="hnsw",
+            postgresql_with={"m": 16, "ef_construction": 64},
+            postgresql_ops={"embedding": "vector_cosine_ops"},
+        ),
+    )
+
+    chunk_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("chunks.id", ondelete="CASCADE"), primary_key=True
+    )
+    model: Mapped[str] = mapped_column(String(128), primary_key=True)
+    embedding: Mapped[list[float]] = mapped_column(Vector(EMBEDDING_DIM))
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
 
