@@ -26,7 +26,9 @@ Ingestion: scheduler ─▶ crawler ─▶ queue ─▶ parse ─▶ clause-awar
 Events (outbox): new circular ─▶ change alerts · obligation extraction · re-index
 ```
 
-Design decisions are recorded in [`docs/adr/`](docs/adr).
+The full system design (architecture, request flow, data model, patterns, failure
+handling, capacity) is in [`docs/design.md`](docs/design.md); individual decisions are
+recorded in [`docs/adr/`](docs/adr).
 
 ## Quick start
 
