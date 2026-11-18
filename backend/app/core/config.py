@@ -23,6 +23,10 @@ class Settings(BaseSettings):
 
     # SecretStr keeps the key out of logs, reprs and tracebacks.
     groq_api_key: SecretStr | None = None
+    # Optional extra keys. When the best model is rate-limited on one key, the gateway
+    # tries it on the next key before falling back to a smaller model.
+    groq_api_key_2: SecretStr | None = None
+    groq_api_key_3: SecretStr | None = None
     groq_base_url: str = "https://api.groq.com/openai/v1"
     # Fallback chain, best first. Override with LLM_MODELS='["a","b"]'.
     llm_models: list[str] = ["openai/gpt-oss-120b", "openai/gpt-oss-20b"]
@@ -43,6 +47,11 @@ class Settings(BaseSettings):
     ml_device: str = "auto"
     # "real" loads the models above; "fake" uses tiny test doubles (no downloads).
     models_backend: Literal["real", "fake"] = "real"
+
+    @property
+    def groq_api_keys(self) -> list[SecretStr]:
+        keys = (self.groq_api_key, self.groq_api_key_2, self.groq_api_key_3)
+        return [k for k in keys if k is not None and k.get_secret_value()]
 
 
 @lru_cache

@@ -158,6 +158,27 @@ async def test_batch_gateway_waits_out_a_long_retry_after() -> None:
     assert events[0].text == "ok" and 378 in slept
 
 
+async def test_rate_limit_switches_key_at_once_but_waits_before_a_weaker_model() -> None:
+    slept: list[float] = []
+
+    async def sleep(s: float) -> None:
+        slept.append(s)
+
+    p = StreamingProvider(
+        {"big": [RateLimited("429", 5), RateLimited("429", 5), ["big ok"]], "small": [["no"]]}
+    )
+    routes = [
+        ModelRoute(p, "big", 6000, label="big@key1"),
+        ModelRoute(p, "big", 6000, label="big@key2"),
+        ModelRoute(p, "small", 6000, label="small@key1"),
+    ]
+    gw = LLMGateway(routes, sleep=sleep, max_retries=3)
+    events = await _collect(gw.stream(REQ))
+    # key1 429 -> key2 at once (no wait); key2 429 -> next is a weaker model, so wait
+    assert p.calls == ["big", "big", "big"] and events[0].text == "big ok"
+    assert slept == [5]
+
+
 async def test_stream_raises_all_models_failed_when_none_start() -> None:
     p = StreamingProvider({"a": [TransientError("x")] * 2})
     with pytest.raises(AllModelsFailed):

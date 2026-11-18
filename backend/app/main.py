@@ -30,7 +30,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         embedder, reranker = build_embedder(settings), build_reranker(settings)
         app.state.retriever = HybridRetriever(app.state.session_factory, embedder, reranker)
         llm_provider = None
-        if settings.groq_api_key is not None:
+        if settings.groq_api_keys:
             gateway, llm_provider = build_gateway(settings)
             app.state.answer_service = AnswerService(
                 app.state.retriever, gateway, app.state.session_factory

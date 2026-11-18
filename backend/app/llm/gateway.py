@@ -103,6 +103,13 @@ class ModelRoute:
     provider: Provider
     model: str
     requests_per_minute: float = 30.0
+    # Distinguishes routes that share a model but not an account (e.g. "...@key2"):
+    # each gets its own rate limiter and circuit breaker. Defaults to the model id.
+    label: str = ""
+
+    @property
+    def name(self) -> str:
+        return self.label or self.model
 
 
 @dataclass
@@ -133,15 +140,18 @@ class LLMGateway:
         self.max_backoff_s = max_backoff_s
         self._sleep = sleep
         self._buckets = {
-            r.model: TokenBucket(
+            r.name: TokenBucket(
                 r.requests_per_minute / 60, max(1.0, r.requests_per_minute / 10), clock, sleep
             )
             for r in routes
         }
         self._breakers = {
-            r.model: CircuitBreaker(breaker_threshold, breaker_cooldown_s, clock) for r in routes
+            r.name: CircuitBreaker(breaker_threshold, breaker_cooldown_s, clock) for r in routes
         }
         self.stats = GatewayStats()
+
+    def _same_model_next(self, i: int) -> bool:
+        return i + 1 < len(self.routes) and self.routes[i + 1].model == self.routes[i].model
 
     def breaker_state(self, model: str) -> str:
         return self._breakers[model].state
@@ -155,44 +165,46 @@ class LLMGateway:
         attempts = 0
         errors: list[str] = []
         for i, route in enumerate(self.routes):
-            breaker = self._breakers[route.model]
+            breaker = self._breakers[route.name]
             if not breaker.allow():
-                errors.append(f"{route.model}: circuit open")
+                errors.append(f"{route.name}: circuit open")
                 continue
             if i > 0:
                 self.stats.fallbacks += 1
-                log.warning("falling back to %s", route.model)
+                log.warning("falling back to %s", route.name)
             for attempt in range(self.max_retries + 1):
-                await self._buckets[route.model].acquire()
+                await self._buckets[route.name].acquire()
                 attempts += 1
                 self.stats.calls += 1
                 try:
                     response = await route.provider.complete(request, route.model)
                 except FatalError as e:
-                    errors.append(f"{route.model}: {e}")
+                    errors.append(f"{route.name}: {e}")
                     breaker.record_failure()
-                    log.warning("%s failed, not retrying: %s", route.model, e)
+                    log.warning("%s failed, not retrying: %s", route.name, e)
                     break  # same request will fail again; try the next model
                 except (RateLimited, TransientError) as e:
                     # A 429 means "slow down", not "broken": it must not open the
                     # breaker, or a burst of rate limits takes a healthy model offline.
                     if not isinstance(e, RateLimited):
                         breaker.record_failure()
-                    errors.append(f"{route.model}: {e}")
+                    errors.append(f"{route.name}: {e}")
                     log.warning(
                         "%s attempt %d failed (breaker %s): %s",
-                        route.model,
+                        route.name,
                         attempt + 1,
                         breaker.state,
                         e,
                     )
                     retry_after = e.retry_after_s if isinstance(e, RateLimited) else None
+                    if isinstance(e, RateLimited) and self._same_model_next(i):
+                        break  # same model on another key: no reason to wait
                     if retry_after is not None and retry_after > self.max_backoff_s:
                         # e.g. a daily quota: retrying sooner than the provider asks
                         # is guaranteed to fail. Move on to the next model at once.
                         log.warning(
                             "%s asks to wait %.0f s (limit %.0f s): skipping",
-                            route.model,
+                            route.name,
                             retry_after,
                             self.max_backoff_s,
                         )
@@ -203,8 +215,8 @@ class LLMGateway:
                     await self._sleep(self._backoff(attempt, retry_after))
                     continue
                 breaker.record_success()
-                prev = self.stats.usage_by_model.get(route.model, Usage())
-                self.stats.usage_by_model[route.model] = Usage(
+                prev = self.stats.usage_by_model.get(route.name, Usage())
+                self.stats.usage_by_model[route.name] = Usage(
                     prev.prompt_tokens + response.usage.prompt_tokens,
                     prev.completion_tokens + response.usage.completion_tokens,
                 )
@@ -231,15 +243,15 @@ class LLMGateway:
         only until the first event is out; the caller never sees two models' text."""
         errors: list[str] = []
         for i, route in enumerate(self.routes):
-            breaker = self._breakers[route.model]
+            breaker = self._breakers[route.name]
             if not breaker.allow():
-                errors.append(f"{route.model}: circuit open")
+                errors.append(f"{route.name}: circuit open")
                 continue
             if i > 0:
                 self.stats.fallbacks += 1
-                log.warning("falling back to %s (stream)", route.model)
+                log.warning("falling back to %s (stream)", route.name)
             for attempt in range(self.max_retries + 1):
-                await self._buckets[route.model].acquire()
+                await self._buckets[route.name].acquire()
                 self.stats.calls += 1
                 events = route.provider.stream(request, route.model)
                 try:
@@ -247,30 +259,32 @@ class LLMGateway:
                 except StopAsyncIteration:
                     first = StreamEvent(done=True, model=route.model, usage=Usage())
                 except FatalError as e:
-                    errors.append(f"{route.model}: {e}")
+                    errors.append(f"{route.name}: {e}")
                     breaker.record_failure()
-                    log.warning("%s failed, not retrying: %s", route.model, e)
+                    log.warning("%s failed, not retrying: %s", route.name, e)
                     break
                 except (RateLimited, TransientError) as e:
                     # A 429 means "slow down", not "broken": it must not open the
                     # breaker, or a burst of rate limits takes a healthy model offline.
                     if not isinstance(e, RateLimited):
                         breaker.record_failure()
-                    errors.append(f"{route.model}: {e}")
+                    errors.append(f"{route.name}: {e}")
                     log.warning(
                         "%s attempt %d failed (breaker %s): %s",
-                        route.model,
+                        route.name,
                         attempt + 1,
                         breaker.state,
                         e,
                     )
                     retry_after = e.retry_after_s if isinstance(e, RateLimited) else None
+                    if isinstance(e, RateLimited) and self._same_model_next(i):
+                        break  # same model on another key: no reason to wait
                     if retry_after is not None and retry_after > self.max_backoff_s:
                         # e.g. a daily quota: retrying sooner than the provider asks
                         # is guaranteed to fail. Move on to the next model at once.
                         log.warning(
                             "%s asks to wait %.0f s (limit %.0f s): skipping",
-                            route.model,
+                            route.name,
                             retry_after,
                             self.max_backoff_s,
                         )
@@ -286,7 +300,7 @@ class LLMGateway:
                     event: StreamEvent | None = first
                     while event is not None:
                         if event.done:
-                            self._record_usage(route.model, event.usage or Usage())
+                            self._record_usage(route.name, event.usage or Usage())
                         yield event
                         if event.done:
                             return
@@ -294,7 +308,7 @@ class LLMGateway:
                 except LLMError as e:
                     breaker.record_failure()
                     self.stats.failures += 1
-                    raise StreamInterrupted(f"{route.model}: {e}") from e
+                    raise StreamInterrupted(f"{route.name}: {e}") from e
                 finally:
                     await events.aclose()  # releases the HTTP connection on cancel too
                 return
