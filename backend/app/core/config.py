@@ -24,8 +24,12 @@ class Settings(BaseSettings):
     # SecretStr keeps the key out of logs, reprs and tracebacks.
     groq_api_key: SecretStr | None = None
     groq_base_url: str = "https://api.groq.com/openai/v1"
+    # Fallback chain, best first. Override with LLM_MODELS='["a","b"]'.
+    llm_models: list[str] = ["openai/gpt-oss-120b", "openai/gpt-oss-20b"]
+    llm_requests_per_minute: float = 30.0
 
     data_dir: Path = _REPO_ROOT / "data"
+    eval_dir: Path = _REPO_ROOT / "eval"  # datasets and reports (committed)
     # Identify the crawler honestly. Add a contact URL here once the repo is public.
     crawler_user_agent: str = "AdvancedRagBot/0.1"
     crawler_min_interval_s: float = 3.0

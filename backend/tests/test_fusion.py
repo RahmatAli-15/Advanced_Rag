@@ -24,3 +24,10 @@ def test_keyword_query_is_an_or_of_sanitised_words() -> None:
         "what | s | the | v | cip | rule | nbfc | kyc"
     )
     assert keyword_tsquery("?!") is None
+
+
+def test_weighted_rrf_downweights_a_list() -> None:
+    fused = rrf_fuse([["v1", "v2"], ["k1", "k2"]], weights=[1.0, 0.3])
+    assert [x for x, _ in fused][:2] == ["v1", "v2"]
+    with pytest.raises(ValueError):
+        rrf_fuse([["a"]], weights=[1.0, 2.0])

@@ -10,7 +10,8 @@ import argparse
 import asyncio
 import json
 from dataclasses import asdict
-from datetime import date
+from datetime import UTC, date, datetime
+from pathlib import Path
 
 from app.chunking.pipeline import chunk_versions
 from app.core.config import get_settings
@@ -18,9 +19,13 @@ from app.core.logging import configure_logging
 from app.db.session import create_engine, create_session_factory
 from app.embeddings.factory import build_embedder, build_reranker
 from app.embeddings.pipeline import embed_pending_chunks
+from app.eval import dataset
+from app.eval.generate import generate
+from app.eval.run import evaluate, write_report
 from app.ingestion.http import PoliteClient
 from app.ingestion.pipeline import crawl_master_directions
 from app.ingestion.raw_store import RawStore
+from app.llm.factory import build_gateway
 from app.retrieval.hybrid import HybridRetriever, SearchFilters
 
 
@@ -91,6 +96,59 @@ async def _search(args: argparse.Namespace) -> int:
     return 0
 
 
+async def _eval_generate(args: argparse.Namespace) -> int:
+    s = get_settings()
+    engine = create_engine(s.database_url)
+    gateway, provider = build_gateway(s)
+    out = Path(args.out) if args.out else s.eval_dir / "datasets" / "retrieval_v1.jsonl"
+    try:
+        items, stats = await generate(
+            create_session_factory(engine),
+            gateway,
+            model_label=s.llm_models[0],
+            n=args.n,
+            per_document=args.per_document,
+            seed=args.seed,
+        )
+    finally:
+        await provider.aclose()
+        await engine.dispose()
+    dataset.save(out, items)
+    print(
+        json.dumps(
+            {**asdict(stats), "out": str(out), "llm": asdict(gateway.stats)}, indent=2, default=str
+        )
+    )
+    return 0
+
+
+async def _eval_retrieval(args: argparse.Namespace) -> int:
+    s = get_settings()
+    path = Path(args.dataset) if args.dataset else s.eval_dir / "datasets" / "retrieval_v1.jsonl"
+    items = dataset.load(path)
+    if args.language:
+        items = [i for i in items if i.language == args.language]
+    engine = create_engine(s.database_url)
+    factory = create_session_factory(engine)
+    embedder = build_embedder(s)
+    plain = HybridRetriever(factory, embedder, None)
+    reranking = HybridRetriever(factory, embedder, build_reranker(s))
+    try:
+        await reranking.search("warm up")  # load models outside the timed runs
+        results = await evaluate(items, plain, reranking, factory)
+    finally:
+        await engine.dispose()
+    meta: dict[str, object] = {
+        "dataset": f"{path.name} ({len(items)} questions)",
+        "embedding_model": embedder.name,
+        "reranker_model": s.reranker_model,
+        "generated": datetime.now(UTC).strftime("%Y-%m-%d %H:%M UTC"),
+    }
+    md, _ = write_report(results, meta, s.eval_dir / "reports")
+    print(md.read_text(encoding="utf-8"))
+    return 0
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(prog="advancedrag-ingest")
     sub = parser.add_subparsers(dest="command", required=True)
@@ -111,6 +169,16 @@ def main() -> int:
     se.add_argument("--as-of", help="YYYY-MM-DD; default today")
     se.add_argument("--no-rerank", action="store_true")
 
+    eg = sub.add_parser("eval-generate", help="generate a synthetic retrieval test set")
+    eg.add_argument("-n", type=int, default=60, help="clauses to sample")
+    eg.add_argument("--per-document", type=int, default=2)
+    eg.add_argument("--seed", type=int, default=42)
+    eg.add_argument("--out")
+
+    er = sub.add_parser("eval-retrieval", help="score retrieval configs on a test set")
+    er.add_argument("--dataset")
+    er.add_argument("--language", choices=["en", "hinglish", "hi"])
+
     args = parser.parse_args()
     configure_logging(get_settings().log_level)
     commands = {
@@ -118,6 +186,8 @@ def main() -> int:
         "chunk": _chunk,
         "embed": _embed,
         "search": _search,
+        "eval-generate": _eval_generate,
+        "eval-retrieval": _eval_retrieval,
     }
     return asyncio.run(commands[args.command](args))
 

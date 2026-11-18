@@ -15,7 +15,7 @@ import time
 import uuid
 from dataclasses import dataclass, field
 from datetime import date
-from typing import Any
+from typing import Any, Literal
 
 from sqlalchemy import ColumnElement, and_, func, or_, select, text
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
@@ -24,6 +24,8 @@ from app.db.models import Chunk, ChunkEmbedding, ContentStatus, Document, Docume
 from app.embeddings.base import Embedder
 from app.retrieval.fusion import rrf_fuse
 from app.retrieval.rerank import Reranker
+
+SearchMode = Literal["hybrid", "vector", "keyword"]
 
 
 @dataclass(frozen=True)
@@ -96,6 +98,7 @@ class HybridRetriever:
         candidates: int = 40,
         rerank_top: int = 30,
         ef_search: int = 100,
+        keyword_weight: float = 0.3,  # measured: eval/reports, ADR 0006
     ) -> None:
         self._sf = session_factory
         self._embedder = embedder
@@ -103,6 +106,7 @@ class HybridRetriever:
         self._candidates = candidates
         self._rerank_top = rerank_top
         self._ef_search = ef_search
+        self._keyword_weight = keyword_weight
 
     async def _keyword(self, query: str, on: date, filters: SearchFilters) -> list[uuid.UUID]:
         tsq_text = keyword_tsquery(query)
@@ -147,8 +151,14 @@ class HybridRetriever:
             return {row[0].id: row for row in (await s.execute(stmt)).all()}
 
     async def search(
-        self, query: str, k: int = 8, filters: SearchFilters | None = None
+        self,
+        query: str,
+        k: int = 8,
+        filters: SearchFilters | None = None,
+        mode: SearchMode = "hybrid",
+        keyword_weight: float | None = None,
     ) -> tuple[list[SearchHit], RetrievalTrace]:
+        """`mode` exists for evaluation: it isolates each retriever's contribution."""
         filters = filters or SearchFilters()
         on = filters.as_of or date.today()
         trace = RetrievalTrace(as_of=on)
@@ -159,17 +169,22 @@ class HybridRetriever:
             trace.timings_ms[stage] = round((now - since) * 1000, 1)
             return now
 
-        keyword_task = asyncio.create_task(self._keyword(query, on, filters))
-        t = time.perf_counter()
-        qvec = await asyncio.to_thread(self._embedder.embed_query, query)
-        t = mark("embed_query", t)
-        vector_ids = await self._vector(qvec, on, filters)
-        t = mark("vector_search", t)
-        keyword_ids = await keyword_task
-        mark("keyword_search(overlapped)", t0)
+        keyword_task = (
+            asyncio.create_task(self._keyword(query, on, filters)) if mode != "vector" else None
+        )
+        vector_ids: list[uuid.UUID] = []
+        if mode != "keyword":
+            t = time.perf_counter()
+            qvec = await asyncio.to_thread(self._embedder.embed_query, query)
+            t = mark("embed_query", t)
+            vector_ids = await self._vector(qvec, on, filters)
+            mark("vector_search", t)
+        keyword_ids = await keyword_task if keyword_task else []
+        mark("retrieve", t0)
         trace.vector_candidates, trace.keyword_candidates = len(vector_ids), len(keyword_ids)
 
-        fused = rrf_fuse([vector_ids, keyword_ids])
+        kw = self._keyword_weight if keyword_weight is None else keyword_weight
+        fused = rrf_fuse([vector_ids, keyword_ids], weights=[1.0, kw])
         trace.fused_candidates = len(fused)
         vrank = {cid: i for i, cid in enumerate(vector_ids, start=1)}
         krank = {cid: i for i, cid in enumerate(keyword_ids, start=1)}

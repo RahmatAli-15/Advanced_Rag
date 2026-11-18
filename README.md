@@ -81,6 +81,21 @@ when a clause is split, and every amendment footnote linked to the paragraph it 
 
 Run the whole stack in containers instead: `docker compose --profile full up --build`.
 
+## Measured retrieval quality
+
+153 questions in English, Hinglish and Hindi over 45 RBI NBFC Master Directions
+([protocol and caveats](eval/README.md), [full analysis](docs/adr/0006-retrieval-evaluation.md)):
+
+| Config | hit@1 | hit@5 | MRR@10 | p50 latency |
+|---|---|---|---|---|
+| keyword only | 0.06 | 0.21 | 0.12 | 68 ms |
+| vector only | 0.77 | 0.89 | 0.82 | 118 ms |
+| hybrid, equal weights | 0.49 | 0.78 | 0.61 | 118 ms |
+| **hybrid (keyword ×0.3) + rerank — default** | **0.79** | **0.94** | **0.86** | 720 ms |
+
+Equal-weight fusion made retrieval *worse* than vectors alone; the reranker is the
+biggest single gain. The questions are LLM-generated and not yet human-reviewed.
+
 ## Development
 
 ```bash
@@ -97,7 +112,9 @@ pytest            # integration tests use a separate advancedrag_test database
 - [x] Clause-aware chunking with amendment tracking and full-text index
 - [x] Local embeddings (bge-m3), hybrid search + RRF, cross-encoder reranking, as-of-date filtering
 - [ ] **Phase 2 — Core RAG:** cited answers via the LLM gateway, chat UI
-- [ ] **Phase 3 — Evaluation:** golden dataset, retrieval + faithfulness metrics gating CI, tracing
+- [x] LLM gateway: fallback chain, retries honouring Retry-After, rate limiting, circuit breaker, JSON repair
+- [x] Retrieval evaluation: multilingual test set, ablation of every component
+- [ ] **Phase 3 — Evaluation:** human review of the test set, exact-term questions, answer faithfulness, tracing
 - [ ] **Phase 4 — Compliance engine:** versioned rules ("as of date"), amendment diffs, citation graph, alerts, obligation register
 - [ ] **Phase 5 — Agent:** LangGraph impact analysis, MCP server
 - [ ] **Phase 6 — Production:** semantic cache, rate limiting, RBAC + multi-tenancy, cost tracking, Helm
