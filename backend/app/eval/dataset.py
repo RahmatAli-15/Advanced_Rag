@@ -23,7 +23,13 @@ class GoldItem(BaseModel):
     text_snippet: str  # start of the gold chunk text; used when refs are ambiguous
     as_of: date | None = None
     origin: str  # e.g. "synthetic:openai/gpt-oss-120b"
-    reviewed: bool = False  # set to true once a human has checked the item
+    reviewed: bool = False  # set to true only once a HUMAN has checked the item
+    # Review against the gold clause (who did it is recorded, so an AI review is never
+    # mistaken for a human one).
+    review: Literal["ok", "fixed"] | None = None
+    reviewed_by: str | None = None  # e.g. "ai:claude" or a person's name
+    review_note: str | None = None
+    original_question: str | None = None  # set when the review rewrote the question
 
 
 def load(path: Path) -> list[GoldItem]:

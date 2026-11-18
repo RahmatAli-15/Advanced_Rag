@@ -163,18 +163,20 @@ version (transactional outbox) and shown under "Recent RBI changes"
 
 ## Measured retrieval quality
 
-153 questions in English, Hinglish and Hindi over 45 RBI NBFC Master Directions
+144 questions in English, Hinglish and Hindi over 45 RBI NBFC Master Directions
 ([protocol and caveats](eval/README.md), [full analysis](docs/adr/0006-retrieval-evaluation.md)):
 
 | Config | hit@1 | hit@5 | MRR@10 | p50 latency |
 |---|---|---|---|---|
-| keyword only | 0.06 | 0.21 | 0.12 | 68 ms |
-| vector only | 0.77 | 0.89 | 0.82 | 118 ms |
-| hybrid, equal weights | 0.49 | 0.78 | 0.61 | 118 ms |
-| **hybrid (keyword ×0.3) + rerank — default** | **0.79** | **0.94** | **0.86** | 720 ms |
+| keyword only | 0.06 | 0.23 | 0.14 | 60 ms |
+| vector only | 0.72 | 0.91 | 0.80 | 117 ms |
+| hybrid, equal weights | 0.44 | 0.79 | 0.58 | 118 ms |
+| **hybrid (keyword ×0.3) + rerank — default** | **0.86** | **0.97** | **0.91** | 731 ms |
 
 Equal-weight fusion made retrieval *worse* than vectors alone; the reranker is the
-biggest single gain. The questions are LLM-generated and not yet human-reviewed.
+biggest single gain. The questions were LLM-generated, then reviewed clause by clause
+(by an AI reviewer, not yet a human): 39 rewritten, 9 dropped as unanswerable from
+their gold clause.
 
 ## Measured answer quality
 

@@ -40,6 +40,25 @@ Findings:
 - The cross-encoder reranker is the largest single gain (+5 points hit@5 over vector).
 - With reranking, vector-only and weighted hybrid are tied (differences of one question).
 
+### Re-run on the reviewed set (v2, 144 questions)
+
+After a clause-by-clause review of every question (AI-reviewed, see
+[eval/README.md](../../eval/README.md)): 39 questions rewritten, 9 dropped.
+
+| Config | hit@1 | hit@5 | MRR@10 | p50 |
+|---|---|---|---|---|
+| keyword | 0.062 | 0.229 | 0.138 | 60 ms |
+| vector | 0.722 | 0.910 | 0.802 | 117 ms |
+| hybrid (equal weights) | 0.438 | 0.785 | 0.582 | 118 ms |
+| hybrid, keyword weight 0.3 | 0.521 | 0.861 | 0.669 | 116 ms |
+| vector + rerank | 0.861 | 0.965 | 0.908 | 689 ms |
+| hybrid + rerank | 0.854 | 0.944 | 0.896 | 813 ms |
+| **hybrid kw 0.3 + rerank (default)** | **0.861** | **0.965** | **0.908** | **731 ms** |
+
+hit@1 rose 7 points with the same system: part of v1's "misses" were bad questions
+(wrong terms, an answer not in the gold clause, no single right answer). The ranking of
+configurations, and every finding above, is unchanged.
+
 ## Decision on defaults
 
 Hybrid with keyword weight 0.3 plus reranking. It ties the best configuration here and
@@ -48,8 +67,8 @@ this paraphrase-only test set does not exercise.
 
 ## Limitations (stated, not hidden)
 
-- **Synthetic questions.** Written by an LLM and not yet human-reviewed; spot checks found
-  one question naming its document and one Hindi mistranslation.
+- **Synthetic questions.** Written by an LLM; v2 is reviewed by an AI against each gold
+  clause but not yet by a human.
 - **Biased against keyword search** by design (no copied wording). An exact-term question
   set is the next check before the keyword weight is trusted.
 - **Small:** 51 independent clauses × 3 languages. Differences below ~3 points are noise.

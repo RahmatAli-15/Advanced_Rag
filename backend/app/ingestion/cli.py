@@ -125,7 +125,7 @@ async def _eval_generate(args: argparse.Namespace) -> int:
 
 async def _eval_retrieval(args: argparse.Namespace) -> int:
     s = get_settings()
-    path = Path(args.dataset) if args.dataset else s.eval_dir / "datasets" / "retrieval_v1.jsonl"
+    path = Path(args.dataset) if args.dataset else s.eval_dir / "datasets" / "retrieval_v2.jsonl"
     items = dataset.load(path)
     if args.language:
         items = [i for i in items if i.language == args.language]
@@ -158,7 +158,7 @@ async def _eval_answers(args: argparse.Namespace) -> int:
     from app.eval import faithfulness as fa
 
     s = get_settings()
-    items = dataset.load(s.eval_dir / "datasets" / "retrieval_v1.jsonl")
+    items = dataset.load(s.eval_dir / "datasets" / "retrieval_v2.jsonl")
     if args.language:  # a focused run, e.g. to check one language fix cheaply
         items = [i for i in items if i.language == args.language]
     gold = fa.sample(items, args.n, args.seed)
@@ -203,7 +203,7 @@ async def _eval_answers(args: argparse.Namespace) -> int:
 
     summary = fa.summarise(results)
     meta: dict[str, object] = {
-        "answerable": f"{len(gold)} questions sampled from retrieval_v1.jsonl "
+        "answerable": f"{len(gold)} questions sampled from retrieval_v2.jsonl "
         f"(seed {args.seed}{', ' + args.language + ' only' if args.language else ''})",
         "unanswerable": f"{len(unanswerable)} questions from unanswerable_v1.jsonl",
         "answer_model": f"{s.llm_models[0]} (no fallback during evaluation)",
@@ -222,7 +222,7 @@ async def _bench_retrieval(args: argparse.Namespace) -> int:
     from app.eval.bench import BenchConfig, bench, render
 
     s = get_settings()
-    items = dataset.load(s.eval_dir / "datasets" / "retrieval_v1.jsonl")
+    items = dataset.load(s.eval_dir / "datasets" / "retrieval_v2.jsonl")
     configs = [
         BenchConfig("current", candidates=40, rerank_top=30),
         BenchConfig("rerank 20", candidates=40, rerank_top=20),
