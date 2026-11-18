@@ -141,6 +141,36 @@ async def test_recent_changes_summarises_the_diff() -> None:
     assert "para 38 now reads: new text" in text
 
 
+def test_recent_changes_prefers_the_agent_analysis() -> None:
+    from app.mcp_server import format_changes
+
+    row = {
+        "detected_at": "2026-11-18T10:00:00Z",
+        "document_title": "Credit Facilities Directions",
+        "kind": "archive_backfill",
+        "source_url": "https://rbi.org.in/x",
+        "counts": {"changed": 1},
+        "changed": [{"para": "72", "after": "raw text"}],
+        "impact": {
+            "summary": "Para 72 clarifies right of way.",
+            "paragraphs": [
+                {
+                    "para": "72",
+                    "verified": False,
+                    "severity": "low",
+                    "what_changed": "An explanation was added.",
+                    "action": "Update guidance.",
+                }
+            ],
+        },
+    }
+    text = format_changes([row])
+    assert "Impact (AI analysis): Para 72 clarifies right of way." in text
+    assert "para 72 [low] [unverified]: An explanation was added. Action: Update guidance." in text
+    assert "raw text" not in text  # the analysis replaces the raw excerpt
+    assert "Internet Archive" in text
+
+
 async def test_api_down_is_a_clear_tool_error() -> None:
     text, err = await _call(FakeApi(fail=True), "ask_compliance", {"question": "x?"})
     assert err and "not reachable" in text

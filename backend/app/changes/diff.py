@@ -50,6 +50,11 @@ def diff_paragraphs(old: dict[str, str], new: dict[str, str]) -> dict[str, Any]:
     }
 
 
+def raw_paragraphs(raw: bytes, parse: Parser = rbi.parse_detail) -> dict[str, str]:
+    """Paragraph ref -> full text of a stored page (no excerpt limit)."""
+    return paragraphs(chunk_blocks(parse(decode_html(raw)).blocks))
+
+
 def diff_raw(
     old_raw: bytes | None, new_raw: bytes, parse: Parser = rbi.parse_detail
 ) -> dict[str, Any]:

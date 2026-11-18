@@ -18,13 +18,15 @@ class ChangeOut(BaseModel):
     id: uuid.UUID
     document_title: str
     source_url: str
-    kind: str  # new_document | new_version | silent_edit
+    kind: str  # new_document | new_version | silent_edit | archive_backfill
     status: str  # pending | ready | failed
     detected_at: datetime
     counts: dict[str, int]
     changed: list[dict[str, Any]]
     added: list[dict[str, Any]]
     removed: list[dict[str, Any]]
+    archived_from: str | None = None  # set for changes backfilled from the Internet Archive
+    impact: dict[str, Any] | None = None  # change-impact agent output (ADR 0014)
 
 
 @router.get("/changes", response_model=list[ChangeOut])
@@ -51,6 +53,8 @@ async def changes(request: Request, limit: int = Query(20, ge=1, le=100)) -> lis
             changed=e.diff.get("changed", []),
             added=e.diff.get("added", []),
             removed=e.diff.get("removed", []),
+            archived_from=e.diff.get("archived_from"),
+            impact=e.impact,
         )
         for e, title, url in rows
     ]

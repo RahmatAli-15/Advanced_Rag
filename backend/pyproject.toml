@@ -20,6 +20,7 @@ dependencies = [
     "pgvector>=0.3",
     "prometheus-client>=0.21",
     "mcp>=2.3,<3",  # MCP server (app/mcp_server.py); 2.x API (MCPServer)
+    "langgraph>=1.2,<2",  # change-impact agent (app/changes/impact.py)
 ]
 
 [project.optional-dependencies]

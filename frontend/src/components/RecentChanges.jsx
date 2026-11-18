@@ -6,6 +6,57 @@ const KIND = {
   new_document: 'New direction',
   new_version: 'New version',
   silent_edit: 'Edited without a new date',
+  archive_backfill: 'Past amendment',
+}
+
+const TYPE = {
+  scope: 'scope change',
+  new_requirement: 'new requirement',
+  tightening: 'tightened',
+  relaxation: 'relaxed',
+  clarification: 'clarification',
+  removed_requirement: 'requirement removed',
+}
+
+// The change-impact agent's analysis (ADR 0014). Quotes were checked against the two
+// versions in code; a paragraph whose quotes never matched is shown as unverified.
+function Impact({ impact }) {
+  return (
+    <div className="impact">
+      <p className="impact-summary">{impact.summary}</p>
+      {impact.paragraphs
+        .filter((p) => p.what_changed)
+        .map((p) => (
+          <div key={p.para} className="impact-para">
+            <p className="eyebrow">
+              Para {p.para}
+              <span className={`sev sev-${p.severity}`}>{p.severity}</span>
+              {TYPE[p.change_type] ?? p.change_type}
+              {!p.verified && <span className="sev sev-unverified">unverified</span>}
+            </p>
+            <p>{p.what_changed}</p>
+            <p>
+              <strong>Affects:</strong> {p.affected.join(', ')}. <strong>Action:</strong>{' '}
+              {p.action}
+            </p>
+            {p.related.length > 0 && (
+              <p className="impact-related">
+                Check also:{' '}
+                {p.related.map((r, i) => (
+                  <span key={`${r.source_url}-${r.para_refs[0]}`}>
+                    {i > 0 && ', '}
+                    <a href={r.source_url} target="_blank" rel="noreferrer">
+                      {shortTitle(r.document_title)}, para {r.para_refs[0]}
+                    </a>
+                  </span>
+                ))}
+              </p>
+            )}
+          </div>
+        ))}
+      <p className="impact-note">AI analysis of the text below. Confirm against the official text.</p>
+    </div>
+  )
 }
 
 function summary(c) {
@@ -49,6 +100,20 @@ export function RecentChanges() {
             </button>
             {open === c.id && c.kind !== 'new_document' && (
               <div className="change-detail">
+                {c.impact ? (
+                  <Impact impact={c.impact} />
+                ) : (
+                  c.status === 'ready' && <p className="impact-note">Impact analysis pending.</p>
+                )}
+                {c.archived_from && (
+                  <p className="impact-note">
+                    Earlier text from an{' '}
+                    <a href={c.archived_from} target="_blank" rel="noreferrer">
+                      Internet Archive snapshot
+                    </a>
+                    .
+                  </p>
+                )}
                 {c.changed.map((p) => (
                   <div key={p.para} className="change-para">
                     <p className="eyebrow">Para {p.para}</p>

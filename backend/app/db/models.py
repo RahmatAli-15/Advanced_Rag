@@ -248,6 +248,9 @@ class ChangeEvent(Base):
     new_raw_path: Mapped[str | None] = mapped_column(Text)
     status: Mapped[str] = mapped_column(String(16), default="pending", server_default="pending")
     diff: Mapped[dict[str, Any]] = mapped_column(default=dict)
+    # Written by the change-impact agent (app/changes/impact.py, ADR 0014): per-paragraph
+    # analysis with verified quotes, related clauses and a summary. None = not analysed.
+    impact: Mapped[dict[str, Any] | None] = mapped_column(default=None)
     error: Mapped[str | None] = mapped_column(Text)
     detected_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), index=True

@@ -113,6 +113,7 @@ def format_changes(rows: list[dict[str, Any]]) -> str:
         "new_document": "new direction",
         "new_version": "new version",
         "silent_edit": "edited without a new version date",
+        "archive_backfill": "past amendment, earlier text from the Internet Archive",
     }
     out = []
     for r in rows:
@@ -122,6 +123,18 @@ def format_changes(rows: list[dict[str, Any]]) -> str:
             f"- {r['detected_at'][:10]}: {r['document_title']}"
             f" ({kinds.get(r['kind'], r['kind'])}; {summary})\n  {r['source_url']}"
         )
+        impact = r.get("impact")
+        if impact:  # the change-impact agent's analysis (quotes verified in code)
+            out.append(f"  Impact (AI analysis): {impact['summary']}")
+            for p in impact["paragraphs"]:
+                if not p.get("what_changed"):
+                    continue
+                flag = "" if p["verified"] else " [unverified]"
+                out.append(
+                    f"  · para {p['para']} [{p['severity']}]{flag}: {p['what_changed']}"
+                    f" Action: {p['action']}"
+                )
+            continue
         for ch in r["changed"][:3]:
             out.append(
                 f"  · para {ch.get('para', '?')} now reads: {_clip(str(ch.get('after', '')), 300)}"

@@ -194,6 +194,28 @@ question was answered by `gpt-oss-20b`, and the downgrade showed on the dashboar
 An uncached answer costs about $0.0004 at list price; a cache hit costs nothing
 ([ADR 0011](docs/adr/0011-observability-and-cost-control.md)).
 
+### What a change means (change-impact agent)
+
+When the worker detects a change, a small **LangGraph** agent explains it: what changed,
+who it affects, what to do, and which other clauses to check. Every claim must quote the
+old or new text **word for word**; code checks the quotes and sends failures back to the
+model (at most twice), otherwise the paragraph is marked unverified
+([ADR 0014](docs/adr/0014-change-impact-agent.md)).
+
+Tested on a real amendment (earlier text from an Internet Archive snapshot):
+
+```bash
+python -m app.ingestion.cli changes-from-archive 12957 20260608114823
+python -m app.ingestion.cli analyse-impact
+```
+
+> *Para 3(3): the exemption now applies only to NBFCs holding a Certificate of
+> Registration as "Type I NBFC" (high). Para 70 lets NBFCs finance independent viable
+> units as separate projects with their own financial closure (medium). Para 72
+> clarifies right of way for generation projects (low).*
+
+The analysis shows under "Recent RBI changes" in the UI and in MCP's `recent_changes`.
+
 ### Capacity and overload protection
 
 `python -m app.ingestion.cli load-test` measured the system on a laptop RTX 3050:
@@ -218,7 +240,7 @@ python -m app.worker dead                 # inspect jobs that failed for good
 
 The worker runs a job chain on a small Redis Streams queue (retries with backoff,
 dead-letter queue, crash recovery, idempotent daily scheduling): crawl → chunk + embed →
-paragraph diffs. Every detected change is written in the same transaction as the new
+paragraph diffs → impact analysis. Every detected change is written in the same transaction as the new
 version (transactional outbox) and shown under "Recent RBI changes"
 ([ADR 0010](docs/adr/0010-background-jobs-and-change-detection.md)).
 
@@ -287,10 +309,10 @@ npm run lint && npm test && npm run build
 - [x] MCP server: search, cited answers and recent changes as tools for AI assistants
 - [x] Test set reviewed clause by clause against its gold clauses (AI review; v2)
 - [x] Load test, GPU load shedding (503 + Retry-After) and per-client rate limiting
+- [x] Change-impact agent (LangGraph) with quote verification, tested on a real amendment
 
 **Next**
 
-- [ ] Change-impact agent (LangGraph): explains each detected RBI change and who it affects, citing old and new text
 - [ ] Exact-term test questions (e.g. "V-CIP", "NOF") to check the keyword-search weight
 - [ ] Human spot-check of the reviewed test set
 - [ ] On-demand AWS deployment (Terraform)

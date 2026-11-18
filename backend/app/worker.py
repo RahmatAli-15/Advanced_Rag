@@ -26,17 +26,20 @@ from datetime import datetime, time, timedelta, timezone
 
 from redis.asyncio import Redis
 
+from app.changes.impact import analyse_pending
 from app.changes.service import process_change_events
 from app.chunking.pipeline import chunk_versions
 from app.core.config import Settings, get_settings
 from app.core.logging import configure_logging
 from app.db.session import create_engine, create_session_factory
-from app.embeddings.factory import build_embedder
+from app.embeddings.factory import build_embedder, build_reranker
 from app.embeddings.pipeline import embed_pending_chunks
 from app.ingestion.http import PoliteClient
 from app.ingestion.pipeline import crawl_master_directions
 from app.ingestion.raw_store import RawStore
+from app.llm.factory import build_gateway
 from app.queue.core import Handler, PermanentError, Queue, Worker
+from app.retrieval.hybrid import HybridRetriever
 
 log = logging.getLogger(__name__)
 
@@ -78,14 +81,30 @@ def build_handlers(settings: Settings) -> dict[str, Handler]:
         log.info("indexed: %s / %s", asdict(chunked), asdict(embedded))
         await q.enqueue("build_changes")
 
-    async def build_changes(_: dict[str, object], __: Queue) -> None:
+    async def build_changes(_: dict[str, object], q: Queue) -> None:
         n = await process_change_events(sf, store)
         log.info("change events processed: %d", n)
+        await q.enqueue("analyse_impact")
+
+    async def analyse_impact(_: dict[str, object], __: Queue) -> None:
+        # The change-impact agent (ADR 0014). Patient retries: a batch job can wait out
+        # rate limits, a user request should not.
+        if not settings.groq_api_keys:
+            log.warning("no LLM key configured: skipping change-impact analysis")
+            return
+        gateway, provider = build_gateway(settings, max_retries=6, max_backoff_s=120)
+        retriever = HybridRetriever(sf, embedder, build_reranker(settings))
+        try:
+            n = await analyse_pending(sf, store, gateway, retriever)
+        finally:
+            await provider.aclose()
+        log.info("changes analysed: %d", n)
 
     return {
         "refresh_rbi": refresh_rbi,
         "index_pending": index_pending,
         "build_changes": build_changes,
+        "analyse_impact": analyse_impact,
     }
 
 

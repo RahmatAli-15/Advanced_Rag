@@ -379,6 +379,67 @@ a {
   background: var(--ok-bg);
 }
 
+.impact {
+  margin-bottom: 16px;
+  padding: 12px 14px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+
+.impact p {
+  margin: 0 0 8px;
+}
+
+.impact-summary {
+  font-weight: 500;
+}
+
+.impact-para {
+  padding-top: 8px;
+  border-top: 1px solid var(--line);
+}
+
+.impact-para .eyebrow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+
+.sev {
+  padding: 1px 6px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  border-radius: 4px;
+}
+
+.sev-high {
+  color: var(--bad);
+  background: var(--bad-bg);
+}
+
+.sev-medium {
+  color: var(--accent);
+  background: var(--warn-bg);
+}
+
+.sev-low,
+.sev-unverified {
+  color: var(--ink-3);
+  background: var(--line);
+}
+
+.impact-related {
+  font-size: 13px;
+}
+
+.impact-note {
+  font-size: 12px;
+  color: var(--ink-3);
+}
+
 /* ---------- a question and its answer ---------- */
 
 .turn {

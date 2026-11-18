@@ -57,7 +57,8 @@ flowchart LR
 | Local models | Query/chunk embeddings (bge-m3, multilingual) and reranking | Free, private, no quota |
 | LLM gateway | The only path to an LLM: fallback, retries, rate limits, circuit breaker, daily token budget | (0002, 0011) |
 | Redis | Answer cache, job queue, token-budget counter | Simple uses of one service |
-| Worker | Daily crawl, indexing, change diffs | Hand-written queue on Redis Streams (0010) |
+| Worker | Daily crawl, indexing, change diffs, impact analysis | Hand-written queue on Redis Streams (0010) |
+| Change-impact agent | Explains each change: what, who, action, related clauses | LangGraph with code-verified quotes (0014) |
 | MCP server | `ask_compliance`, `search_regulations`, `recent_changes` for AI assistants | Thin client of the API (0012) |
 | Prometheus + Grafana | `/metrics` scrape, dashboard for latency, outcomes, cost, queue | Metrics at three choke points (0011) |
 

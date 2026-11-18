@@ -10,6 +10,7 @@ import argparse
 import asyncio
 import json
 import random
+import uuid
 from dataclasses import asdict
 from datetime import UTC, date, datetime
 from pathlib import Path
@@ -258,6 +259,51 @@ async def _bench_retrieval(args: argparse.Namespace) -> int:
     return 0
 
 
+async def _changes_from_archive(args: argparse.Namespace) -> int:
+    from app.changes.archive import backfill_from_archive
+    from app.db.models import ChangeEvent
+
+    s = get_settings()
+    engine = create_engine(s.database_url)
+    try:
+        event_id = await backfill_from_archive(
+            create_session_factory(engine),
+            RawStore(s.data_dir / "raw"),
+            args.source_key,
+            args.timestamp,
+            user_agent=s.crawler_user_agent,
+        )
+        async with create_session_factory(engine)() as session:
+            event = await session.get_one(ChangeEvent, event_id)
+            print(f"change event {event_id}: {event.status}, {event.diff.get('counts')}")
+    finally:
+        await engine.dispose()
+    return 0
+
+
+async def _analyse_impact(args: argparse.Namespace) -> int:
+    from app.changes.impact import analyse_change, analyse_pending
+
+    s = get_settings()
+    engine = create_engine(s.database_url)
+    factory = create_session_factory(engine)
+    store = RawStore(s.data_dir / "raw")
+    retriever = (
+        None if args.no_related else HybridRetriever(factory, build_embedder(s), build_reranker(s))
+    )
+    gateway, provider = build_gateway(s, max_retries=6, max_backoff_s=120)
+    try:
+        if args.event:
+            impact = await analyse_change(uuid.UUID(args.event), factory, store, gateway, retriever)
+            print(json.dumps(impact, ensure_ascii=False, indent=2))
+        else:
+            print(f"analysed {await analyse_pending(factory, store, gateway, retriever)} changes")
+    finally:
+        await provider.aclose()
+        await engine.dispose()
+    return 0
+
+
 async def _load_test(args: argparse.Namespace) -> int:
     from app.eval.load import render, run
 
@@ -330,6 +376,16 @@ def main() -> int:
 
     sub.add_parser("bench-retrieval", help="per-stage latency vs quality for retrieval settings")
 
+    ca = sub.add_parser(
+        "changes-from-archive", help="diff an Internet Archive snapshot against current text"
+    )
+    ca.add_argument("source_key", help="RBI document id, e.g. 12957")
+    ca.add_argument("timestamp", help="Wayback snapshot timestamp, YYYYMMDDhhmmss")
+
+    ai = sub.add_parser("analyse-impact", help="run the change-impact agent (LangGraph)")
+    ai.add_argument("--event", help="one change event id (default: every unanalysed one)")
+    ai.add_argument("--no-related", action="store_true", help="skip the related-clause search")
+
     lt = sub.add_parser("load-test", help="throughput and latency of a running API under load")
     lt.add_argument("--url", default="http://localhost:8000")
     lt.add_argument("--endpoints", default="search,ask-cached", help="search,ask-cached")
@@ -349,6 +405,8 @@ def main() -> int:
         "eval-answers": _eval_answers,
         "bench-retrieval": _bench_retrieval,
         "load-test": _load_test,
+        "changes-from-archive": _changes_from_archive,
+        "analyse-impact": _analyse_impact,
     }
     return asyncio.run(commands[args.command](args))
 
