@@ -10,13 +10,15 @@ Parsers are pure functions (HTML in, dataclasses out) so they are fast to test
 against saved fixtures and independent of the network.
 """
 
+import hashlib
 import re
 from dataclasses import dataclass, field
 from datetime import date, datetime
-from typing import Literal
 from urllib.parse import parse_qs, urljoin, urlsplit
 
 from bs4 import BeautifulSoup, Tag
+
+from app.ingestion.document import AmendmentAction, Block, BlockKind, Footnote
 
 BASE_URL = "https://www.rbi.org.in/Scripts/"
 LISTING_URL = urljoin(BASE_URL, "BS_ViewMasterDirections.aspx")
@@ -112,14 +114,6 @@ def parse_listing(html: str) -> list[ListingItem]:
 
 # --------------------------------------------------------------------------- detail
 
-BlockKind = Literal["heading", "paragraph", "table"]
-
-
-@dataclass(frozen=True)
-class Block:
-    kind: BlockKind
-    text: str
-
 
 @dataclass(frozen=True)
 class DetailPage:
@@ -128,11 +122,100 @@ class DetailPage:
     ref_numbers: list[str]
     issued_on: date | None
     annex_links: list[str]
+    # sha256 of the page's normalised visible text. Independent of how we split it
+    # into blocks, so improving the parser never looks like a regulatory change.
+    fingerprint: str
     blocks: list[Block] = field(default_factory=list)
+    footnotes: dict[str, Footnote] = field(default_factory=dict)
 
     @property
     def text(self) -> str:
         return "\n\n".join(b.text for b in self.blocks)
+
+
+# Footnotes come in many shapes, e.g.
+#   "Inserted with effect from July 1, 2026, vide <circular> dated June 30, 2026."
+#   "Substituted w.e.f. February 13, 2026, vide <circular>"
+#   "Deleted vide the <circular>"            (no date)
+#   "Amended with effect from April 01, 2026, pursuant to the <circular>"
+#   "Modified w.e.f January 01, 2026."       (no source)
+#   "Ibid."                                   (same as previous footnote)
+# so each part is found separately instead of with one brittle pattern.
+_DATE_PATTERN = r"[A-Za-z]+\.?\s+\d{1,2},?\s+\d{4}"
+_ACTION_RE = re.compile(
+    r"^(Inserted|Added|Substituted|Modified|Amended|Revised|Deleted|Omitted)\b", re.I
+)
+_EFFECTIVE_RE = re.compile(
+    rf"(?:with\s+effect\s+from|w\.?\s*e\.?\s*f\.?(?:\s+from)?)\s*,?\s*({_DATE_PATTERN})", re.I
+)
+_SOURCE_RE = re.compile(
+    rf"\b(?:vide|consequent\s+to|pursuant\s+to)\s+(?:the\s+)?(.+?)"
+    rf"(?:,?\s+dated\s+{_DATE_PATTERN})?\s*[.,]?\s*$",
+    re.I | re.S,
+)
+_ACTIONS: dict[str, AmendmentAction] = {
+    "inserted": "inserted",
+    "added": "inserted",
+    "substituted": "substituted",
+    "modified": "amended",
+    "amended": "amended",
+    "revised": "amended",
+    "deleted": "deleted",
+    "omitted": "deleted",
+}
+
+
+def parse_footnote(
+    fid: str, text: str, url: str | None, previous: Footnote | None = None
+) -> Footnote:
+    if text.lower().startswith("ibid") and previous is not None:
+        # "Ibid." = same source as the previous footnote
+        return Footnote(
+            fid,
+            text,
+            previous.action,
+            previous.effective_from,
+            previous.amending_title,
+            previous.amending_url,
+        )
+    action = _ACTION_RE.match(text)
+    if not action:
+        return Footnote(fid, text, "note", None, None, url)
+    effective = _EFFECTIVE_RE.search(text)
+    source = _SOURCE_RE.search(text)
+    return Footnote(
+        id=fid,
+        text=text,
+        action=_ACTIONS[action.group(1).lower()],
+        effective_from=parse_date(effective.group(1)) if effective else None,
+        amending_title=_clean(source.group(1)).rstrip(" ,.") if source else None,
+        amending_url=url,
+    )
+
+
+def _marker_links(el: Tag) -> list[Tag]:
+    return [
+        a
+        for sup in el.find_all("sup")
+        for a in sup.find_all("a", href=True)
+        if str(a["href"]).startswith("#")
+    ]
+
+
+def _footnote_refs(el: Tag) -> tuple[str, ...]:
+    refs = [str(a["href"])[1:] for a in _marker_links(el)]
+    return tuple(dict.fromkeys(refs))  # dedupe, keep order
+
+
+def _is_footnote_paragraph(p: Tag) -> bool:
+    # Seen both as <p class="footnote"> and <p><span class="footnote">.
+    return "footnote" in (p.get("class") or []) or p.find(class_="footnote") is not None
+
+
+def _text_without_markers(el: Tag) -> str:
+    """Element text minus <sup> footnote numbers, which otherwise leak into sentences."""
+    parts = [str(s) for s in el.find_all(string=True) if s.find_parent("sup") is None]
+    return _clean(" ".join(parts))
 
 
 class PageLayoutChanged(ValueError):
@@ -149,7 +232,7 @@ def _content_cell(soup: BeautifulSoup) -> Tag:
 def _table_text(table: Tag) -> str:
     rows = []
     for tr in table.find_all("tr"):
-        cells = [_clean(c.get_text(" ")) for c in tr.find_all(["td", "th"])]
+        cells = [_text_without_markers(c) for c in tr.find_all(["td", "th"])]
         if any(cells):
             rows.append(" | ".join(cells))
     return "\n".join(rows)
@@ -183,6 +266,9 @@ def parse_detail(html: str) -> DetailPage:
         }
     )
 
+    fingerprint = hashlib.sha256(_clean(cell.get_text(" ")).encode()).hexdigest()
+
+    footnotes: dict[str, Footnote] = {}
     blocks: list[Block] = []
     for el in title_p.find_all_next(["p", "table", "li"]):
         if not isinstance(el, Tag) or not _inside(el, cell):
@@ -191,21 +277,54 @@ def parse_detail(html: str) -> DetailPage:
         # table is captured as part of that table's block.
         if el.find_parent("table") is not cell:
             continue
+        classes: list[str] = list(el.get("class") or [])
+        if el.name == "p" and _is_footnote_paragraph(el):
+            anchor = el.find("a", id=True)
+            if isinstance(anchor, Tag):
+                fid = str(anchor["id"])
+                link = next(
+                    (
+                        urljoin(BASE_URL, str(a["href"]))
+                        for a in el.find_all("a", href=True)
+                        if not str(a["href"]).startswith("#")
+                    ),
+                    None,
+                )
+                previous = next(reversed(footnotes.values()), None)
+                footnotes[fid] = parse_footnote(fid, _text_without_markers(el), link, previous)
+            continue
         if el.name == "table":
             if "table of contents" in el.get_text(" ").lower()[:200]:
                 continue
             if text := _table_text(el):
-                blocks.append(Block("table", text))
+                blocks.append(Block("table", text, _footnote_refs(el)))
             continue
         if el.name == "p" and el.find_parent("li") is not None:
             continue  # the enclosing <li> already holds this text
-        text = _clean(el.get_text(" "))
+        text = _text_without_markers(el)
         if not text:
             continue
-        kind: BlockKind = "heading" if "head" in (el.get("class") or []) else "paragraph"
-        blocks.append(Block(kind, text))
+        kind: BlockKind = "heading" if "head" in classes else "paragraph"
+        blocks.append(Block(kind, text, _footnote_refs(el)))
 
-    return DetailPage(title, updated, ref_numbers, issued_on, annex_links, blocks)
+    # Fallback: each inline marker repeats its footnote text in a tooltip title.
+    for a in _marker_links(cell):
+        fid = str(a["href"])[1:]
+        sup = a.find_parent("sup")
+        tooltip = _clean(str(sup.get("title", ""))) if sup is not None else ""
+        if fid not in footnotes and tooltip:
+            footnotes[fid] = parse_footnote(fid, tooltip, None)
+
+    return DetailPage(
+        title=title,
+        updated_as_on=updated,
+        ref_numbers=ref_numbers,
+        issued_on=issued_on,
+        annex_links=annex_links,
+        fingerprint=fingerprint,
+        blocks=blocks,
+        footnotes=footnotes,
+    )
 
 
 def _inside(el: Tag | None, ancestor: Tag) -> bool:

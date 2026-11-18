@@ -92,3 +92,84 @@ def test_parse_versions_sorted_and_case_insensitive() -> None:
 def test_decode_html_keeps_utf8_and_repairs_cp1252_bytes() -> None:
     assert decode_html("Banks – CRR".encode()) == "Banks – CRR"
     assert decode_html(b"Banks \x96 CRR") == "Banks – CRR"
+
+
+def test_footnote_markers_are_linked_not_leaked_into_text() -> None:
+    page = rbi.parse_detail(_load("rbi_detail.html"))
+    para2 = next(b for b in page.blocks if b.text.startswith("2."))
+    assert para2.text == "2. These Directions shall come into force with immediate effect."
+    assert para2.footnote_ids == ("F1",)
+
+    f1 = page.footnotes["F1"]
+    assert f1.action == "substituted"
+    assert f1.effective_from == date(2026, 7, 1)
+    assert f1.amending_title == "X Amendment Directions, 2026"
+    assert f1.amending_url == (
+        "https://www.rbi.org.in/Scripts/NotificationUser.aspx?Id=13236&Mode=0"
+    )
+
+
+def test_missing_footnote_definition_falls_back_to_marker_tooltip() -> None:
+    page = rbi.parse_detail(_load("rbi_detail.html"))
+    ft2 = page.footnotes["FT2"]  # no <p class="footnote"> for FT2; tooltip only
+    assert ft2.action == "deleted"
+    assert ft2.effective_from == date(2026, 1, 1)
+    assert ft2.amending_url is None
+
+
+@pytest.mark.parametrize(
+    ("text", "action", "effective", "title"),
+    [
+        (
+            "Inserted with effect from July 1, 2026, vide RBI (NBFC – KYC) Amendment "
+            "Directions, 2026 dated June 30, 2026.",
+            "inserted",
+            date(2026, 7, 1),
+            "RBI (NBFC – KYC) Amendment Directions, 2026",
+        ),
+        (
+            "Substituted w.e.f. February 13, 2026, vide Y Directions",
+            "substituted",
+            date(2026, 2, 13),
+            "Y Directions",
+        ),
+        ("Inserted w.e.f from February 13, 2026 vide Z", "inserted", date(2026, 2, 13), "Z"),
+        (
+            "Deleted vide the Q Amendment Directions, 2026",
+            "deleted",
+            None,
+            "Q Amendment Directions, 2026",
+        ),
+        (
+            "Amended with effect from April 01, 2026, pursuant to the P Directions",
+            "amended",
+            date(2026, 4, 1),
+            "P Directions",
+        ),
+        ("Modified w.e.f January 01, 2026.", "amended", date(2026, 1, 1), None),
+        ("Refer to the judgement of the Supreme Court dated March 27, 2023", "note", None, None),
+    ],
+)
+def test_parse_footnote_variants(
+    text: str, action: str, effective: date | None, title: str | None
+) -> None:
+    fn = rbi.parse_footnote("F9", text, None)
+    assert (fn.action, fn.effective_from, fn.amending_title) == (action, effective, title)
+
+
+def test_ibid_inherits_previous_footnote() -> None:
+    prev = rbi.parse_footnote("F1", "Inserted w.e.f. July 1, 2026 vide A Directions", "u")
+    ibid = rbi.parse_footnote("F2", "Ibid.", None, previous=prev)
+    assert (ibid.action, ibid.effective_from, ibid.amending_url) == (
+        "inserted",
+        date(2026, 7, 1),
+        "u",
+    )
+
+
+def test_fingerprint_ignores_markup_but_tracks_text() -> None:
+    html = _load("rbi_detail.html")
+    same = rbi.parse_detail(html.replace("<p>1. These", "<p >1.  These")).fingerprint
+    changed = rbi.parse_detail(html.replace("immediate effect", "effect from 1 May")).fingerprint
+    base = rbi.parse_detail(html).fingerprint
+    assert same == base and changed != base

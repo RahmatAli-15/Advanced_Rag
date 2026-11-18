@@ -14,6 +14,7 @@ from typing import Any, ClassVar
 
 from sqlalchemy import (
     CheckConstraint,
+    Computed,
     Date,
     DateTime,
     Enum,
@@ -26,7 +27,7 @@ from sqlalchemy import (
     UniqueConstraint,
     func,
 )
-from sqlalchemy.dialects.postgresql import JSONB, UUID
+from sqlalchemy.dialects.postgresql import JSONB, TSVECTOR, UUID
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
 NAMING = {
@@ -40,7 +41,11 @@ NAMING = {
 
 class Base(DeclarativeBase):
     metadata = MetaData(naming_convention=NAMING)
-    type_annotation_map: ClassVar[dict[Any, Any]] = {dict[str, Any]: JSONB, list[str]: JSONB}
+    type_annotation_map: ClassVar[dict[Any, Any]] = {
+        dict[str, Any]: JSONB,
+        list[str]: JSONB,
+        list[dict[str, Any]]: JSONB,
+    }
 
 
 class ContentStatus(StrEnum):
@@ -110,6 +115,41 @@ class DocumentVersion(Base):
     )
 
     document: Mapped[Document] = relationship(back_populates="versions")
+
+
+class Chunk(Base):
+    """A retrieval unit: one clause (or part of one) of a captured document version.
+
+    `context` is the header prepended for embedding and keyword search (document title,
+    headings, paragraph refs, parent lead-in); `text` is the exact regulatory text shown
+    and cited. `search_tsv` is maintained by Postgres, so keyword search can never drift
+    out of sync with the text.
+    """
+
+    __tablename__ = "chunks"
+    __table_args__ = (
+        UniqueConstraint("version_id", "ordinal"),
+        Index("ix_chunks_search_tsv", "search_tsv", postgresql_using="gin"),
+    )
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    version_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("document_versions.id", ondelete="CASCADE")
+    )
+    ordinal: Mapped[int] = mapped_column(Integer)
+    kind: Mapped[str] = mapped_column(String(16))
+    heading_path: Mapped[list[str]] = mapped_column(default=list)
+    para_refs: Mapped[list[str]] = mapped_column(default=list)
+    context: Mapped[str] = mapped_column(Text)
+    text: Mapped[str] = mapped_column(Text)
+    token_count: Mapped[int] = mapped_column(Integer)
+    amendments: Mapped[list[dict[str, Any]]] = mapped_column(default=list)
+    chunker_version: Mapped[str] = mapped_column(String(32))
+    search_tsv: Mapped[str] = mapped_column(
+        TSVECTOR,
+        Computed("to_tsvector('english', context || ' ' || text)", persisted=True),
+    )
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
 
 class CrawlRun(Base):

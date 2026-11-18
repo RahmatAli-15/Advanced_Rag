@@ -9,7 +9,6 @@ A bot-protection challenge aborts the whole run: we back off, we do not push thr
 """
 
 import asyncio
-import hashlib
 import logging
 import uuid
 from dataclasses import asdict, dataclass
@@ -124,7 +123,7 @@ async def _ingest_one(
     result = await client.get(item.url)
     stats.fetched += 1
     page = rbi.parse_detail(decode_html(result.body))
-    text_sha = hashlib.sha256(page.text.encode()).hexdigest()
+    text_sha = page.fingerprint
 
     valid_from = page.updated_as_on or page.issued_on or item.issued_on
     if valid_from is None:

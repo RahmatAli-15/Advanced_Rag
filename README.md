@@ -50,12 +50,17 @@ Then open http://localhost:8000/health/ready and http://localhost:8000/docs.
 cd backend
 alembic upgrade head
 python -m app.ingestion.cli rbi-master-directions --match "Non-Banking" --history
+python -m app.ingestion.cli chunk
 ```
 
 The crawler obeys robots.txt (RFC 9309), waits 3 s between requests, stops on any
 bot-protection challenge, and is idempotent. See [ADR 0003](docs/adr/0003-crawling-policy.md).
 Each Master Direction is stored with its version history, so you can ask which version
 was in force on a given date.
+
+Chunking follows the regulation's own structure ([ADR 0004](docs/adr/0004-clause-aware-chunking.md)):
+one clause per chunk, exact paragraph references (`63(9)(iv)`), parent context repeated
+when a clause is split, and every amendment footnote linked to the paragraph it changed.
 
 Run the whole stack in containers instead: `docker compose --profile full up --build`.
 
@@ -72,7 +77,7 @@ pytest            # integration tests use a separate advancedrag_test database
 
 - [x] **Phase 1 — Foundation:** FastAPI skeleton, Postgres + pgvector, Redis, CI
 - [x] Polite RBI crawler, structure-preserving parser, versioned (bitemporal) storage
-- [ ] Clause-aware chunking
+- [x] Clause-aware chunking with amendment tracking and full-text index
 - [ ] **Phase 2 — Core RAG:** local embeddings, hybrid search + RRF, reranking, cited answers, chat UI
 - [ ] **Phase 3 — Evaluation:** golden dataset, retrieval + faithfulness metrics gating CI, tracing
 - [ ] **Phase 4 — Compliance engine:** versioned rules ("as of date"), amendment diffs, citation graph, alerts, obligation register

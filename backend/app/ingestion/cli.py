@@ -1,6 +1,7 @@
-"""Command-line entry point for crawlers.
+"""Command-line entry point for ingestion.
 
-python -m app.ingestion.cli rbi-master-directions --match "Non-Banking" --limit 5 --history
+python -m app.ingestion.cli rbi-master-directions --match "Non-Banking" --history
+python -m app.ingestion.cli chunk [--rebuild]
 """
 
 import argparse
@@ -8,6 +9,7 @@ import asyncio
 import json
 from dataclasses import asdict
 
+from app.chunking.pipeline import chunk_versions
 from app.core.config import get_settings
 from app.core.logging import configure_logging
 from app.db.session import create_engine, create_session_factory
@@ -35,6 +37,19 @@ async def _rbi_master_directions(args: argparse.Namespace) -> int:
     return 1 if stats.aborted else 0
 
 
+async def _chunk(args: argparse.Namespace) -> int:
+    s = get_settings()
+    engine = create_engine(s.database_url)
+    try:
+        stats = await chunk_versions(
+            create_session_factory(engine), RawStore(s.data_dir / "raw"), rebuild=args.rebuild
+        )
+    finally:
+        await engine.dispose()
+    print(json.dumps(asdict(stats), indent=2))
+    return 1 if stats.failed else 0
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(prog="advancedrag-ingest")
     sub = parser.add_subparsers(dest="command", required=True)
@@ -44,10 +59,15 @@ def main() -> int:
     md.add_argument("--limit", type=int, help="max documents to fetch")
     md.add_argument("--history", action="store_true", help="also record past version dates")
 
+    ch = sub.add_parser("chunk", help="chunk captured versions not yet chunked")
+    ch.add_argument("--rebuild", action="store_true", help="re-chunk every captured version")
+
     args = parser.parse_args()
     configure_logging(get_settings().log_level)
     if args.command == "rbi-master-directions":
         return asyncio.run(_rbi_master_directions(args))
+    if args.command == "chunk":
+        return asyncio.run(_chunk(args))
     return 2
 
 
