@@ -4,7 +4,7 @@
 
 AdvancedRag tracks circulars and master directions from Indian regulators (starting with the RBI), answers questions with exact paragraph citations, and tells compliance teams what changed and what they now have to do.
 
-> 🚧 **Status: early development (Phase 1 — foundation).** See the [roadmap](#roadmap).
+> 🚧 **Status: early development (Phase 2 — core RAG).** See the [roadmap](#roadmap).
 
 ## Why this is hard
 
@@ -30,7 +30,7 @@ Design decisions are recorded in [`docs/adr/`](docs/adr).
 
 ## Quick start
 
-Requirements: Docker, Python 3.12.
+Requirements: Docker, Python 3.12, Node 22.
 
 ```bash
 cp .env.example .env              # add your GROQ_API_KEY
@@ -43,6 +43,17 @@ uvicorn app.main:app --reload
 ```
 
 Then open http://localhost:8000/health/ready and http://localhost:8000/docs.
+
+### Chat UI
+
+```bash
+cd frontend
+npm install
+npm run dev          # http://localhost:5173, proxies /api to the API on :8000
+```
+
+Answers stream in token by token. Each citation opens the exact clause, the version in
+force on the chosen date, its amendment history, and a link to the official RBI text.
 
 ### Ingest RBI Master Directions
 
@@ -98,6 +109,10 @@ curl -X POST localhost:8000/ask -H "content-type: application/json" \
 }
 ```
 
+For a streamed answer, use `POST /ask/stream` (Server-Sent Events: `stage`, `sources`,
+`delta`, `final`). Retries and model fallback happen only before the first token, and the
+`final` event carries the verified answer ([ADR 0008](docs/adr/0008-streaming-answers.md)).
+
 Works in English, Hinglish and Hindi. Unanswerable or off-topic questions get an honest
 `not_found` / `insufficient_sources` / `no_coverage` instead of a guess; every citation is
 verified against the clauses actually retrieved, and every answer is written to an audit
@@ -125,6 +140,9 @@ cd backend
 ruff check . && ruff format --check .
 mypy app
 pytest            # integration tests use a separate advancedrag_test database
+
+cd ../frontend
+npm run lint && npm test && npm run build
 ```
 
 ## Roadmap
@@ -134,7 +152,7 @@ pytest            # integration tests use a separate advancedrag_test database
 - [x] Clause-aware chunking with amendment tracking and full-text index
 - [x] Local embeddings (bge-m3), hybrid search + RRF, cross-encoder reranking, as-of-date filtering
 - [x] Cited answers (`/ask`): two-layer abstention, citation verification, prompt-injection fencing, audit log
-- [ ] **Phase 2 — Core RAG:** chat UI (React + Vite), streaming
+- [x] **Phase 2 — Core RAG:** chat UI (React + Vite), SSE streaming, clause viewer, as-of date picker
 - [x] LLM gateway: fallback chain, retries honouring Retry-After, rate limiting, circuit breaker, JSON repair
 - [x] Retrieval evaluation: multilingual test set, ablation of every component
 - [ ] **Phase 3 — Evaluation:** human review of the test set, exact-term questions, answer faithfulness, tracing

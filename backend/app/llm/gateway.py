@@ -8,13 +8,16 @@ For each request it walks a fallback chain of models. Per model it applies:
     cool-down period, so a dead model does not add latency to every request
 Fatal errors (bad request, auth) are not retried. When every model fails, the caller
 gets AllModelsFailed and can degrade gracefully (e.g. return search results only).
+
+Streaming uses the same policy, but only until the first token reaches the caller.
+After that a failure raises StreamInterrupted instead of retrying or falling back.
 """
 
 import asyncio
 import logging
 import random
 import time
-from collections.abc import Awaitable, Callable
+from collections.abc import AsyncGenerator, Awaitable, Callable
 from dataclasses import dataclass, field
 from typing import Protocol
 
@@ -26,6 +29,8 @@ from app.llm.types import (
     LLMResponse,
     Message,
     RateLimited,
+    StreamEvent,
+    StreamInterrupted,
     TransientError,
     Usage,
 )
@@ -40,6 +45,8 @@ class Provider(Protocol):
     name: str
 
     async def complete(self, request: LLMRequest, model: str) -> LLMResponse: ...
+
+    def stream(self, request: LLMRequest, model: str) -> AsyncGenerator[StreamEvent]: ...
 
 
 class TokenBucket:
@@ -188,6 +195,67 @@ class LLMGateway:
                     response.latency_ms,
                     attempts,
                 )
+        self.stats.failures += 1
+        raise AllModelsFailed("; ".join(errors[-6:]) or "no model available")
+
+    def _record_usage(self, model: str, usage: Usage) -> None:
+        prev = self.stats.usage_by_model.get(model, Usage())
+        self.stats.usage_by_model[model] = Usage(
+            prev.prompt_tokens + usage.prompt_tokens,
+            prev.completion_tokens + usage.completion_tokens,
+        )
+
+    async def stream(self, request: LLMRequest) -> AsyncGenerator[StreamEvent]:
+        """Yield text deltas, then one done=True event. Retries and fallbacks happen
+        only until the first event is out; the caller never sees two models' text."""
+        errors: list[str] = []
+        for i, route in enumerate(self.routes):
+            breaker = self._breakers[route.model]
+            if not breaker.allow():
+                errors.append(f"{route.model}: circuit open")
+                continue
+            if i > 0:
+                self.stats.fallbacks += 1
+                log.warning("falling back to %s (stream)", route.model)
+            for attempt in range(self.max_retries + 1):
+                await self._buckets[route.model].acquire()
+                self.stats.calls += 1
+                events = route.provider.stream(request, route.model)
+                try:
+                    first = await anext(events)
+                except StopAsyncIteration:
+                    first = StreamEvent(done=True, model=route.model, usage=Usage())
+                except FatalError as e:
+                    errors.append(f"{route.model}: {e}")
+                    breaker.record_failure()
+                    break
+                except (RateLimited, TransientError) as e:
+                    breaker.record_failure()
+                    errors.append(f"{route.model}: {e}")
+                    if attempt == self.max_retries or not breaker.allow():
+                        break
+                    self.stats.retries += 1
+                    retry_after = e.retry_after_s if isinstance(e, RateLimited) else None
+                    await self._sleep(self._backoff(attempt, retry_after))
+                    continue
+
+                breaker.record_success()
+                try:
+                    event: StreamEvent | None = first
+                    while event is not None:
+                        if event.done:
+                            self._record_usage(route.model, event.usage or Usage())
+                        yield event
+                        if event.done:
+                            return
+                        event = await anext(events, None)
+                except LLMError as e:
+                    breaker.record_failure()
+                    self.stats.failures += 1
+                    raise StreamInterrupted(f"{route.model}: {e}") from e
+                finally:
+                    await events.aclose()  # releases the HTTP connection on cancel too
+                return
         self.stats.failures += 1
         raise AllModelsFailed("; ".join(errors[-6:]) or "no model available")
 

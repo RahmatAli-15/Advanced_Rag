@@ -8,7 +8,7 @@ from fastapi import FastAPI
 from redis.asyncio import Redis
 
 from app.answer.service import AnswerService
-from app.api import ask, health, search
+from app.api import ask, corpus, health, search
 from app.core.config import Settings, get_settings
 from app.core.logging import configure_logging
 from app.db.session import create_engine, create_session_factory
@@ -57,6 +57,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(health.router)
     app.include_router(search.router)
     app.include_router(ask.router)
+    app.include_router(corpus.router)
     return app
 
 

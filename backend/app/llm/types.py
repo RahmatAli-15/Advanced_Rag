@@ -40,6 +40,17 @@ class LLMResponse:
     attempts: int = 1  # total provider calls made, including retries and fallbacks
 
 
+@dataclass(frozen=True)
+class StreamEvent:
+    """A piece of a streamed completion. The last event has done=True and carries the
+    model that answered and the token usage."""
+
+    text: str = ""
+    done: bool = False
+    model: str = ""
+    usage: Usage | None = None
+
+
 class LLMError(Exception):
     """Base class for provider failures."""
 
@@ -60,3 +71,8 @@ class FatalError(LLMError):
 
 class AllModelsFailed(LLMError):
     """Every model in the fallback chain failed or was unavailable."""
+
+
+class StreamInterrupted(LLMError):
+    """A stream failed after text had already been sent to the caller. It is not
+    retried: splicing a second model's output onto the first would be incoherent."""
