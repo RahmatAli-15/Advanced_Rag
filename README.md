@@ -4,7 +4,13 @@
 
 AdvancedRag tracks circulars and master directions from Indian regulators (starting with the RBI), answers questions with exact paragraph citations, and tells compliance teams what changed and what they now have to do.
 
-> 🚧 **Status: early development (Phase 2 — core RAG).** See the [roadmap](#roadmap).
+> **New here? Read [AdvancedRag, explained simply](docs/explained.md)**: what it is, why,
+> how to use it, the architecture (HLD/LLD), guardrails, cost and measured results, in
+> plain language.
+>
+> **Status:** working end to end on the RBI NBFC Master Directions (45 directions):
+> cited answers in English, Hindi and Hinglish, change tracking with an explaining agent,
+> monitoring and load protection. Next steps are in the [roadmap](#roadmap).
 
 ## Why this is hard
 
