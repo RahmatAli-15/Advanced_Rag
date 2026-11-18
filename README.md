@@ -81,6 +81,28 @@ when a clause is split, and every amendment footnote linked to the paragraph it 
 
 Run the whole stack in containers instead: `docker compose --profile full up --build`.
 
+## Ask a question
+
+```bash
+curl -X POST localhost:8000/ask -H "content-type: application/json" \
+  -d '{"question": "How often must an NBFC update KYC for high-risk customers?"}'
+```
+
+```json
+{
+  "status": "answered",
+  "answer": "An NBFC must update the KYC of high-risk customers **at least once every two years** from the date of opening of the account or the last KYC updation [S1]",
+  "citations": [{"id": "S1", "document_title": "Reserve Bank of India (Non-Banking Financial Companies – Know Your Customer) Directions, 2025",
+                 "para_refs": ["42(1)", "42(2)", "42(3)"], "version_valid_from": "2025-12-29", "...": "..."}],
+  "timings_ms": {"retrieval": 905, "llm": 1324, "total": 2229}
+}
+```
+
+Works in English, Hinglish and Hindi. Unanswerable or off-topic questions get an honest
+`not_found` / `insufficient_sources` / `no_coverage` instead of a guess; every citation is
+verified against the clauses actually retrieved, and every answer is written to an audit
+log ([ADR 0007](docs/adr/0007-grounded-answers.md)).
+
 ## Measured retrieval quality
 
 153 questions in English, Hinglish and Hindi over 45 RBI NBFC Master Directions
@@ -111,7 +133,8 @@ pytest            # integration tests use a separate advancedrag_test database
 - [x] Polite RBI crawler, structure-preserving parser, versioned (bitemporal) storage
 - [x] Clause-aware chunking with amendment tracking and full-text index
 - [x] Local embeddings (bge-m3), hybrid search + RRF, cross-encoder reranking, as-of-date filtering
-- [ ] **Phase 2 — Core RAG:** cited answers via the LLM gateway, chat UI
+- [x] Cited answers (`/ask`): two-layer abstention, citation verification, prompt-injection fencing, audit log
+- [ ] **Phase 2 — Core RAG:** chat UI (React + Vite), streaming
 - [x] LLM gateway: fallback chain, retries honouring Retry-After, rate limiting, circuit breaker, JSON repair
 - [x] Retrieval evaluation: multilingual test set, ablation of every component
 - [ ] **Phase 3 — Evaluation:** human review of the test set, exact-term questions, answer faithfulness, tracing

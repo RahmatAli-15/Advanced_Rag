@@ -192,20 +192,21 @@ class LLMGateway:
         raise AllModelsFailed("; ".join(errors[-6:]) or "no model available")
 
 
-async def complete_json[T](
+async def complete_json_with_response[T](
     gateway: LLMGateway,
     request: LLMRequest,
     parse: Callable[[str], T],
     *,
     repairs: int = 1,
-) -> T:
-    """Ask for JSON, validate it, and on failure send the error back once for repair."""
+) -> tuple[T, LLMResponse]:
+    """Ask for JSON, validate it, and on failure send the error back once for repair.
+    Returns the parsed value and the response that produced it (model, usage)."""
     req = LLMRequest(request.messages, request.temperature, request.max_tokens, json_mode=True)
     last_error = ""
     for _ in range(repairs + 1):
         response = await gateway.complete(req)
         try:
-            return parse(response.text)
+            return parse(response.text), response
         except (ValueError, LLMError) as e:  # pydantic ValidationError is a ValueError
             last_error = str(e)[:500]
             req = LLMRequest(
@@ -223,3 +224,14 @@ async def complete_json[T](
                 json_mode=True,
             )
     raise ValueError(f"model did not produce valid JSON after repair: {last_error}")
+
+
+async def complete_json[T](
+    gateway: LLMGateway,
+    request: LLMRequest,
+    parse: Callable[[str], T],
+    *,
+    repairs: int = 1,
+) -> T:
+    value, _ = await complete_json_with_response(gateway, request, parse, repairs=repairs)
+    return value

@@ -19,6 +19,7 @@ from sqlalchemy import (
     Date,
     DateTime,
     Enum,
+    Float,
     ForeignKey,
     Index,
     Integer,
@@ -180,6 +181,34 @@ class ChunkEmbedding(Base):
     model: Mapped[str] = mapped_column(String(128), primary_key=True)
     embedding: Mapped[list[float]] = mapped_column(Vector(EMBEDDING_DIM))
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
+class AnswerLog(Base):
+    """Audit trail: every answer can be reproduced and explained later.
+
+    Records exactly which clauses were retrieved and cited, the model and prompt
+    version used, and the as-of date, so "why did the system say X on day Y?" has an
+    answer. Chunk ids are stored as plain strings (no foreign key) so the log survives
+    re-chunking.
+    """
+
+    __tablename__ = "answer_logs"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    question: Mapped[str] = mapped_column(Text)
+    as_of: Mapped[date] = mapped_column(Date)
+    status: Mapped[str] = mapped_column(String(32))
+    answer: Mapped[str] = mapped_column(Text)
+    model: Mapped[str | None] = mapped_column(String(128))
+    prompt_version: Mapped[str] = mapped_column(String(32))
+    retrieved_chunk_ids: Mapped[list[str]] = mapped_column(default=list)
+    cited_chunk_ids: Mapped[list[str]] = mapped_column(default=list)
+    top_rerank_score: Mapped[float | None] = mapped_column(Float)
+    usage: Mapped[dict[str, Any]] = mapped_column(default=dict)
+    timings_ms: Mapped[dict[str, Any]] = mapped_column(default=dict)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), index=True
+    )
 
 
 class CrawlRun(Base):
