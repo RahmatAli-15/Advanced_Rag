@@ -1,7 +1,7 @@
 from collections.abc import Sequence
 
 from app.core.config import Settings
-from app.llm.gateway import LLMGateway, ModelRoute
+from app.llm.gateway import Budget, LLMGateway, ModelRoute
 from app.llm.groq import GroqProvider
 
 
@@ -22,6 +22,7 @@ def build_gateway(
     *,
     max_retries: int = 3,
     max_backoff_s: float = 30.0,
+    budget: Budget | None = None,
 ) -> tuple[LLMGateway, ProviderPool]:
     """Returns the gateway and its providers (which the caller must aclose()).
 
@@ -43,5 +44,11 @@ def build_gateway(
         for model in (models or settings.llm_models)
         for i, provider in enumerate(providers, start=1)
     ]
-    gateway = LLMGateway(routes, max_retries=max_retries, max_backoff_s=max_backoff_s)
+    gateway = LLMGateway(
+        routes,
+        max_retries=max_retries,
+        max_backoff_s=max_backoff_s,
+        budget=budget,
+        prices=settings.llm_prices_usd_per_m,
+    )
     return gateway, ProviderPool(providers)

@@ -34,6 +34,15 @@ class Settings(BaseSettings):
     # Answer-evaluation judge: a different model family from the answer model, so the
     # judge is not grading its own phrasing (self-preference bias).
     judge_models: list[str] = ["qwen/qwen3.8-27b"]
+    # Daily token budget for the primary model; past it, requests start at the next,
+    # cheaper model (ADR 0011). 0 turns the budget off.
+    llm_daily_token_budget: int = 1_000_000
+    # List prices in USD per 1M tokens [input, output], for the cost metric. Check the
+    # provider's pricing page; models not listed are counted at 0.
+    llm_prices_usd_per_m: dict[str, list[float]] = {
+        "openai/gpt-oss-120b": [0.15, 0.60],
+        "openai/gpt-oss-20b": [0.075, 0.30],
+    }
 
     data_dir: Path = _REPO_ROOT / "data"
     eval_dir: Path = _REPO_ROOT / "eval"  # datasets and reports (committed)

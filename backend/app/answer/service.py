@@ -25,6 +25,7 @@ from typing import Any, Literal, Protocol
 from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
+from app.core import metrics
 from app.db.models import AnswerLog
 from app.llm.gateway import LLMGateway, complete_json_with_response
 from app.llm.types import AllModelsFailed, LLMError, LLMRequest, Message, Usage
@@ -572,6 +573,7 @@ class AnswerService:
         top_score: float,
         prompt_version: str = PROMPT_VERSION,
     ) -> uuid.UUID:
+        _observe(result, prompt_version)
         # Keep the id locally: reading it from the row after commit would trigger an
         # implicit reload on a closed session.
         log_id = uuid.uuid4()
@@ -595,6 +597,16 @@ class AnswerService:
         async with self._sf() as s, s.begin():
             s.add(row)
         return log_id
+
+
+def _observe(result: AnswerResult, prompt_version: str) -> None:
+    """Prometheus metrics for one answer. Called from _log, the one place every answer
+    shown passes through (cache hits included), so the two never disagree."""
+    mode = "stream" if prompt_version.startswith("answer-stream") else "sync"
+    cached = "true" if result.cached else "false"
+    metrics.ANSWERS.labels(mode, result.status, cached).inc()
+    for stage, ms in result.timings_ms.items():
+        metrics.STAGE_SECONDS.labels(stage, cached).observe(ms / 1000)
 
 
 def _split_marker(text: str) -> tuple[bool, str]:

@@ -146,6 +146,23 @@ correct answer is worth half a second. Latency is handled instead by the cache (
 questions ~4 ms) and by streaming (sources after ~1 s, then the answer as it is written).
 Full table: [`eval/reports/bench-20261118-1059.md`](eval/reports/bench-20261118-1059.md).
 
+### Monitoring and cost control
+
+```bash
+docker compose --profile observability up -d   # Prometheus :9090, Grafana :3000
+```
+
+The API exposes Prometheus metrics at `/metrics`, and Grafana opens on a ready-made
+dashboard: answers by status, cache hit rate, p95 time per stage, LLM calls by outcome
+(including 429s per key), tokens and **cost per answer**, and queue depth with
+dead-lettered jobs.
+
+A **daily token budget** in the LLM gateway caps spend on the primary model: past the
+limit, requests start at the cheaper model instead of failing (checked live: the next
+question was answered by `gpt-oss-20b`, and the downgrade showed on the dashboard).
+An uncached answer costs about $0.0004 at list price; a cache hit costs nothing
+([ADR 0011](docs/adr/0011-observability-and-cost-control.md)).
+
 ### Keep it up to date (background worker)
 
 ```bash
@@ -222,10 +239,11 @@ npm run lint && npm test && npm run build
 - [x] Retrieval evaluation: multilingual test set, ablation of every component
 - [x] Answer evaluation: claim-level faithfulness, blind citation check, judge sensitivity, abstention
 - [x] Answer cache, multi-key LLM routing, background worker (queue, retries, DLQ, daily crawl), change detection
+- [x] Prometheus + Grafana monitoring, cost per answer, daily token budget with model downgrade
 - [ ] **Phase 3 — Evaluation:** human review of the test set, exact-term questions, tracing
 - [ ] **Phase 4 — Compliance engine:** versioned rules ("as of date"), amendment diffs, citation graph, alerts, obligation register
 - [ ] **Phase 5 — Agent:** LangGraph impact analysis, MCP server
-- [ ] **Phase 6 — Production:** semantic cache, rate limiting, RBAC + multi-tenancy, cost tracking, Helm
+- [ ] **Phase 6 — Production:** semantic cache, rate limiting, RBAC + multi-tenancy, Helm
 
 ## Disclaimer
 

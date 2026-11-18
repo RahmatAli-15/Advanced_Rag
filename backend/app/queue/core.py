@@ -86,6 +86,24 @@ class Queue:
                 moved += 1
         return moved
 
+    async def depth(self, group: str = "workers") -> dict[str, int]:
+        """Jobs by state, for monitoring: waiting for a worker (ready), taken but not
+        acked (running), scheduled for a retry (delayed), and dead-lettered (dead)."""
+        ready = running = 0
+        try:
+            groups: Any = await self.redis.xinfo_groups(self.stream)
+        except ResponseError:  # the stream does not exist yet: nothing enqueued
+            groups = []
+        for g in groups:
+            if _s(g["name"]) == group:
+                ready, running = int(g.get("lag") or 0), int(g["pending"])
+        return {
+            "ready": ready,
+            "running": running,
+            "delayed": int(await self.redis.zcard(self.delayed)),
+            "dead": int(await self.redis.xlen(self.dead)),
+        }
+
     async def dead_letters(self, count: int = 50) -> list[Payload]:
         rows: Any = await self.redis.xrevrange(self.dead, count=count)
         return [json.loads(_s(fields.get(b"job") or fields["job"])) for _, fields in rows]

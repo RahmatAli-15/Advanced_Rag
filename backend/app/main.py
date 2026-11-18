@@ -9,11 +9,12 @@ from redis.asyncio import Redis
 
 from app.answer.cache import AnswerCache, CorpusFingerprint
 from app.answer.service import AnswerService
-from app.api import ask, changes, corpus, health, search
+from app.api import ask, changes, corpus, health, metrics, search
 from app.core.config import Settings, get_settings
 from app.core.logging import configure_logging
 from app.db.session import create_engine, create_session_factory
 from app.embeddings.factory import build_embedder, build_reranker
+from app.llm.budget import DailyTokenBudget
 from app.llm.factory import build_gateway
 from app.retrieval.hybrid import HybridRetriever
 
@@ -32,7 +33,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         app.state.retriever = HybridRetriever(app.state.session_factory, embedder, reranker)
         llm_provider = None
         if settings.groq_api_keys:
-            gateway, llm_provider = build_gateway(settings)
+            budget = DailyTokenBudget(app.state.redis, settings.llm_daily_token_budget)
+            gateway, llm_provider = build_gateway(settings, budget=budget)
             cache = AnswerCache(app.state.redis, CorpusFingerprint(app.state.session_factory))
             app.state.answer_service = AnswerService(
                 app.state.retriever, gateway, app.state.session_factory, cache=cache
@@ -61,6 +63,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(ask.router)
     app.include_router(corpus.router)
     app.include_router(changes.router)
+    app.include_router(metrics.router)
     return app
 
 

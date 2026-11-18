@@ -11,6 +11,10 @@ gets AllModelsFailed and can degrade gracefully (e.g. return search results only
 
 Streaming uses the same policy, but only until the first token reaches the caller.
 After that a failure raises StreamInterrupted instead of retrying or falling back.
+
+Cost control: with a daily token budget, once the primary model has used its tokens
+for the day, requests start at the first cheaper model instead (ADR 0011). Every
+attempt, token and (list-price) dollar is exported as a Prometheus metric.
 """
 
 import asyncio
@@ -21,6 +25,7 @@ from collections.abc import AsyncGenerator, Awaitable, Callable
 from dataclasses import dataclass, field
 from typing import Protocol
 
+from app.core import metrics
 from app.llm.types import (
     AllModelsFailed,
     FatalError,
@@ -47,6 +52,19 @@ class Provider(Protocol):
     async def complete(self, request: LLMRequest, model: str) -> LLMResponse: ...
 
     def stream(self, request: LLMRequest, model: str) -> AsyncGenerator[StreamEvent]: ...
+
+
+class Budget(Protocol):
+    """Daily token budget for the primary model (implemented in app.llm.budget)."""
+
+    async def exhausted(self) -> bool: ...
+    async def add(self, tokens: int) -> None: ...
+
+
+def _outcome(e: LLMError) -> str:
+    if isinstance(e, RateLimited):
+        return "rate_limited"
+    return "fatal_error" if isinstance(e, FatalError) else "transient_error"
 
 
 class TokenBucket:
@@ -130,12 +148,16 @@ class LLMGateway:
         breaker_threshold: int = 3,
         breaker_cooldown_s: float = 60.0,
         max_backoff_s: float = 30.0,
+        budget: Budget | None = None,
+        prices: dict[str, list[float]] | None = None,
         clock: Clock = time.monotonic,
         sleep: Sleep = asyncio.sleep,
     ) -> None:
         if not routes:
             raise ValueError("at least one model route is required")
         self.routes = routes
+        self.budget = budget
+        self.prices = prices or {}
         self.max_retries = max_retries
         self.max_backoff_s = max_backoff_s
         self._sleep = sleep
@@ -149,6 +171,36 @@ class LLMGateway:
             r.name: CircuitBreaker(breaker_threshold, breaker_cooldown_s, clock) for r in routes
         }
         self.stats = GatewayStats()
+
+    async def _first_route(self) -> int:
+        """Index of the first route to try: 0, or the first cheaper model when the
+        primary model's daily budget is spent. Routes are ordered model-first, so the
+        primary model's routes are the ones at the start."""
+        primary = self.routes[0].model
+        cheaper = [i for i, r in enumerate(self.routes) if r.model != primary]
+        if self.budget is None or not cheaper or not await self.budget.exhausted():
+            return 0
+        metrics.LLM_BUDGET_DOWNGRADES.inc()
+        log.warning(
+            "daily token budget for %s spent: using %s", primary, self.routes[cheaper[0]].model
+        )
+        return cheaper[0]
+
+    async def _account(self, route: ModelRoute, usage: Usage) -> None:
+        """Record a successful call's tokens: stats, metrics, cost and budget."""
+        prev = self.stats.usage_by_model.get(route.name, Usage())
+        self.stats.usage_by_model[route.name] = Usage(
+            prev.prompt_tokens + usage.prompt_tokens,
+            prev.completion_tokens + usage.completion_tokens,
+        )
+        metrics.LLM_TOKENS.labels(route.model, "prompt").inc(usage.prompt_tokens)
+        metrics.LLM_TOKENS.labels(route.model, "completion").inc(usage.completion_tokens)
+        cost = metrics.cost_usd(
+            self.prices, route.model, usage.prompt_tokens, usage.completion_tokens
+        )
+        metrics.LLM_COST.labels(route.model).inc(cost)
+        if self.budget is not None and route.model == self.routes[0].model:
+            await self.budget.add(usage.prompt_tokens + usage.completion_tokens)
 
     def _same_model_next(self, i: int) -> bool:
         return i + 1 < len(self.routes) and self.routes[i + 1].model == self.routes[i].model
@@ -164,13 +216,15 @@ class LLMGateway:
     async def complete(self, request: LLMRequest) -> LLMResponse:
         attempts = 0
         errors: list[str] = []
-        for i, route in enumerate(self.routes):
+        start = await self._first_route()
+        for i, route in enumerate(self.routes[start:], start=start):
             breaker = self._breakers[route.name]
             if not breaker.allow():
                 errors.append(f"{route.name}: circuit open")
                 continue
-            if i > 0:
+            if i > start:
                 self.stats.fallbacks += 1
+                metrics.LLM_FALLBACKS.inc()
                 log.warning("falling back to %s", route.name)
             for attempt in range(self.max_retries + 1):
                 await self._buckets[route.name].acquire()
@@ -179,11 +233,13 @@ class LLMGateway:
                 try:
                     response = await route.provider.complete(request, route.model)
                 except FatalError as e:
+                    metrics.LLM_CALLS.labels(route.name, _outcome(e)).inc()
                     errors.append(f"{route.name}: {e}")
                     breaker.record_failure()
                     log.warning("%s failed, not retrying: %s", route.name, e)
                     break  # same request will fail again; try the next model
                 except (RateLimited, TransientError) as e:
+                    metrics.LLM_CALLS.labels(route.name, _outcome(e)).inc()
                     # A 429 means "slow down", not "broken": it must not open the
                     # breaker, or a burst of rate limits takes a healthy model offline.
                     if not isinstance(e, RateLimited):
@@ -215,11 +271,8 @@ class LLMGateway:
                     await self._sleep(self._backoff(attempt, retry_after))
                     continue
                 breaker.record_success()
-                prev = self.stats.usage_by_model.get(route.name, Usage())
-                self.stats.usage_by_model[route.name] = Usage(
-                    prev.prompt_tokens + response.usage.prompt_tokens,
-                    prev.completion_tokens + response.usage.completion_tokens,
-                )
+                metrics.LLM_CALLS.labels(route.name, "ok").inc()
+                await self._account(route, response.usage)
                 return LLMResponse(
                     response.text,
                     response.model,
@@ -231,24 +284,19 @@ class LLMGateway:
         self.stats.failures += 1
         raise AllModelsFailed("; ".join(errors[-6:]) or "no model available")
 
-    def _record_usage(self, model: str, usage: Usage) -> None:
-        prev = self.stats.usage_by_model.get(model, Usage())
-        self.stats.usage_by_model[model] = Usage(
-            prev.prompt_tokens + usage.prompt_tokens,
-            prev.completion_tokens + usage.completion_tokens,
-        )
-
     async def stream(self, request: LLMRequest) -> AsyncGenerator[StreamEvent]:
         """Yield text deltas, then one done=True event. Retries and fallbacks happen
         only until the first event is out; the caller never sees two models' text."""
         errors: list[str] = []
-        for i, route in enumerate(self.routes):
+        start = await self._first_route()
+        for i, route in enumerate(self.routes[start:], start=start):
             breaker = self._breakers[route.name]
             if not breaker.allow():
                 errors.append(f"{route.name}: circuit open")
                 continue
-            if i > 0:
+            if i > start:
                 self.stats.fallbacks += 1
+                metrics.LLM_FALLBACKS.inc()
                 log.warning("falling back to %s (stream)", route.name)
             for attempt in range(self.max_retries + 1):
                 await self._buckets[route.name].acquire()
@@ -259,11 +307,13 @@ class LLMGateway:
                 except StopAsyncIteration:
                     first = StreamEvent(done=True, model=route.model, usage=Usage())
                 except FatalError as e:
+                    metrics.LLM_CALLS.labels(route.name, _outcome(e)).inc()
                     errors.append(f"{route.name}: {e}")
                     breaker.record_failure()
                     log.warning("%s failed, not retrying: %s", route.name, e)
                     break
                 except (RateLimited, TransientError) as e:
+                    metrics.LLM_CALLS.labels(route.name, _outcome(e)).inc()
                     # A 429 means "slow down", not "broken": it must not open the
                     # breaker, or a burst of rate limits takes a healthy model offline.
                     if not isinstance(e, RateLimited):
@@ -296,11 +346,12 @@ class LLMGateway:
                     continue
 
                 breaker.record_success()
+                metrics.LLM_CALLS.labels(route.name, "ok").inc()
                 try:
                     event: StreamEvent | None = first
                     while event is not None:
                         if event.done:
-                            self._record_usage(route.name, event.usage or Usage())
+                            await self._account(route, event.usage or Usage())
                         yield event
                         if event.done:
                             return

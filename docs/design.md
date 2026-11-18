@@ -55,9 +55,10 @@ flowchart LR
 | FastAPI | `/ask`, `/ask/stream`, `/search`, `/changes`, `/corpus`, `/health/*` | Async throughout; models warm up in the background |
 | Postgres + pgvector | Documents, versions, chunks, vectors, full-text index, audit log, change events | One store for everything (0001) |
 | Local models | Query/chunk embeddings (bge-m3, multilingual) and reranking | Free, private, no quota |
-| LLM gateway | The only path to an LLM: fallback, retries, rate limits, circuit breaker | (0002) |
-| Redis | Answer cache and job queue | Two simple uses of one service |
+| LLM gateway | The only path to an LLM: fallback, retries, rate limits, circuit breaker, daily token budget | (0002, 0011) |
+| Redis | Answer cache, job queue, token-budget counter | Simple uses of one service |
 | Worker | Daily crawl, indexing, change diffs | Hand-written queue on Redis Streams (0010) |
+| Prometheus + Grafana | `/metrics` scrape, dashboard for latency, outcomes, cost, queue | Metrics at three choke points (0011) |
 
 ## 3. Answering a question
 
