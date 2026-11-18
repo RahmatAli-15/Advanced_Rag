@@ -155,6 +155,8 @@ async def _ingest_one(
         if await repo.captured_text_sha(session, doc_id, valid_from) == text_sha:
             outcome = repo.VersionOutcome.UNCHANGED
         else:
+            # Read before recording: on a silent edit the row is about to be overwritten.
+            old_raw = await repo.text_to_compare(session, doc_id, valid_from)
             # If the transaction below fails, this blob is orphaned but harmless:
             # it is content-addressed and gets reused on the next attempt.
             blob = await asyncio.to_thread(store.put, result.body, ".html")
@@ -171,6 +173,19 @@ async def _ingest_one(
                     annex_links=page.annex_links,
                 ),
             )
+            # Outbox: the change event commits (or rolls back) with the version itself.
+            kind = {
+                repo.VersionOutcome.NEW: "new_document" if created else "new_version",
+                repo.VersionOutcome.SILENT_EDIT: "silent_edit",
+            }.get(outcome)
+            if kind is not None:
+                repo.add_change_event(
+                    session,
+                    doc_id,
+                    kind,
+                    old_raw_path=None if created else old_raw,
+                    new_raw_path=blob.relative_path,
+                )
         if outcome == repo.VersionOutcome.NEW:
             stats.new_versions += 1
         elif outcome == repo.VersionOutcome.FILLED:

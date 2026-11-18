@@ -1,3 +1,5 @@
+import { RecentChanges } from './RecentChanges.jsx'
+
 const EXAMPLES = [
   { q: 'How often must an NBFC update KYC for high-risk customers?', lang: 'English' },
   { q: 'Gold loan pe maximum LTV kitna allowed hai?', lang: 'Hinglish' },
@@ -23,6 +25,7 @@ export function EmptyState({ onPick, corpus }) {
           </li>
         ))}
       </ul>
+      <RecentChanges />
       {corpus && (
         <p className="scope">
           Covers {corpus.documents} RBI Master Directions for NBFCs. SEBI, GST and bank-only rules

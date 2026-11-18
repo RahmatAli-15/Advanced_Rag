@@ -179,6 +179,9 @@ async def test_sources_are_fenced_and_injection_stays_inside_them(
         ("Two years (S6).", "Two years [S6]."),  # parentheses
         ("Two years [ **S1**, S2 ]", "Two years [S1][S2]"),
         ("See para (1) and (iv)", "See para (1) and (iv)"),  # paragraph refs untouched
+        ("Tier-2 capital [स्रोत: S3]", "Tier-2 capital [S3]"),  # "source:" in Hindi
+        ("Two years [Source: S1, S2]", "Two years [S1][S2]"),
+        ("Sources: see below (S1)", "Sources: see below [S1]"),
     ],
 )
 def test_citation_styles_are_normalised(raw: str, expected: str) -> None:
@@ -203,3 +206,21 @@ async def test_date_outside_coverage_is_reported_as_such(
     r = await service.ask("KYC rules?", as_of=date(2020, 1, 1))
     assert r.status == "no_coverage" and "2020-01-01" in r.answer
     assert llm.requests == []
+
+
+@pytest.mark.parametrize(
+    ("question", "expected"),
+    [
+        ("Gold loan pe maximum LTV kitna allowed hai?", "Hinglish"),
+        ("Kya SRO apne members ke loan ka range publish kar sakti hai?", "Hinglish"),
+        ("UPI transaction ki daily limit kitni hai?", "Hinglish"),
+        ("How often must an NBFC update KYC for high-risk customers?", "English"),
+        ("Can customer due diligence be done over video?", "English"),
+        ("Is a loan to me possible to par value?", "English"),  # English 'to', 'me', 'par'
+        ("एनबीएफसी में KYC?", "Hindi"),
+    ],
+)
+def test_answer_language_is_detected_from_the_question(question: str, expected: str) -> None:
+    from app.answer.service import answer_language
+
+    assert answer_language(question).startswith(expected)

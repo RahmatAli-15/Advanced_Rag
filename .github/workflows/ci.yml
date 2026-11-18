@@ -22,9 +22,16 @@ jobs:
         options: >-
           --health-cmd "pg_isready -U advancedrag"
           --health-interval 5s --health-timeout 3s --health-retries 10
+      redis:
+        image: redis:7-alpine
+        ports: ["6379:6379"]
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s --health-timeout 3s --health-retries 10
     env:
       DATABASE_URL: postgresql+asyncpg://advancedrag:advancedrag@localhost:5432/advancedrag
       TEST_DATABASE_URL: postgresql+asyncpg://advancedrag:advancedrag@localhost:5432/advancedrag_test
+      REDIS_URL: redis://localhost:6379/0
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5

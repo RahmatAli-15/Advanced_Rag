@@ -128,6 +128,21 @@ labelled in the UI. There is deliberately no "semantic" cache: in compliance, "C
 do video KYC?" and "Can banks do video KYC?" are similar questions with different
 answers.
 
+### Keep it up to date (background worker)
+
+```bash
+cd backend
+python -m app.worker                      # daily RBI refresh at 06:30 IST
+python -m app.worker enqueue refresh_rbi  # or run one now
+python -m app.worker dead                 # inspect jobs that failed for good
+```
+
+The worker runs a job chain on a small Redis Streams queue (retries with backoff,
+dead-letter queue, crash recovery, idempotent daily scheduling): crawl → chunk + embed →
+paragraph diffs. Every detected change is written in the same transaction as the new
+version (transactional outbox) and shown under "Recent RBI changes"
+([ADR 0010](docs/adr/0010-background-jobs-and-change-detection.md)).
+
 ## Measured retrieval quality
 
 153 questions in English, Hinglish and Hindi over 45 RBI NBFC Master Directions
@@ -142,6 +157,26 @@ answers.
 
 Equal-weight fusion made retrieval *worse* than vectors alone; the reranker is the
 biggest single gain. The questions are LLM-generated and not yet human-reviewed.
+
+## Measured answer quality
+
+30 answerable questions (judged claim by claim by a different model family, blind to the
+citations) and 20 questions the system should decline
+([ADR 0009](docs/adr/0009-answer-evaluation.md)):
+
+| Metric | Baseline | After the fixes it found |
+|---|---|---|
+| Claims supported by their sources | 91.2% | **95.9%** |
+| Answers with every claim supported | 70.8% | **86.2%** |
+| Numbers found in the cited clause | 90.2% | **100%** |
+| Correct answers wrongly flagged "unverified" | 6 / 30 | **1 / 30** |
+| Hinglish answers in the question's script | 2 / 7 | **9 / 9** |
+| Out-of-scope questions declined | 20 / 20 | 20 / 20 |
+| Judge caught planted wrong numbers | 9 / 9 | 10 / 10 |
+
+```bash
+python -m app.ingestion.cli eval-answers -n 30   # or --language hinglish for a quick check
+```
 
 ## Development
 
@@ -165,7 +200,9 @@ npm run lint && npm test && npm run build
 - [x] **Phase 2 — Core RAG:** chat UI (React + Vite), SSE streaming, clause viewer, as-of date picker
 - [x] LLM gateway: fallback chain, retries honouring Retry-After, rate limiting, circuit breaker, JSON repair
 - [x] Retrieval evaluation: multilingual test set, ablation of every component
-- [ ] **Phase 3 — Evaluation:** human review of the test set, exact-term questions, answer faithfulness, tracing
+- [x] Answer evaluation: claim-level faithfulness, blind citation check, judge sensitivity, abstention
+- [x] Answer cache, multi-key LLM routing, background worker (queue, retries, DLQ, daily crawl), change detection
+- [ ] **Phase 3 — Evaluation:** human review of the test set, exact-term questions, tracing
 - [ ] **Phase 4 — Compliance engine:** versioned rules ("as of date"), amendment diffs, citation graph, alerts, obligation register
 - [ ] **Phase 5 — Agent:** LangGraph impact analysis, MCP server
 - [ ] **Phase 6 — Production:** semantic cache, rate limiting, RBAC + multi-tenancy, cost tracking, Helm

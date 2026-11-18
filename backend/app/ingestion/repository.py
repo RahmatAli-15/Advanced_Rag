@@ -4,11 +4,11 @@ import uuid
 from dataclasses import dataclass
 from datetime import date
 
-from sqlalchemy import func, select, text
+from sqlalchemy import delete, func, select, text
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.db.models import ContentStatus, Document, DocumentVersion
+from app.db.models import ChangeEvent, Chunk, ContentStatus, Document, DocumentVersion
 
 
 @dataclass(frozen=True)
@@ -120,6 +120,10 @@ async def record_captured_version(
         # The page changed without a new "Updated as on" date. Keep the latest text;
         # the raw bytes of the old one stay in the content-addressed store.
         outcome = VersionOutcome.SILENT_EDIT
+        # Drop the old text's chunks (embeddings cascade) so indexing rebuilds them.
+        # Without this, search kept serving the pre-edit text: the chunker only picks
+        # up versions that have no chunks yet.
+        await session.execute(delete(Chunk).where(Chunk.version_id == existing.id))
 
     existing.content_status = ContentStatus.CAPTURED
     existing.title = v.title
@@ -130,6 +134,42 @@ async def record_captured_version(
     existing.annex_links = v.annex_links
     existing.recorded_at = func.now()
     return outcome
+
+
+async def text_to_compare(
+    session: AsyncSession, document_id: uuid.UUID, valid_from: date
+) -> str | None:
+    """Raw path of the text a newly fetched version should be diffed against: the same
+    version's current text (a silent edit), else the latest captured earlier version."""
+    return await session.scalar(
+        select(DocumentVersion.raw_path)
+        .where(
+            DocumentVersion.document_id == document_id,
+            DocumentVersion.content_status == ContentStatus.CAPTURED,
+            DocumentVersion.valid_from <= valid_from,
+        )
+        .order_by(DocumentVersion.valid_from.desc())
+        .limit(1)
+    )
+
+
+def add_change_event(
+    session: AsyncSession,
+    document_id: uuid.UUID,
+    kind: str,
+    *,
+    old_raw_path: str | None,
+    new_raw_path: str | None,
+) -> None:
+    """Outbox write: call inside the transaction that saves the version."""
+    session.add(
+        ChangeEvent(
+            document_id=document_id,
+            kind=kind,
+            old_raw_path=old_raw_path,
+            new_raw_path=new_raw_path,
+        )
+    )
 
 
 async def record_listed_versions(

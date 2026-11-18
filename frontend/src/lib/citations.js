@@ -9,7 +9,9 @@
 // zero-width spaces "[\u200bS1\u200b]" (all observed in the answer evaluation).
 const ZERO_WIDTH = /[\u200b-\u200d\u2060\ufeff]/g
 const ID = String.raw`[*_\s]*S\d+[*_\s]*`
-const CITE_ANY = new RegExp(String.raw`[[【(](${ID}(?:[,;]${ID})*)[\]】)]`, 'g')
+// Optional label inside the brackets: "[Source: S3]", "[स्रोत: S3]" ("source" in Hindi).
+const LABEL = String.raw`(?:[Ss]ources?|स्रोत)?\s*:?`
+const CITE_ANY = new RegExp(String.raw`[[【(]${LABEL}(${ID}(?:[,;]${ID})*)[\]】)]`, 'g')
 
 export function normaliseCitations(text) {
   return text.replace(ZERO_WIDTH, '').replace(CITE_ANY, (_, group) =>

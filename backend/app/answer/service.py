@@ -32,7 +32,7 @@ from app.retrieval.hybrid import HybridRetriever, SearchFilters, SearchHit
 
 log = logging.getLogger(__name__)
 
-PROMPT_VERSION = "answer-v2"
+PROMPT_VERSION = "answer-v3"
 
 # Calibrated on eval/datasets/retrieval_v1.jsonl + 15 off-topic questions (ADR 0007):
 # 0.7% of in-domain questions fall below 0.05; 12/15 off-topic questions are blocked.
@@ -74,7 +74,7 @@ Reply with JSON only:
 # Streaming cannot use JSON mode (the answer would arrive inside a half-written JSON
 # string), so the "not answerable" signal becomes a marker line at the very start.
 NOT_IN_SOURCES = "NOT_IN_SOURCES"
-STREAM_PROMPT_VERSION = "answer-stream-v2"
+STREAM_PROMPT_VERSION = "answer-stream-v3"
 STREAM_SYSTEM_PROMPT = (
     _INTRO
     + f"""3. If the sources do not contain the answer, start your reply with the line
@@ -146,7 +146,9 @@ _CITE = re.compile(r"\[(S\d+)\]")
 # Normalise all of them to "[S1][S3]".
 _ZERO_WIDTH = re.compile("[\u200b-\u200d\u2060\ufeff]")
 _ID = r"[*_\s]*S\d+[*_\s]*"
-_CITE_ANY = re.compile(rf"[\[【(]({_ID}(?:[,;]{_ID})*)[\]】)]")
+# An optional label inside the brackets: "[Source: S3]", "[स्रोत: S3]" ("source" in Hindi).
+_LABEL = r"(?:[Ss]ources?|स्रोत)?\s*:?"
+_CITE_ANY = re.compile(rf"[\[【(]{_LABEL}({_ID}(?:[,;]{_ID})*)[\]】)]")
 
 
 def normalise_citations(text: str) -> str:
@@ -182,6 +184,84 @@ def _format_sources(hits: list[SearchHit]) -> str:
             meta += f' amendments="{amendments}"'
         blocks.append(f"<source {meta}>\n{h.text}\n</source>")
     return "\n\n".join(blocks)
+
+
+# Romanised Hindi function words. Two or more in a Latin-script question = Hinglish.
+# Common English words ("to", "me", "par") are left out on purpose.
+_HINGLISH = frozenset(
+    [
+        "kya",
+        "hai",
+        "hain",
+        "ke",
+        "ki",
+        "ka",
+        "ko",
+        "mein",
+        "se",
+        "pe",
+        "kitna",
+        "kitni",
+        "kitne",
+        "kaun",
+        "kaunsa",
+        "kaunse",
+        "kaise",
+        "kab",
+        "kyun",
+        "karna",
+        "karne",
+        "karte",
+        "chahiye",
+        "hota",
+        "hoti",
+        "hote",
+        "liye",
+        "aur",
+        "nahi",
+        "nahin",
+        "agar",
+        "toh",
+        "wala",
+        "wale",
+        "wali",
+        "sakta",
+        "sakti",
+        "sakte",
+        "hisaab",
+        "diya",
+        "diye",
+        "gaya",
+        "gaye",
+        "jata",
+        "jaata",
+        "apne",
+        "apni",
+    ]
+)
+_DEVANAGARI = re.compile(r"[\u0900-\u097f]")
+
+
+def answer_language(question: str) -> str:
+    """The language and script to answer in, stated next to the question. The answer
+    evaluation showed a general rule in the system prompt is not enough: gpt-oss
+    answered Latin-script Hinglish questions in Devanagari 10 times out of 10."""
+    if _DEVANAGARI.search(question):
+        return "Hindi, in Devanagari script."
+    words = re.findall(r"[a-z]+", question.lower())
+    if sum(w in _HINGLISH for w in words) >= 2:
+        return (
+            "Hinglish: Hindi written in Latin (Roman) letters, like the question. "
+            "Do not use Devanagari script."
+        )
+    return "English."
+
+
+def _user_message(hits: list[SearchHit], question: str) -> str:
+    return (
+        f"Sources:\n\n{_format_sources(hits)}\n\nQuestion: {question}\n\n"
+        f"Answer language: {answer_language(question)}"
+    )
 
 
 def _citation(i: int, h: SearchHit) -> Citation:
@@ -345,7 +425,7 @@ class AnswerService:
         request = LLMRequest(
             [
                 Message("system", SYSTEM_PROMPT.format(as_of=on.isoformat())),
-                Message("user", f"Sources:\n\n{_format_sources(hits)}\n\nQuestion: {question}"),
+                Message("user", _user_message(hits, question)),
             ],
             temperature=0.0,
             max_tokens=2000,
@@ -420,7 +500,7 @@ class AnswerService:
         request = LLMRequest(
             [
                 Message("system", STREAM_SYSTEM_PROMPT.format(as_of=on.isoformat())),
-                Message("user", f"Sources:\n\n{_format_sources(hits)}\n\nQuestion: {question}"),
+                Message("user", _user_message(hits, question)),
             ],
             temperature=0.0,
             max_tokens=2000,

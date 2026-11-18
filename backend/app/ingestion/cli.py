@@ -158,11 +158,12 @@ async def _eval_answers(args: argparse.Namespace) -> int:
     from app.eval import faithfulness as fa
 
     s = get_settings()
-    gold = fa.sample(
-        dataset.load(s.eval_dir / "datasets" / "retrieval_v1.jsonl"), args.n, args.seed
-    )
+    items = dataset.load(s.eval_dir / "datasets" / "retrieval_v1.jsonl")
+    if args.language:  # a focused run, e.g. to check one language fix cheaply
+        items = [i for i in items if i.language == args.language]
+    gold = fa.sample(items, args.n, args.seed)
     unanswerable = fa.load_unanswerable(s.eval_dir / "datasets" / "unanswerable_v1.jsonl")
-    if args.no_unanswerable:
+    if args.no_unanswerable or args.language:
         unanswerable = []
     engine = create_engine(s.database_url)
     factory = create_session_factory(engine)
@@ -202,7 +203,8 @@ async def _eval_answers(args: argparse.Namespace) -> int:
 
     summary = fa.summarise(results)
     meta: dict[str, object] = {
-        "answerable": f"{len(gold)} questions sampled from retrieval_v1.jsonl (seed {args.seed})",
+        "answerable": f"{len(gold)} questions sampled from retrieval_v1.jsonl "
+        f"(seed {args.seed}{', ' + args.language + ' only' if args.language else ''})",
         "unanswerable": f"{len(unanswerable)} questions from unanswerable_v1.jsonl",
         "answer_model": f"{s.llm_models[0]} (no fallback during evaluation)",
         "answer_prompt": f"{STREAM_PROMPT_VERSION} (the one the UI uses)",
@@ -250,6 +252,7 @@ def main() -> int:
     ea.add_argument("-n", type=int, default=30, help="answerable questions to sample")
     ea.add_argument("--seed", type=int, default=7)
     ea.add_argument("--no-unanswerable", action="store_true")
+    ea.add_argument("--language", choices=["en", "hinglish", "hi"], help="only this language")
 
     args = parser.parse_args()
     configure_logging(get_settings().log_level)

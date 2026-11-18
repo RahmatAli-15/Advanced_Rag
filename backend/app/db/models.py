@@ -228,3 +228,28 @@ class CrawlRun(Base):
     error: Mapped[str | None] = mapped_column(Text)
     started_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     finished_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+
+
+class ChangeEvent(Base):
+    """A detected change in a regulation, written in the SAME transaction as the version
+    it describes (transactional outbox): if the version is saved, the event exists; if
+    the transaction rolls back, neither does. A worker later fills in the paragraph
+    diff, so crawling never waits on diffing."""
+
+    __tablename__ = "change_events"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    document_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("documents.id", ondelete="CASCADE"))
+    version_id: Mapped[uuid.UUID | None] = mapped_column(
+        ForeignKey("document_versions.id", ondelete="CASCADE")
+    )
+    kind: Mapped[str] = mapped_column(String(24))  # new_document | new_version | silent_edit
+    old_raw_path: Mapped[str | None] = mapped_column(Text)
+    new_raw_path: Mapped[str | None] = mapped_column(Text)
+    status: Mapped[str] = mapped_column(String(16), default="pending", server_default="pending")
+    diff: Mapped[dict[str, Any]] = mapped_column(default=dict)
+    error: Mapped[str | None] = mapped_column(Text)
+    detected_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), index=True
+    )
+    processed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))

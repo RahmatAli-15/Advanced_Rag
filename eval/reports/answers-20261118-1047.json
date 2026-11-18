@@ -1,0 +1,524 @@
+{
+  "meta": {
+    "answerable": "10 questions sampled from retrieval_v1.jsonl (seed 7, hinglish only)",
+    "unanswerable": "0 questions from unanswerable_v1.jsonl",
+    "answer_model": "openai/gpt-oss-120b (no fallback during evaluation)",
+    "answer_prompt": "answer-stream-v3 (the one the UI uses)",
+    "judge_models": "qwen/qwen3.8-27b",
+    "judge_prompt": "judge-v1",
+    "gateway_retries": 0,
+    "generated": "2026-11-18 10:47 UTC"
+  },
+  "summary": {
+    "answerable": {
+      "n": 10,
+      "answered": 0.8,
+      "abstained": 0.1,
+      "gold_in_sources": 0.9
+    },
+    "claims": {
+      "n": 21,
+      "supported": 1.0,
+      "supported_or_partial": 1.0,
+      "contradicted": 0.0,
+      "uncited": 0.333,
+      "citation_accurate": 1.0,
+      "numbers_grounded": 0.875
+    },
+    "answers_fully_supported": 1.0,
+    "language_ok": 1.0,
+    "judge": {
+      "planted": 1,
+      "caught": 1.0,
+      "errors": 0
+    },
+    "unanswerable": {
+      "n": 0,
+      "abstained": null,
+      "answered_anyway": []
+    },
+    "answered_by": {
+      "openai/gpt-oss-120b": 9,
+      "none": 1
+    },
+    "by_language": {
+      "hinglish": {
+        "answers": 8,
+        "claim_support": 1.0,
+        "language_ok": 1.0
+      }
+    },
+    "latency_p50_ms": 2505.1
+  },
+  "items": [
+    {
+      "id": "c11406d7-hinglish",
+      "kind": "answerable",
+      "language": "hinglish",
+      "question": "Kya NBFC ko service provider ki third‑party review aur market feedback lena zaroori hai, aur ye check karna chahiye ki unke systems NBFC ke saath compatible hain aur performance standards jaise customer service acceptible hain?",
+      "status": "answered",
+      "answer": "**Haan**, NBFC ko **where possible** service provider ki independent review aur market feedback lena zaroori hai, aur **NBFC ko ye bhi evaluate karna chahiye** ki service provider ke systems NBFC ke systems ke compatible hain aur unke performance standards (jaise customer service) acceptible hain. [S1][S1]",
+      "model": "openai/gpt-oss-120b",
+      "gold_in_sources": true,
+      "language_ok": true,
+      "claims": [
+        {
+          "id": "C1",
+          "text": "Haan, NBFC ko where possible service provider ki independent review aur market feedback lena zaroori hai, aur NBFC ko ye bhi evaluate karna chahiye ki service provider ke systems NBFC ke systems ke compatible hain aur unke performance standards (jaise customer service) acceptible hain.",
+          "cited": [
+            "S1"
+          ],
+          "planted": false,
+          "verdict": "supported",
+          "supported_by": [
+            "S1"
+          ],
+          "reason": "Source S1, paragraphs 31 and 32 explicitly state that an NBFC shall obtain independent reviews and market feedback where possible, and shall evaluate system compatibility and acceptability of performance standards including customer service.",
+          "numbers_missing": []
+        }
+      ],
+      "planted": null,
+      "judge_error": null,
+      "total_ms": 2071.4
+    },
+    {
+      "id": "612f25c8-hinglish",
+      "kind": "answerable",
+      "language": "hinglish",
+      "question": "Kaunse base layer ke NBFCs jinke paas customer interface hai aur jo public funds nahi lete, in directions ke under aate hain?",
+      "status": "answered",
+      "answer": "Ye NBFCs **“NBFCs in Base layer having customer interface but not availing public funds”** (NBFC‑BL) ke roop mein aate hain. Ye category sabhi diye gaye directions me mention hai — S1, S2, S3, S4, S5 aur S6 — aur in directions ke kuch paragraphs ke liye alag se applicability ya exclusion di gayi hai (jaise S3 me Paragraphs 7‑14 NBFC‑BL ke liye not applicable)[S1][S2][S3][S4][S5][S6].",
+      "model": "openai/gpt-oss-120b",
+      "gold_in_sources": true,
+      "language_ok": true,
+      "claims": [
+        {
+          "id": "C1",
+          "text": "Ye NBFCs “NBFCs in Base layer having customer interface but not availing public funds” (NBFC‑BL) ke roop mein aate hain.",
+          "cited": [],
+          "planted": false,
+          "verdict": "supported",
+          "supported_by": [
+            "S1",
+            "S2",
+            "S3",
+            "S4",
+            "S5",
+            "S6"
+          ],
+          "reason": "All sources explicitly list 'NBFCs in Base layer having customer interface but not availing public funds' as a specific category.",
+          "numbers_missing": []
+        },
+        {
+          "id": "C2",
+          "text": "Ye category sabhi diye gaye directions me mention hai — S1, S2, S3, S4, S5 aur S6 — aur in directions ke kuch paragraphs ke liye alag se applicability ya exclusion di gayi hai (jaise S3 me Paragraphs 7‑14 NBFC‑BL ke liye not applicable).",
+          "cited": [
+            "S1",
+            "S2",
+            "S3",
+            "S4",
+            "S5",
+            "S6"
+          ],
+          "planted": false,
+          "verdict": "supported",
+          "supported_by": [
+            "S1",
+            "S2",
+            "S3",
+            "S4",
+            "S5",
+            "S6"
+          ],
+          "reason": "The category is mentioned in all six sources. S1, S4, S5, and S6 list it as an exclusion (not applicable). S2 lists it in the context of applicability. S3 explicitly states that Paragraphs 7 to 14 are not applicable for NBFC-BL having 'customer interface but not availing public funds'.",
+          "numbers_missing": [
+            "5"
+          ]
+        }
+      ],
+      "planted": null,
+      "judge_error": null,
+      "total_ms": 3996.2
+    },
+    {
+      "id": "7710cca0-hinglish",
+      "kind": "answerable",
+      "language": "hinglish",
+      "question": "RBI ke Voluntary Amalgamation Directions mein NBFC ke liye kaunse amalgamation ke cases shamil hain?",
+      "status": "answered",
+      "answer": "RBI ke Voluntary Amalgamation Directions mein NBFC ke liye **teen cases** shamil hain:\n\n1. **NBFC aur doosra NBFC** ka amalgamation.  \n2. **NBFC aur koi bhi entity jo RBI ke regulatory purview mein nahi hai** ka amalgamation.  \n3. **Koi bhi entity jo RBI ke regulatory purview mein nahi hai aur NBFC** ka amalgamation.  \n\n[S1]",
+      "model": "openai/gpt-oss-120b",
+      "gold_in_sources": true,
+      "language_ok": true,
+      "claims": [
+        {
+          "id": "C1",
+          "text": "NBFC aur doosra NBFC ka amalgamation.",
+          "cited": [],
+          "planted": false,
+          "verdict": "supported",
+          "supported_by": [
+            "S1"
+          ],
+          "reason": "Source S1, paragraph 6(1) explicitly states that an NBFC with another NBFC is covered under these Directions.",
+          "numbers_missing": []
+        },
+        {
+          "id": "C2",
+          "text": "NBFC aur koi bhi entity jo RBI ke regulatory purview mein nahi hai ka amalgamation.",
+          "cited": [],
+          "planted": false,
+          "verdict": "supported",
+          "supported_by": [
+            "S1"
+          ],
+          "reason": "Source S1, paragraph 6(2) explicitly states that an NBFC with any other entity not under the regulatory purview of RBI is covered.",
+          "numbers_missing": []
+        },
+        {
+          "id": "C3",
+          "text": "Koi bhi entity jo RBI ke regulatory purview mein nahi hai aur NBFC ka amalgamation.",
+          "cited": [
+            "S1"
+          ],
+          "planted": false,
+          "verdict": "supported",
+          "supported_by": [
+            "S1"
+          ],
+          "reason": "Source S1, paragraph 6(3) explicitly states that any entity not under the regulatory purview of RBI with an NBFC is covered.",
+          "numbers_missing": []
+        }
+      ],
+      "planted": null,
+      "judge_error": null,
+      "total_ms": 2338.0
+    },
+    {
+      "id": "bad161be-hinglish",
+      "kind": "answerable",
+      "language": "hinglish",
+      "question": "Project ke financial closure se pehle NBFC ko kaunse approvals ya clearances lena zaroori hai?",
+      "status": "answered",
+      "answer": "NBFC ko project ke financial closure se pehle **sabhi applicable approvals/clearances** jo implementation ya construction ke liye zaroori hain, le lena chahiye. Isme aam tor par **environmental clearance, legal clearance, regulatory clearances** aadi shamil hote hain, jo project par depend karta hai[S1].  \n\nLekin jo approvals ya clearances **milestones ke poore hone par hi milte hain** (jaise boiler operate karne ka consent jo boiler ke construction ke baad hi apply kiya ja sakta hai), unhe financial closure ke samay mandatory nahi maana jata[S3].",
+      "model": "openai/gpt-oss-120b",
+      "gold_in_sources": true,
+      "language_ok": true,
+      "claims": [
+        {
+          "id": "C1",
+          "text": "NBFC ko project ke financial closure se pehle sabhi applicable approvals/clearances jo implementation ya construction ke liye zaroori hain, le lena chahiye.",
+          "cited": [],
+          "planted": false,
+          "verdict": "supported",
+          "supported_by": [
+            "S1"
+          ],
+          "reason": "Source S1 explicitly states that an NBFC shall ensure all applicable approvals/clearances for implementing/constructing the project are obtained before financial closure.",
+          "numbers_missing": []
+        },
+        {
+          "id": "C2",
+          "text": "Isme aam tor par environmental clearance, legal clearance, regulatory clearances aadi shamil hote hain, jo project par depend karta hai.",
+          "cited": [
+            "S1"
+          ],
+          "planted": false,
+          "verdict": "supported",
+          "supported_by": [
+            "S1"
+          ],
+          "reason": "Source S1 lists environmental clearance, legal clearance, and regulatory clearances as an indicative list of pre-requisite approvals, noting they are applicable to the project.",
+          "numbers_missing": []
+        },
+        {
+          "id": "C3",
+          "text": "Lekin jo approvals ya clearances milestones ke poore hone par hi milte hain (jaise boiler operate karne ka consent jo boiler ke construction ke baad hi apply kiya ja sakta hai), unhe financial closure ke samay mandatory nahi maana jata.",
+          "cited": [
+            "S3"
+          ],
+          "planted": false,
+          "verdict": "supported",
+          "supported_by": [
+            "S3"
+          ],
+          "reason": "Source S3 states that approvals contingent on milestones (like consent to operate a boiler after construction) are not treated as mandatory pre-requisites at the time of financial closure.",
+          "numbers_missing": []
+        }
+      ],
+      "planted": null,
+      "judge_error": null,
+      "total_ms": 3021.8
+    },
+    {
+      "id": "a213fc2a-hinglish",
+      "kind": "answerable",
+      "language": "hinglish",
+      "question": "NBFC ko RBI ko large exposure report karte waqt kaunse categories aur threshold include karne hote hain?",
+      "status": "answered",
+      "answer": "NBFC ko RBI ko Large Exposure (LE) report karte waqt **yeh categories** aur **threshold** include karne hote hain:\n\n1. **Sabhi exposures jo large‑exposure ki definition ko meet karte hain** — [S1]  \n2. **Sabhi anya exposures** jo paragraphs 41‑44 ke mutabik measure kiye gaye hain, **aur jinhe credit‑risk‑transfer instruments se offset nahi kiya gaya**, **aur jinki value NBFC ke eligible capital base ka 10 % ya usse adhik ho** — [S1]  \n3. **Sabhi exempted exposures** jinki value bhi **eligible capital base ka 10 % ya usse adhik ho** — [S1]  \n4. **10 sabse bade exposures** jo scope of application mein aate hain, **chahe unki value capital‑base ke percent se kam hi kyu na ho** — [S1]\n\n**Threshold:** 10 per cent of the NBFC’s eligible capital base (categories 2 aur 3 ke liye) — [S1]",
+      "model": "openai/gpt-oss-120b",
+      "gold_in_sources": true,
+      "language_ok": true,
+      "claims": [
+        {
+          "id": "C1",
+          "text": "Sabhi exposures jo large‑exposure ki definition ko meet karte hain —",
+          "cited": [
+            "S1"
+          ],
+          "planted": false,
+          "verdict": "supported",
+          "supported_by": [
+            "S1"
+          ],
+          "reason": "Source S1, paragraph 48(1) states that reporting shall cover 'all exposures, meeting the definition of large exposure'.",
+          "numbers_missing": []
+        },
+        {
+          "id": "C2",
+          "text": "Sabhi anya exposures jo paragraphs 41‑44 ke mutabik measure kiye gaye hain, aur jinhe credit‑risk‑transfer instruments se offset nahi kiya gaya, aur jinki value NBFC ke eligible capital base ka 10 % ya usse adhik ho —",
+          "cited": [
+            "S1"
+          ],
+          "planted": false,
+          "verdict": "supported",
+          "supported_by": [
+            "S1"
+          ],
+          "reason": "Source S1, paragraph 48(2) specifies reporting of 'all other exposures, measured as specified in paragraphs 41 to 44... without offsetting... where values stand equal to or above 10 per cent of the NBFC’s eligible capital base'.",
+          "numbers_missing": []
+        },
+        {
+          "id": "C3",
+          "text": "Sabhi exempted exposures jinki value bhi eligible capital base ka 10 % ya usse adhik ho —",
+          "cited": [
+            "S1"
+          ],
+          "planted": false,
+          "verdict": "supported",
+          "supported_by": [
+            "S1"
+          ],
+          "reason": "Source S1, paragraph 48(3) specifies reporting of 'all the exempted exposures with values equal to or above 10 per cent of the NBFC’s eligible capital base'.",
+          "numbers_missing": []
+        },
+        {
+          "id": "C4",
+          "text": "10 sabse bade exposures jo scope of application mein aate hain, chahe unki value capital‑base ke percent se kam hi kyu na ho —",
+          "cited": [
+            "S1"
+          ],
+          "planted": false,
+          "verdict": "supported",
+          "supported_by": [
+            "S1"
+          ],
+          "reason": "Source S1, paragraph 48(4) specifies reporting of '10 largest exposures included in the scope of application, irrespective of the values of these exposures relative to the NBFC’s eligible capital base'.",
+          "numbers_missing": []
+        },
+        {
+          "id": "C5",
+          "text": "Threshold: 10 per cent of the NBFC’s eligible capital base (categories 2 aur 3 ke liye) —",
+          "cited": [
+            "S1"
+          ],
+          "planted": false,
+          "verdict": "supported",
+          "supported_by": [
+            "S1"
+          ],
+          "reason": "Source S1, paragraphs 48(2) and 48(3) explicitly state the threshold is '10 per cent of the NBFC’s eligible capital base' for these categories.",
+          "numbers_missing": []
+        }
+      ],
+      "planted": {
+        "id": "C6",
+        "text": "Threshold: 13 per cent of the NBFC’s eligible capital base (categories 2 aur 3 ke liye) —",
+        "cited": [
+          "S1"
+        ],
+        "planted": true,
+        "verdict": "contradicted",
+        "supported_by": [
+          "S1"
+        ],
+        "reason": "Source S1 states the threshold is 10 per cent, not 13 per cent.",
+        "numbers_missing": []
+      },
+      "judge_error": null,
+      "total_ms": 3588.1
+    },
+    {
+      "id": "f00ef377-hinglish",
+      "kind": "answerable",
+      "language": "hinglish",
+      "question": "Kya SRO ya industry association apne members ke microfinance loan ke interest rate ka range district level pe publish kar sakti hai?",
+      "status": "answered",
+      "answer": "Haan, SROs ya industry associations apne members ke microfinance loans ke interest‑rate ka range district level pe publish kar sakti hain [S1].",
+      "model": "openai/gpt-oss-120b",
+      "gold_in_sources": true,
+      "language_ok": true,
+      "claims": [
+        {
+          "id": "C1",
+          "text": "Haan, SROs ya industry associations apne members ke microfinance loans ke interest‑rate ka range district level pe publish kar sakti hain .",
+          "cited": [
+            "S1"
+          ],
+          "planted": false,
+          "verdict": "supported",
+          "supported_by": [
+            "S1"
+          ],
+          "reason": "Source S1 explicitly states that SROs/industry associations may publish the range of interest rates on microfinance loans charged by their members operating in a district.",
+          "numbers_missing": []
+        }
+      ],
+      "planted": null,
+      "judge_error": null,
+      "total_ms": 1772.7
+    },
+    {
+      "id": "be92bcd1-hinglish",
+      "kind": "answerable",
+      "language": "hinglish",
+      "question": "Directions mein jo terms define nahi hue hain, unka meaning kya hota hai?",
+      "status": "not_found",
+      "answer": "I could not find this in the RBI directions I cover (NBFC Master Directions in force on 2026-11-18). Try rephrasing, or check whether another regulator governs this.",
+      "model": null,
+      "gold_in_sources": false,
+      "language_ok": null,
+      "claims": [],
+      "planted": null,
+      "judge_error": null,
+      "total_ms": 804.4
+    },
+    {
+      "id": "42446d26-hinglish",
+      "kind": "answerable",
+      "language": "hinglish",
+      "question": "CI ko CICs ko credit info report karte waqt kaunse standardized data formats use karne chahiye?",
+      "status": "answered",
+      "answer": "CI ko CICs ko credit information report karte waqt **Uniform Credit Reporting Format (UCRF)** ka upyog karna hoga, jo ki non‑proprietary standardised format hai aur Annex I mein diye gaye teen forms mein divided hai:  \n\n- **Form 1:** Uniform Credit Reporting Format (Consumer) – consumer segment  \n- **Form 2:** Uniform Credit Reporting Format (Commercial) – commercial segment  \n- **Form 3:** Uniform Credit Reporting Format (MFI) – micro‑finance segment  \n\n[S1]",
+      "model": "openai/gpt-oss-120b",
+      "gold_in_sources": true,
+      "language_ok": true,
+      "claims": [
+        {
+          "id": "C1",
+          "text": "Form 1: Uniform Credit Reporting Format (Consumer) – consumer segment",
+          "cited": [],
+          "planted": false,
+          "verdict": "supported",
+          "supported_by": [
+            "S1"
+          ],
+          "reason": "Source S1 explicitly states Form 1 is Uniform Credit Reporting Format (Consumer) for the consumer segment.",
+          "numbers_missing": []
+        },
+        {
+          "id": "C2",
+          "text": "Form 2: Uniform Credit Reporting Format (Commercial) – commercial segment",
+          "cited": [],
+          "planted": false,
+          "verdict": "supported",
+          "supported_by": [
+            "S1"
+          ],
+          "reason": "Source S1 explicitly states Form 2 is Uniform Credit Reporting Format (Commercial) for the commercial segment.",
+          "numbers_missing": []
+        },
+        {
+          "id": "C3",
+          "text": "Form 3: Uniform Credit Reporting Format (MFI) – micro‑finance segment",
+          "cited": [
+            "S1"
+          ],
+          "planted": false,
+          "verdict": "supported",
+          "supported_by": [
+            "S1"
+          ],
+          "reason": "Source S1 explicitly states Form 3 is Uniform Credit Reporting Format (MFI) for the microfinance segment.",
+          "numbers_missing": []
+        }
+      ],
+      "planted": null,
+      "judge_error": null,
+      "total_ms": 3295.7
+    },
+    {
+      "id": "94067bbe-hinglish",
+      "kind": "answerable",
+      "language": "hinglish",
+      "question": "Kya STC securitisation ki performance active discretionary basis pe assets ko cherry-pick ya select karne par depend kar sakti hai?",
+      "status": "answered",
+      "answer": "Nahi, STC securitisation ki performance active discretionary basis pe assets ko cherry‑pick ya select karne par depend nahi kar sakti.  \n\n- Performance “should not rely upon the ongoing selection of assets through active management on a discretionary basis” [S1].  \n- Credit claims transferred after the securitisation becomes effective “may not be actively selected, actively managed or otherwise cherry‑picked on a discretionary basis” [S2].",
+      "model": "openai/gpt-oss-120b",
+      "gold_in_sources": true,
+      "language_ok": true,
+      "claims": [
+        {
+          "id": "C1",
+          "text": "Nahi, STC securitisation ki performance active discretionary basis pe assets ko cherry‑pick ya select karne par depend nahi kar sakti.",
+          "cited": [],
+          "planted": false,
+          "verdict": "supported",
+          "supported_by": [
+            "S1",
+            "S2"
+          ],
+          "reason": "S1 explicitly states that performance should not rely on active discretionary selection, and S2 reinforces that assets may not be actively selected or cherry-picked.",
+          "numbers_missing": []
+        },
+        {
+          "id": "C2",
+          "text": "Performance “should not rely upon the ongoing selection of assets through active management on a discretionary basis” .",
+          "cited": [
+            "S1"
+          ],
+          "planted": false,
+          "verdict": "supported",
+          "supported_by": [
+            "S1"
+          ],
+          "reason": "This is a direct quote from paragraph 47 of S1.",
+          "numbers_missing": []
+        },
+        {
+          "id": "C3",
+          "text": "Credit claims transferred after the securitisation becomes effective “may not be actively selected, actively managed or otherwise cherry‑picked on a discretionary basis” .",
+          "cited": [
+            "S2"
+          ],
+          "planted": false,
+          "verdict": "supported",
+          "supported_by": [
+            "S2"
+          ],
+          "reason": "This is a direct quote from paragraph 48 of S2.",
+          "numbers_missing": []
+        }
+      ],
+      "planted": null,
+      "judge_error": null,
+      "total_ms": 2059.4
+    },
+    {
+      "id": "43ba6fa9-hinglish",
+      "kind": "answerable",
+      "language": "hinglish",
+      "question": "NBFC‑Middle Layer ke liye kaunse conditions se asset NPA maana jata hai?",
+      "status": "ungrounded",
+      "answer": "**NBFC‑Middle Layer (NBFC‑ML) ke liye asset tab NPA maana jata hai jab koi bhi neeche diye gaye condition satisfy ho:**  \n\n1. Interest overdue **90 din** se zyada ho.  \n2. Term loan (including unpaid interest) ka instalment **90 din** se zyada overdue ho ya interest amount **90 din** se zyada overdue ho.  \n3. Demand ya call loan **90 din** se zyada overdue ho ya uska interest **90 din** se zyada overdue ho.  \n4. Bill **90 din** se zyada overdue ho.  \n5. Short‑term loan/advance (other current assets) ka interest **90 din** se zyada overdue ho.  \n6. Sale of assets, services rendered ya expense reimbursement ke dues **90 din** se zyada overdue ho.  \n7. Lease rental ya hire‑purchase instalment **90 din** se zyada overdue ho. *(Provided that NBFC‑ML shall classify each such account on the basis of its record of recovery.)*  \n8. Loans, advances ya any credit facilities (including bills purchased/discounted) ka balance outstanding (including accrued interest) jab upar ke koi bhi facility NPA ban jaye.  \n\n[All conditions are taken from S1]",
+      "model": "openai/gpt-oss-120b",
+      "gold_in_sources": true,
+      "language_ok": null,
+      "claims": [],
+      "planted": null,
+      "judge_error": null,
+      "total_ms": 2672.1
+    }
+  ]
+}
