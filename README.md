@@ -128,6 +128,22 @@ labelled in the UI. There is deliberately no "semantic" cache: in compliance, "C
 do video KYC?" and "Can banks do video KYC?" are similar questions with different
 answers.
 
+### Where the time goes
+
+Measured on 153 questions (laptop RTX 3050), `python -m app.ingestion.cli bench-retrieval`:
+
+| Step | Median |
+|---|---|
+| Embed the question + vector and keyword search | ~120 ms |
+| Rerank 30 candidate clauses (cross-encoder) | ~650 ms |
+| LLM writes the answer | ~1,000 ms |
+
+Reranking fewer clauses is faster but less accurate (top-5 hit rate: 30 clauses 94.1%,
+15 → 90.2%, 10 → 88.2%, none → 82.4%), so the reranker stays at 30: in compliance a
+correct answer is worth half a second. Latency is handled instead by the cache (repeat
+questions ~4 ms) and by streaming (sources after ~1 s, then the answer as it is written).
+Full table: [`eval/reports/bench-20261118-1059.md`](eval/reports/bench-20261118-1059.md).
+
 ### Keep it up to date (background worker)
 
 ```bash

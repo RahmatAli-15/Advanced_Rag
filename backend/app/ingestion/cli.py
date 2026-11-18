@@ -218,6 +218,46 @@ async def _eval_answers(args: argparse.Namespace) -> int:
     return 0
 
 
+async def _bench_retrieval(args: argparse.Namespace) -> int:
+    from app.eval.bench import BenchConfig, bench, render
+
+    s = get_settings()
+    items = dataset.load(s.eval_dir / "datasets" / "retrieval_v1.jsonl")
+    configs = [
+        BenchConfig("current", candidates=40, rerank_top=30),
+        BenchConfig("rerank 20", candidates=40, rerank_top=20),
+        BenchConfig("rerank 15", candidates=40, rerank_top=15),
+        BenchConfig("rerank 10", candidates=40, rerank_top=10),
+        BenchConfig("no rerank", candidates=40, rerank_top=0),
+    ]
+    engine = create_engine(s.database_url)
+    factory = create_session_factory(engine)
+    embedder, reranker = build_embedder(s), build_reranker(s)
+    try:
+        results = []
+        for cfg in configs:
+            rr = reranker if cfg.rerank_top else None
+            [res] = await bench(items, factory, {"embedder": embedder, "reranker": rr}, [cfg])
+            results.append(res)
+            print(f"{cfg.name}: total p50 {res.p50.get('total')} ms, hit@5 {res.hit5}", flush=True)
+    finally:
+        await engine.dispose()
+    table = render(results)
+    out = s.eval_dir / "reports" / f"bench-{datetime.now(UTC).strftime('%Y%m%d-%H%M')}.md"
+    generated = datetime.now(UTC).strftime("%Y-%m-%d %H:%M UTC")
+    header = [
+        "# Retrieval latency benchmark",
+        "",
+        f"- questions: {len(items)}",
+        f"- device: {s.ml_device}",
+        f"- generated: {generated}",
+        "",
+    ]
+    out.write_text("\n".join(header) + table, encoding="utf-8")
+    print(table)
+    return 0
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(prog="advancedrag-ingest")
     sub = parser.add_subparsers(dest="command", required=True)
@@ -254,6 +294,8 @@ def main() -> int:
     ea.add_argument("--no-unanswerable", action="store_true")
     ea.add_argument("--language", choices=["en", "hinglish", "hi"], help="only this language")
 
+    sub.add_parser("bench-retrieval", help="per-stage latency vs quality for retrieval settings")
+
     args = parser.parse_args()
     configure_logging(get_settings().log_level)
     commands = {
@@ -264,6 +306,7 @@ def main() -> int:
         "eval-generate": _eval_generate,
         "eval-retrieval": _eval_retrieval,
         "eval-answers": _eval_answers,
+        "bench-retrieval": _bench_retrieval,
     }
     return asyncio.run(commands[args.command](args))
 
