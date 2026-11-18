@@ -194,6 +194,19 @@ question was answered by `gpt-oss-20b`, and the downgrade showed on the dashboar
 An uncached answer costs about $0.0004 at list price; a cache hit costs nothing
 ([ADR 0011](docs/adr/0011-observability-and-cost-control.md)).
 
+### Capacity and overload protection
+
+`python -m app.ingestion.cli load-test` measured the system on a laptop RTX 3050:
+the GPU serves about **1.2 searches per second**, and repeat questions (answer cache)
+**80-100 per second**. Without limits, 16 concurrent users collapsed search throughput to
+0.5/s with a 38 s p95. Two simple protections fix that
+([ADR 0013](docs/adr/0013-load-testing-and-overload-protection.md)):
+
+- **Load shedding:** at most 2 searches use the GPU at once and 2 wait; beyond that the
+  API answers 503 + Retry-After at once. With 16 users throughput stays at 1.15/s and
+  p95 at **3.8 s instead of 38 s**.
+- **Rate limiting:** 20 requests per minute per client (Redis), then 429 + Retry-After.
+
 ### Keep it up to date (background worker)
 
 ```bash
@@ -273,10 +286,10 @@ npm run lint && npm test && npm run build
 - [x] Prometheus + Grafana monitoring, cost per answer, daily token budget with model downgrade
 - [x] MCP server: search, cited answers and recent changes as tools for AI assistants
 - [x] Test set reviewed clause by clause against its gold clauses (AI review; v2)
+- [x] Load test, GPU load shedding (503 + Retry-After) and per-client rate limiting
 
 **Next**
 
-- [ ] Load test (throughput and p95 under concurrency) and per-client rate limiting
 - [ ] Change-impact agent (LangGraph): explains each detected RBI change and who it affects, citing old and new text
 - [ ] Exact-term test questions (e.g. "V-CIP", "NOF") to check the keyword-search weight
 - [ ] Human spot-check of the reviewed test set

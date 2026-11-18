@@ -4,7 +4,8 @@ import asyncio
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
+from fastapi.responses import JSONResponse
 from redis.asyncio import Redis
 
 from app.answer.cache import AnswerCache, CorpusFingerprint
@@ -16,6 +17,7 @@ from app.db.session import create_engine, create_session_factory
 from app.embeddings.factory import build_embedder, build_reranker
 from app.llm.budget import DailyTokenBudget
 from app.llm.factory import build_gateway
+from app.retrieval.gate import ConcurrencyGate, Overloaded
 from app.retrieval.hybrid import HybridRetriever
 
 
@@ -30,7 +32,10 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         app.state.session_factory = create_session_factory(app.state.engine)
         app.state.redis = Redis.from_url(settings.redis_url)
         embedder, reranker = build_embedder(settings), build_reranker(settings)
-        app.state.retriever = HybridRetriever(app.state.session_factory, embedder, reranker)
+        gate = ConcurrencyGate(settings.retrieval_max_concurrent, settings.retrieval_max_waiting)
+        app.state.retriever = HybridRetriever(
+            app.state.session_factory, embedder, reranker, gate=gate
+        )
         llm_provider = None
         if settings.groq_api_keys:
             budget = DailyTokenBudget(app.state.redis, settings.llm_daily_token_budget)
@@ -58,6 +63,16 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             await app.state.engine.dispose()
 
     app = FastAPI(title="AdvancedRag", version="0.1.0", lifespan=lifespan)
+    app.state.rate_limit_per_minute = settings.rate_limit_per_minute
+
+    @app.exception_handler(Overloaded)
+    async def overloaded(_: Request, e: Overloaded) -> JSONResponse:
+        return JSONResponse(
+            {"detail": "The service is busy right now. Please try again in a few seconds."},
+            status_code=503,
+            headers={"Retry-After": str(e.retry_after_s)},
+        )
+
     app.include_router(health.router)
     app.include_router(search.router)
     app.include_router(ask.router)

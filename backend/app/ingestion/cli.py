@@ -258,6 +258,40 @@ async def _bench_retrieval(args: argparse.Namespace) -> int:
     return 0
 
 
+async def _load_test(args: argparse.Namespace) -> int:
+    from app.eval.load import render, run
+
+    s = get_settings()
+    questions = [i.question for i in dataset.load(s.eval_dir / "datasets" / "retrieval_v2.jsonl")]
+    results = []
+    for endpoint in args.endpoints.split(","):
+        if endpoint == "ask-cached":  # warm the cache so every measured request is a hit
+            await run(args.url, "ask-cached", questions[: args.cached_pool], 2, args.cached_pool)
+        pool = questions[: args.cached_pool] if endpoint == "ask-cached" else questions
+        for c in (int(x) for x in args.concurrency.split(",")):
+            res = await run(args.url, endpoint, pool, c, args.requests)
+            results.append(res)
+            print(
+                f"{endpoint} x{c}: {res.throughput:.2f} req/s, p95 {res.pct(95):.0f} ms, "
+                f"statuses {res.statuses}, errors {res.errors}",
+                flush=True,
+            )
+    table = render(results)
+    stamp = datetime.now(UTC)
+    out = s.eval_dir / "reports" / f"load-{stamp.strftime('%Y%m%d-%H%M')}.md"
+    header = [
+        "# Load test",
+        "",
+        f"- target: {args.url}",
+        f"- requests per run: {args.requests}; questions from retrieval_v2.jsonl",
+        f"- generated: {stamp.strftime('%Y-%m-%d %H:%M UTC')}",
+        "",
+    ]
+    out.write_text("\n".join(header) + table, encoding="utf-8")
+    print(table)
+    return 0
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(prog="advancedrag-ingest")
     sub = parser.add_subparsers(dest="command", required=True)
@@ -296,6 +330,13 @@ def main() -> int:
 
     sub.add_parser("bench-retrieval", help="per-stage latency vs quality for retrieval settings")
 
+    lt = sub.add_parser("load-test", help="throughput and latency of a running API under load")
+    lt.add_argument("--url", default="http://localhost:8000")
+    lt.add_argument("--endpoints", default="search,ask-cached", help="search,ask-cached")
+    lt.add_argument("--concurrency", default="1,2,4,8", help="simulated users per run")
+    lt.add_argument("--requests", type=int, default=48, help="requests per run")
+    lt.add_argument("--cached-pool", type=int, default=12, help="questions reused for ask-cached")
+
     args = parser.parse_args()
     configure_logging(get_settings().log_level)
     commands = {
@@ -307,6 +348,7 @@ def main() -> int:
         "eval-retrieval": _eval_retrieval,
         "eval-answers": _eval_answers,
         "bench-retrieval": _bench_retrieval,
+        "load-test": _load_test,
     }
     return asyncio.run(commands[args.command](args))
 

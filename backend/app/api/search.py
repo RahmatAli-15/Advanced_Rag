@@ -4,12 +4,13 @@ import uuid
 from datetime import date
 from typing import Any
 
-from fastapi import APIRouter, Request
+from fastapi import APIRouter, Depends, Request
 from pydantic import BaseModel, Field
 
+from app.api.ratelimit import rate_limit
 from app.retrieval.hybrid import HybridRetriever, SearchFilters
 
-router = APIRouter(tags=["search"])
+router = APIRouter(tags=["search"], dependencies=[Depends(rate_limit)])
 
 
 class SearchRequest(BaseModel):

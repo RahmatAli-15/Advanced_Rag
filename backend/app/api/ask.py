@@ -8,7 +8,7 @@ from collections.abc import AsyncIterator
 from datetime import date
 from typing import Any
 
-from fastapi import APIRouter, HTTPException, Request
+from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
 
@@ -22,9 +22,11 @@ from app.answer.service import (
     StageEvent,
     Status,
 )
+from app.api.ratelimit import rate_limit
+from app.retrieval.gate import Overloaded
 
 log = logging.getLogger(__name__)
-router = APIRouter(tags=["ask"])
+router = APIRouter(tags=["ask"], dependencies=[Depends(rate_limit)])
 
 
 class AskRequest(BaseModel):
@@ -129,6 +131,9 @@ async def ask_stream(body: AskRequest, request: Request) -> StreamingResponse:
                         yield _sse("delta", json.dumps({"text": text}))
                     case FinalEvent(result=result):
                         yield _sse("final", _response(result).model_dump_json())
+        except Overloaded:  # the 200 is already sent, so the refusal is an event
+            message = "The service is busy right now. Please try again in a few seconds."
+            yield _sse("error", json.dumps({"message": message}))
         except Exception:
             log.exception("ask stream failed")
             yield _sse("error", json.dumps({"message": "Something went wrong. Try again."}))

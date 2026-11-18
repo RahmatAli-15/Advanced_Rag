@@ -45,6 +45,11 @@ LLM_BUDGET_DOWNGRADES = Counter(
 
 QUEUE_DEPTH = Gauge("queue_jobs", "Jobs in the queue", ["state"])  # ready | delayed | dead
 
+# Overload protection (app/retrieval/gate.py, app/api/ratelimit.py)
+GATE = Gauge("retrieval_gate", "Searches using the models or waiting for them", ["state"])
+SHED = Counter("retrieval_shed_total", "Searches refused because the models were saturated")
+RATE_LIMITED = Counter("rate_limited_total", "Requests refused by the per-client limit", ["route"])
+
 
 def cost_usd(prices: dict[str, list[float]], model: str, prompt: int, completion: int) -> float:
     """List-price cost. `prices` maps model -> [USD per 1M input, USD per 1M output].

@@ -68,6 +68,7 @@ python -m app.ingestion.cli eval-retrieval            # all configs, all languag
 python -m app.ingestion.cli eval-retrieval --language hi
 python -m app.ingestion.cli eval-answers -n 30        # answer faithfulness (ADR 0009)
 python -m app.ingestion.cli bench-retrieval           # latency per stage vs quality
+python -m app.ingestion.cli load-test                 # throughput/p95 of a running API (ADR 0013)
 ```
 
 Reports are written to `reports/` as Markdown and JSON. See

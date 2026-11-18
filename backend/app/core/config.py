@@ -44,6 +44,15 @@ class Settings(BaseSettings):
         "openai/gpt-oss-20b": [0.075, 0.30],
     }
 
+    # Overload protection (ADR 0013). Requests per client IP per minute on /ask,
+    # /ask/stream and /search (0 = off), and how many searches may use the GPU models
+    # at once / wait for them before new ones are refused with 503. Measured on the
+    # 4 GB laptop GPU (ADR 0013): without a cap, 16 parallel searches collapsed throughput
+    # to 0.5/s (p95 38 s); 2 at a time kept ~1.3/s, and 1 at a time cost ~20%.
+    rate_limit_per_minute: int = 20
+    retrieval_max_concurrent: int = 2
+    retrieval_max_waiting: int = 2
+
     data_dir: Path = _REPO_ROOT / "data"
     eval_dir: Path = _REPO_ROOT / "eval"  # datasets and reports (committed)
     # Identify the crawler honestly. Add a contact URL here once the repo is public.

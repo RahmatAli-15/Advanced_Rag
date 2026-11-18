@@ -23,6 +23,7 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 from app.db.models import Chunk, ChunkEmbedding, ContentStatus, Document, DocumentVersion
 from app.embeddings.base import Embedder
 from app.retrieval.fusion import rrf_fuse
+from app.retrieval.gate import ConcurrencyGate
 from app.retrieval.rerank import Reranker
 
 SearchMode = Literal["hybrid", "vector", "keyword"]
@@ -99,7 +100,9 @@ class HybridRetriever:
         rerank_top: int = 30,
         ef_search: int = 100,
         keyword_weight: float = 0.3,  # measured: eval/reports, ADR 0006
+        gate: ConcurrencyGate | None = None,  # load shedding for the API (ADR 0013)
     ) -> None:
+        self._gate = gate
         self._sf = session_factory
         self._embedder = embedder
         self._reranker = reranker
@@ -158,7 +161,21 @@ class HybridRetriever:
         mode: SearchMode = "hybrid",
         keyword_weight: float | None = None,
     ) -> tuple[list[SearchHit], RetrievalTrace]:
-        """`mode` exists for evaluation: it isolates each retriever's contribution."""
+        """`mode` exists for evaluation: it isolates each retriever's contribution.
+        With a gate, raises Overloaded when the models are saturated."""
+        if self._gate is None:
+            return await self._search(query, k, filters, mode, keyword_weight)
+        async with self._gate.slot():
+            return await self._search(query, k, filters, mode, keyword_weight)
+
+    async def _search(
+        self,
+        query: str,
+        k: int,
+        filters: SearchFilters | None,
+        mode: SearchMode,
+        keyword_weight: float | None,
+    ) -> tuple[list[SearchHit], RetrievalTrace]:
         filters = filters or SearchFilters()
         on = filters.as_of or date.today()
         trace = RetrievalTrace(as_of=on)
