@@ -154,25 +154,10 @@ eval/          test sets and measured reports
 ops/           Prometheus + Grafana config
 ```
 
-## Roadmap
-
-Done: crawler and versions · hybrid search + reranking · cited answers · streaming UI ·
-LLM gateway · evaluations · cache · job queue and change tracking · monitoring · MCP ·
-load protection · change-impact agent · distilled reranker.
-
-Next:
-- [ ] Human spot-check of the test set (currently AI-reviewed, and labelled so)
-- [ ] Exact-term test questions (e.g. "V-CIP", "NOF")
-- [ ] On-demand AWS deployment (Terraform) on a CPU server, using the distilled reranker
-
-**Not planned on purpose:** a "similar question" cache. "Can NBFCs do video KYC?" and
-"Can banks do video KYC?" are similar questions with different answers, so only exact
-repeats are reused.
-
 ## Scope and disclaimer
 
-Covers the RBI's Master Directions for NBFCs (45 directions). Not SEBI, IRDAI or bank
-directions yet. **Not legal advice**: it always links the official text so a person can
+Covers the RBI's Master Directions for NBFCs (45 directions), not SEBI, IRDAI or bank
+directions. **Not legal advice**: it always links the official text so a person can
 confirm.
 
 ## License

@@ -8,8 +8,7 @@ links to its ADR in [`docs/adr/`](adr/). Numbers are measured on a laptop (RTX 3
 **Contents:** [1. Problem](#1-problem) · [2. Architecture](#2-architecture) ·
 [3. Answering a question](#3-answering-a-question) · [4. Keeping the corpus current](#4-keeping-the-corpus-current) ·
 [5. Data model](#5-data-model) · [6. Low-level design](#6-low-level-design) ·
-[7. Failure handling](#7-failure-handling) · [8. Capacity and scaling](#8-capacity-and-scaling) ·
-[9. Not built yet](#9-not-built-yet)
+[7. Failure handling](#7-failure-handling) · [8. Capacity and scaling](#8-capacity-and-scaling)
 
 ---
 
@@ -213,7 +212,7 @@ Patterns, and where they are used:
 
 Testing: unit tests for pure logic (parsers, chunker, fusion, citation parsing, diff);
 integration tests against a real Postgres and Redis (rolled back or prefixed and
-cleaned up); fakes for LLMs and models. 180 backend tests and 25 frontend tests run in CI.
+cleaned up); fakes for LLMs and models. 228 backend tests and 26 frontend tests run in CI.
 
 ## 7. Failure handling
 
@@ -245,14 +244,3 @@ Today: 45 RBI NBFC directions, 96 versions, 3,707 chunks. Vectors take about 15 
 Measured latency: retrieval ~750 ms (reranker 650 of it), LLM ~1 s, total ~2.5 s;
 cached ~4 ms. Reranking fewer clauses was measured and rejected: faster, but less
 accurate ([developer guide, "Measure"](developer-guide.md#8-measure)).
-
-## 9. Not built yet
-
-Kept out on purpose to keep the system simple; each has a clear place to attach:
-
-- **Deployment** to AWS on demand (Terraform; ECS, RDS Postgres with pgvector,
-  ElastiCache, SQS in place of Redis Streams)
-- **Auth and multi-tenancy** (API keys, per-tenant rate limits)
-- **Tracing dashboards** (OpenTelemetry; today: structured JSON logs and timings in every response)
-- **More regulators** (SEBI, GST): a new parser in `PARSERS`, same pipeline
-- **Notifications** for change events (email/Slack); `GET /changes` is the hook

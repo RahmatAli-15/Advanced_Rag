@@ -216,11 +216,10 @@ compliance only exact repeats are safe to reuse.
 | Off-topic questions correctly refused | **20 / 20** |
 | The checker caught deliberately planted wrong numbers | **10 / 10** |
 | Capacity of one laptop GPU | ~1.2 searches/s; ~90 cached answers/s |
-| Automated tests | 218 backend + 25 frontend, run on every commit (CI) |
+| Automated tests | 228 backend + 26 frontend, run on every commit (CI) |
 
 The test questions were made by an AI, then reviewed clause by clause (also by an AI,
-and labelled that way): 39 were rewritten and 9 dropped. A human check is still on the
-to-do list.
+and labelled that way): 39 were rewritten and 9 dropped.
 
 ---
 
@@ -241,7 +240,7 @@ to-do list.
 | Only a chat box | Also an API and an MCP tool for AI assistants |
 
 Every major decision is written down with its reason and the alternatives considered:
-14 short [ADRs](adr/).
+15 short [ADRs](adr/).
 
 ---
 
@@ -249,7 +248,7 @@ Every major decision is written down with its reason and the alternatives consid
 
 - Covers RBI NBFC Master Directions only (not SEBI, IRDAI, or bank directions).
 - Runs on one laptop GPU: about 1.2 new searches per second.
-- The test set is AI-made and AI-reviewed; a human spot-check is still to do.
+- The test set is AI-made and AI-reviewed, not human-reviewed.
 - The change-impact agent has been tested on one real amendment so far, and its
   severity labels are the AI's judgement (quotes are checked, labels are not).
 - Not legal advice: it points to the official text so a person can confirm.
