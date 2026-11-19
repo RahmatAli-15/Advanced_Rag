@@ -38,19 +38,24 @@ confidently when they do not know.
 
 ## How it works
 
-```mermaid
-flowchart LR
-    Q[Question] --> S[Find the right paragraphs<br/>meaning + keyword search]
-    S --> R[Re-rank the best 30<br/>cross-encoder model]
-    R --> G{Relevant<br/>enough?}
-    G -- no --> N[Not in the RBI rules]
-    G -- yes --> L[LLM answers only<br/>from those paragraphs]
-    L --> C[Code checks every citation]
-    C --> A[Answer + sources]
-```
+![AdvancedRag architecture: indexing, storage, answering, change tracking and operations](docs/images/architecture.svg)
 
-A background worker downloads the RBI rules every day, splits them into 3,707 clauses,
-keeps every version, and finds and explains what changed.
+1. **Indexing (every day, in the background):** the crawler downloads the RBI rules
+   politely, the parser turns each page into numbered paragraphs, the chunker makes one
+   chunk per clause (3,707), and bge-m3 turns each chunk into a vector.
+2. **Storage:** one PostgreSQL database holds the text, every past version, a keyword
+   index and the vectors (pgvector). Redis holds the cache, rate limits and job queue.
+3. **Answering:** a repeat question comes straight from the cache (~5 ms). Otherwise the
+   system searches by meaning and by keyword, re-ranks the best 30 clauses, refuses if
+   nothing is relevant, lets the LLM answer only from the top 6, and checks every
+   citation in code before showing the answer.
+4. **Change tracking:** when a rule changes, the system finds the changed paragraphs,
+   and an AI agent explains what changed, who is affected and what to do. Its quotes
+   are checked word for word.
+5. **Operations:** metrics, a Grafana dashboard, measured evaluations and CI on every
+   commit.
+
+More detail: [system design](docs/design.md).
 
 ## Results (measured, not guessed)
 

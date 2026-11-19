@@ -1,0 +1,236 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="1190" viewBox="0 0 1400 1190" role="img" aria-label="AdvancedRag architecture: indexing, storage, answering, change tracking, operations">
+<style>
+  text { font-family: 'Segoe UI', Helvetica, Arial, sans-serif; }
+  .title { font-size: 24px; font-weight: 700; fill: #0f172a; }
+  .sub { font-size: 14px; fill: #64748b; }
+  .lane { font-size: 15px; font-weight: 700; letter-spacing: .3px; }
+  .note { font-size: 12px; fill: #475569; }
+  .bt { font-size: 14.5px; font-weight: 700; }
+  .d { font-size: 12px; fill: #334155; }
+  .c { font-size: 11.5px; }
+  .ct { font-size: 12.5px; font-weight: 700; }
+  .lbl { font-size: 11.5px; font-style: italic; }
+</style>
+<defs>
+  <marker id="ah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+    <path d="M0,0 L10,5 L0,10 z" fill="currentColor"/>
+  </marker>
+</defs>
+<rect width="1400" height="1190" fill="#ffffff"/>
+<text x="30" y="44" class="title" text-anchor="start">AdvancedRag: how it works</text>
+<text x="1370" y="44" class="sub" text-anchor="end">RBI compliance copilot · high-level design</text>
+<rect x="15" y="70" width="1370" height="165" rx="14" fill="#eff6ff" stroke="#3b82f6" stroke-width="1.5"/>
+<text x="35" y="96" class="lane" fill="#1e3a8a">① INDEXING: how RBI rules get in</text>
+<text x="1365" y="96" class="note" text-anchor="end" fill="#1e3a8a">background worker · Redis Streams job queue · daily 06:30 IST · retries · dead-letter queue</text>
+<rect x="30" y="110" width="200" height="100" rx="10" fill="#ffffff" stroke="#3b82f6" stroke-width="1.3"/>
+<text x="130.0" y="133" class="bt" fill="#1e3a8a" text-anchor="middle">RBI website</text>
+<text x="130.0" y="154" class="d" text-anchor="middle">45 NBFC Master Directions</text>
+<text x="130.0" y="170" class="d" text-anchor="middle">+ every past version</text>
+<rect x="258" y="110" width="200" height="100" rx="10" fill="#ffffff" stroke="#3b82f6" stroke-width="1.3"/>
+<text x="358.0" y="133" class="bt" fill="#1e3a8a" text-anchor="middle">Crawler</text>
+<text x="358.0" y="154" class="d" text-anchor="middle">obeys robots.txt</text>
+<text x="358.0" y="170" class="d" text-anchor="middle">3 s between requests</text>
+<text x="358.0" y="186" class="d" text-anchor="middle">stops on bot challenge</text>
+<path d="M232,160 L254,160" fill="none" stroke="#3b82f6" stroke-width="1.8" marker-end="url(#ah)" style="color:#3b82f6"/>
+<rect x="486" y="110" width="200" height="100" rx="10" fill="#ffffff" stroke="#3b82f6" stroke-width="1.3"/>
+<text x="586.0" y="133" class="bt" fill="#1e3a8a" text-anchor="middle">Raw HTML store</text>
+<text x="586.0" y="154" class="d" text-anchor="middle">saved by SHA-256 hash</text>
+<text x="586.0" y="170" class="d" text-anchor="middle">same page → skipped</text>
+<text x="586.0" y="186" class="d" text-anchor="middle">(files on disk)</text>
+<path d="M460,160 L482,160" fill="none" stroke="#3b82f6" stroke-width="1.8" marker-end="url(#ah)" style="color:#3b82f6"/>
+<rect x="714" y="110" width="200" height="100" rx="10" fill="#ffffff" stroke="#3b82f6" stroke-width="1.3"/>
+<text x="814.0" y="133" class="bt" fill="#1e3a8a" text-anchor="middle">Parser</text>
+<text x="814.0" y="154" class="d" text-anchor="middle">HTML → numbered paragraphs</text>
+<text x="814.0" y="170" class="d" text-anchor="middle">footnotes → amended para</text>
+<text x="814.0" y="186" class="d" text-anchor="middle">valid-from / valid-to dates</text>
+<path d="M688,160 L710,160" fill="none" stroke="#3b82f6" stroke-width="1.8" marker-end="url(#ah)" style="color:#3b82f6"/>
+<rect x="942" y="110" width="200" height="100" rx="10" fill="#ffffff" stroke="#3b82f6" stroke-width="1.3"/>
+<text x="1042.0" y="133" class="bt" fill="#1e3a8a" text-anchor="middle">Clause-aware chunker</text>
+<text x="1042.0" y="154" class="d" text-anchor="middle">1 clause = 1 chunk (3,707)</text>
+<text x="1042.0" y="170" class="d" text-anchor="middle">exact ref, e.g. 63(9)(iv)</text>
+<text x="1042.0" y="186" class="d" text-anchor="middle">parent text kept if split</text>
+<path d="M916,160 L938,160" fill="none" stroke="#3b82f6" stroke-width="1.8" marker-end="url(#ah)" style="color:#3b82f6"/>
+<rect x="1170" y="110" width="200" height="100" rx="10" fill="#ffffff" stroke="#3b82f6" stroke-width="1.3"/>
+<text x="1270.0" y="133" class="bt" fill="#1e3a8a" text-anchor="middle">Embedder</text>
+<text x="1270.0" y="154" class="d" text-anchor="middle">BAAI bge-m3 (local GPU)</text>
+<text x="1270.0" y="170" class="d" text-anchor="middle">1 chunk → 1024-d vector</text>
+<text x="1270.0" y="186" class="d" text-anchor="middle">fp16, batched</text>
+<path d="M1144,160 L1166,160" fill="none" stroke="#3b82f6" stroke-width="1.8" marker-end="url(#ah)" style="color:#3b82f6"/>
+<g transform="translate(0,-35)">
+<rect x="15" y="295" width="1370" height="190" rx="14" fill="#f5f3ff" stroke="#8b5cf6" stroke-width="1.5"/>
+<text x="35" y="321" class="lane" fill="#4c1d95">② STORAGE</text>
+<rect x="30" y="335" width="200" height="128" rx="10" fill="#ffffff" stroke="#8b5cf6" stroke-width="1.3"/>
+<text x="130.0" y="358" class="bt" fill="#4c1d95" text-anchor="middle">Redis</text>
+<text x="130.0" y="379" class="d" text-anchor="middle">answer cache (24 h)</text>
+<text x="130.0" y="395" class="d" text-anchor="middle">rate-limit counters</text>
+<text x="130.0" y="411" class="d" text-anchor="middle">job queue (Streams)</text>
+<text x="130.0" y="427" class="d" text-anchor="middle">daily token budget</text>
+<rect x="246" y="327" width="1136" height="146" rx="12" fill="#ede9fe" stroke="#8b5cf6" stroke-width="1.3"/>
+<text x="266" y="350" class="bt" fill="#4c1d95">PostgreSQL + pgvector</text>
+<text x="462" y="350" class="note" text-anchor="start">one database for text, versions, keyword search and vectors</text>
+<rect x="262" y="364" width="192" height="96" rx="10" fill="#ffffff" stroke="#8b5cf6" stroke-width="1.3"/>
+<text x="358.0" y="387" class="bt" fill="#4c1d95" text-anchor="middle">answer_logs</text>
+<text x="358.0" y="408" class="d" text-anchor="middle">audit of every answer</text>
+<text x="358.0" y="424" class="d" text-anchor="middle">incl. cached ones</text>
+<rect x="490" y="364" width="192" height="96" rx="10" fill="#ffffff" stroke="#8b5cf6" stroke-width="1.3"/>
+<text x="586.0" y="387" class="bt" fill="#4c1d95" text-anchor="middle">change_events</text>
+<text x="586.0" y="408" class="d" text-anchor="middle">paragraph diffs</text>
+<text x="586.0" y="424" class="d" text-anchor="middle">+ AI impact (JSON)</text>
+<rect x="718" y="364" width="192" height="96" rx="10" fill="#ffffff" stroke="#8b5cf6" stroke-width="1.3"/>
+<text x="814.0" y="387" class="bt" fill="#4c1d95" text-anchor="middle">documents + versions</text>
+<text x="814.0" y="408" class="d" text-anchor="middle">every version kept</text>
+<text x="814.0" y="424" class="d" text-anchor="middle">→ rules on any date</text>
+<rect x="946" y="364" width="192" height="96" rx="10" fill="#ffffff" stroke="#8b5cf6" stroke-width="1.3"/>
+<text x="1042.0" y="387" class="bt" fill="#4c1d95" text-anchor="middle">chunks</text>
+<text x="1042.0" y="408" class="d" text-anchor="middle">clause text + para refs</text>
+<text x="1042.0" y="424" class="d" text-anchor="middle">full-text index (GIN)</text>
+<rect x="1174" y="364" width="192" height="96" rx="10" fill="#ffffff" stroke="#8b5cf6" stroke-width="1.3"/>
+<text x="1270.0" y="387" class="bt" fill="#4c1d95" text-anchor="middle">chunk_embeddings</text>
+<text x="1270.0" y="408" class="d" text-anchor="middle">1024-d vectors</text>
+<text x="1270.0" y="424" class="d" text-anchor="middle">HNSW index</text>
+<path d="M814.0,247 L814.0,360" fill="none" stroke="#3b82f6" stroke-width="1.8" marker-end="url(#ah)" style="color:#3b82f6"/>
+<text x="822.0" y="318" class="lbl" fill="#3b82f6">writes</text>
+<path d="M1042.0,247 L1042.0,360" fill="none" stroke="#3b82f6" stroke-width="1.8" marker-end="url(#ah)" style="color:#3b82f6"/>
+<path d="M1270.0,247 L1270.0,360" fill="none" stroke="#3b82f6" stroke-width="1.8" marker-end="url(#ah)" style="color:#3b82f6"/>
+<rect x="15" y="505" width="1370" height="445" rx="14" fill="#ecfdf5" stroke="#10b981" stroke-width="1.5"/>
+<text x="35" y="531" class="lane" fill="#064e3b">③ ANSWERING: how a question gets a checked answer</text>
+<rect x="30" y="568" width="200" height="56" rx="10" fill="#ffffff" stroke="#10b981" stroke-width="1.3"/>
+<text x="130.0" y="591" class="bt" fill="#064e3b" text-anchor="middle">Chat UI</text>
+<text x="130" y="612" class="d" text-anchor="middle">React · streaming</text>
+<rect x="30" y="632" width="200" height="56" rx="10" fill="#ffffff" stroke="#10b981" stroke-width="1.3"/>
+<text x="130.0" y="655" class="bt" fill="#064e3b" text-anchor="middle">MCP server</text>
+<text x="130" y="676" class="d" text-anchor="middle">Claude · Cursor · VS Code</text>
+<rect x="258" y="568" width="200" height="120" rx="10" fill="#ffffff" stroke="#10b981" stroke-width="1.3"/>
+<text x="358.0" y="591" class="bt" fill="#064e3b" text-anchor="middle">FastAPI</text>
+<text x="358.0" y="612" class="d" text-anchor="middle">POST /ask · /ask/stream</text>
+<text x="358.0" y="628" class="d" text-anchor="middle">rate limit: 20/min per IP</text>
+<text x="358.0" y="644" class="d" text-anchor="middle">over the limit → 429</text>
+<rect x="486" y="568" width="200" height="120" rx="10" fill="#ffffff" stroke="#10b981" stroke-width="1.3"/>
+<text x="586.0" y="591" class="bt" fill="#064e3b" text-anchor="middle">Answer cache</text>
+<text x="586.0" y="612" class="d" text-anchor="middle">exact match on question</text>
+<text x="586.0" y="628" class="d" text-anchor="middle">+ date + prompt version</text>
+<text x="586.0" y="644" class="d" text-anchor="middle">+ corpus fingerprint</text>
+<rect x="714" y="568" width="200" height="120" rx="10" fill="#ffffff" stroke="#10b981" stroke-width="1.3"/>
+<text x="814.0" y="591" class="bt" fill="#064e3b" text-anchor="middle">Load gate</text>
+<text x="814.0" y="612" class="d" text-anchor="middle">2 searches at a time</text>
+<text x="814.0" y="628" class="d" text-anchor="middle">+ 2 waiting</text>
+<text x="814.0" y="644" class="d" text-anchor="middle">else 503 + Retry-After</text>
+<rect x="942" y="568" width="200" height="120" rx="10" fill="#ffffff" stroke="#10b981" stroke-width="1.3"/>
+<text x="1042.0" y="591" class="bt" fill="#064e3b" text-anchor="middle">Hybrid search</text>
+<text x="1042.0" y="612" class="d" text-anchor="middle">question → bge-m3 vector</text>
+<text x="1042.0" y="628" class="d" text-anchor="middle">40 by meaning (HNSW)</text>
+<text x="1042.0" y="644" class="d" text-anchor="middle">+ 40 by keyword (FTS)</text>
+<text x="1042.0" y="660" class="d" text-anchor="middle">merged: weighted RRF</text>
+<rect x="1170" y="568" width="200" height="120" rx="10" fill="#ffffff" stroke="#10b981" stroke-width="1.3"/>
+<text x="1270.0" y="591" class="bt" fill="#064e3b" text-anchor="middle">Reranker</text>
+<text x="1270.0" y="612" class="d" text-anchor="middle">cross-encoder scores</text>
+<text x="1270.0" y="628" class="d" text-anchor="middle">the top 30 clauses</text>
+<text x="1270.0" y="644" class="d" text-anchor="middle">bge-reranker-v2-m3</text>
+<text x="1270.0" y="660" class="d" text-anchor="middle">or own 118M student</text>
+<path d="M232,628 L254,628" fill="none" stroke="#059669" stroke-width="1.8" marker-end="url(#ah)" style="color:#059669"/>
+<path d="M460,628 L482,628" fill="none" stroke="#059669" stroke-width="1.8" marker-end="url(#ah)" style="color:#059669"/>
+<path d="M688,628 L710,628" fill="none" stroke="#059669" stroke-width="1.8" marker-end="url(#ah)" style="color:#059669"/>
+<text x="692" y="617" class="lbl" fill="#059669">miss</text>
+<path d="M916,628 L938,628" fill="none" stroke="#059669" stroke-width="1.8" marker-end="url(#ah)" style="color:#059669"/>
+<path d="M1144,628 L1166,628" fill="none" stroke="#059669" stroke-width="1.8" marker-end="url(#ah)" style="color:#059669"/>
+<path d="M1012,566 L1012,464" fill="none" stroke="#8b5cf6" stroke-width="1.8" marker-end="url(#ah)" style="color:#8b5cf6"/>
+<text x="782" y="500" class="lbl" fill="#8b5cf6">reads (only rules in force that day)</text>
+<path d="M1092,566 L1230,464" fill="none" stroke="#8b5cf6" stroke-width="1.8" marker-end="url(#ah)" style="color:#8b5cf6"/>
+<path d="M586,566 L586,490 L130,490 L130,467" fill="none" stroke="#8b5cf6" stroke-width="1.8" stroke-dasharray="6 5" marker-end="url(#ah)" style="color:#8b5cf6"/>
+<path d="M586,690 L586,722 L130,722 L130,754" fill="none" stroke="#059669" stroke-width="1.8" stroke-dasharray="6 5" marker-end="url(#ah)" style="color:#059669"/>
+<text x="142" y="715" class="lbl" fill="#059669">hit → answer in ~5 ms, no LLM call</text>
+<path d="M1270,690 L1270,754" fill="none" stroke="#059669" stroke-width="1.8" marker-end="url(#ah)" style="color:#059669"/>
+<rect x="1170" y="758" width="200" height="120" rx="10" fill="#ffffff" stroke="#10b981" stroke-width="1.3"/>
+<text x="1270.0" y="781" class="bt" fill="#064e3b" text-anchor="middle">Relevance gate</text>
+<text x="1270.0" y="802" class="d" text-anchor="middle">best rerank score</text>
+<text x="1270.0" y="818" class="d" text-anchor="middle">≥ 0.05 ?</text>
+<rect x="942" y="758" width="200" height="120" rx="10" fill="#ffffff" stroke="#10b981" stroke-width="1.3"/>
+<text x="1042.0" y="781" class="bt" fill="#064e3b" text-anchor="middle">LLM gateway</text>
+<text x="1042.0" y="802" class="d" text-anchor="middle">3 keys · 120b → 20b fallback</text>
+<text x="1042.0" y="818" class="d" text-anchor="middle">retries · circuit breaker</text>
+<text x="1042.0" y="834" class="d" text-anchor="middle">daily token budget</text>
+<rect x="714" y="758" width="200" height="120" rx="10" fill="#ffffff" stroke="#10b981" stroke-width="1.3"/>
+<text x="814.0" y="781" class="bt" fill="#064e3b" text-anchor="middle">Groq · gpt-oss-120b</text>
+<text x="814.0" y="802" class="d" text-anchor="middle">answers only from the</text>
+<text x="814.0" y="818" class="d" text-anchor="middle">top 6 clauses, cites [S1]…</text>
+<text x="814.0" y="834" class="d" text-anchor="middle">may say &quot;not enough&quot;</text>
+<rect x="486" y="758" width="200" height="120" rx="10" fill="#ffffff" stroke="#10b981" stroke-width="1.3"/>
+<text x="586.0" y="781" class="bt" fill="#064e3b" text-anchor="middle">Citation check (code)</text>
+<text x="586.0" y="802" class="d" text-anchor="middle">removes made-up [S#]</text>
+<text x="586.0" y="818" class="d" text-anchor="middle">no valid citation →</text>
+<text x="586.0" y="834" class="d" text-anchor="middle">&quot;ungrounded&quot;</text>
+<rect x="258" y="758" width="200" height="120" rx="10" fill="#ffffff" stroke="#10b981" stroke-width="1.3"/>
+<text x="358.0" y="781" class="bt" fill="#064e3b" text-anchor="middle">Save</text>
+<text x="358.0" y="802" class="d" text-anchor="middle">→ Redis cache (24 h)</text>
+<text x="358.0" y="818" class="d" text-anchor="middle">→ answer_logs (audit)</text>
+<rect x="30" y="758" width="200" height="120" rx="10" fill="#d1fae5" stroke="#10b981" stroke-width="1.3"/>
+<text x="130.0" y="781" class="bt" fill="#064e3b" text-anchor="middle">Answer + sources</text>
+<text x="130.0" y="802" class="d" text-anchor="middle">streamed to the UI (SSE)</text>
+<text x="130.0" y="818" class="d" text-anchor="middle">click → exact RBI para</text>
+<text x="130.0" y="834" class="d" text-anchor="middle">and official page</text>
+<path d="M1168,818 L1146,818" fill="none" stroke="#059669" stroke-width="1.8" marker-end="url(#ah)" style="color:#059669"/>
+<text x="1148" y="810" class="lbl" fill="#059669">yes</text>
+<path d="M940,818 L918,818" fill="none" stroke="#059669" stroke-width="1.8" marker-end="url(#ah)" style="color:#059669"/>
+<path d="M712,818 L690,818" fill="none" stroke="#059669" stroke-width="1.8" marker-end="url(#ah)" style="color:#059669"/>
+<path d="M484,818 L462,818" fill="none" stroke="#059669" stroke-width="1.8" marker-end="url(#ah)" style="color:#059669"/>
+<path d="M256,818 L234,818" fill="none" stroke="#059669" stroke-width="1.8" marker-end="url(#ah)" style="color:#059669"/>
+<path d="M1270,880 L1270,896" fill="none" stroke="#dc2626" stroke-width="1.8" marker-end="url(#ah)" style="color:#dc2626"/>
+<rect x="1170" y="900" width="200" height="36" rx="18" fill="#fee2e2" stroke="#dc2626" stroke-width="1.2"/>
+<text x="1270" y="923" class="c" fill="#7f1d1d" text-anchor="middle">no → "Not in the RBI rules"</text>
+<text x="1132" y="923" class="lbl" text-anchor="end">(no LLM call, no cost)</text>
+<rect x="15" y="970" width="899" height="240" rx="14" fill="#fff7ed" stroke="#f97316" stroke-width="1.5"/>
+<text x="35" y="996" class="lane" fill="#7c2d12">④ CHANGE TRACKING: what changed, and why it matters</text>
+<rect x="45" y="1012" width="265" height="48" rx="8" fill="#fed7aa" stroke="none"/>
+<text x="177.5" y="1032.5" class="ct" fill="#7c2d12" text-anchor="middle">New version crawled</text>
+<text x="177.5" y="1047.5" class="c" fill="#7c2d12" text-anchor="middle">(daily job)</text>
+<rect x="340" y="1012" width="265" height="48" rx="8" fill="#fed7aa" stroke="none"/>
+<text x="472.5" y="1032.5" class="ct" fill="#7c2d12" text-anchor="middle">Paragraph diff</text>
+<text x="472.5" y="1047.5" class="c" fill="#7c2d12" text-anchor="middle">added · changed · removed</text>
+<path d="M312,1036 L336,1036" fill="none" stroke="#ea580c" stroke-width="1.8" marker-end="url(#ah)" style="color:#ea580c"/>
+<rect x="635" y="1012" width="265" height="48" rx="8" fill="#fed7aa" stroke="none"/>
+<text x="767.5" y="1032.5" class="ct" fill="#7c2d12" text-anchor="middle">change_events row</text>
+<text x="767.5" y="1047.5" class="c" fill="#7c2d12" text-anchor="middle">saved with the version (outbox)</text>
+<path d="M607,1036 L631,1036" fill="none" stroke="#ea580c" stroke-width="1.8" marker-end="url(#ah)" style="color:#ea580c"/>
+<rect x="45" y="1076" width="855" height="100" rx="10" fill="#ffffff" stroke="#f97316" stroke-width="1.3"/>
+<text x="61" y="1098" class="bt" fill="#7c2d12">Change-impact agent (LangGraph)</text>
+<text x="884" y="1098" class="lbl" text-anchor="end">uses the LLM gateway + hybrid search</text>
+<rect x="61" y="1114" width="104" height="30" rx="8" fill="#fed7aa" stroke="none"/>
+<text x="113.0" y="1133.0" class="c" fill="#7c2d12" text-anchor="middle">load change</text>
+<rect x="183" y="1114" width="104" height="30" rx="8" fill="#fed7aa" stroke="none"/>
+<text x="235.0" y="1133.0" class="c" fill="#7c2d12" text-anchor="middle">analyse (LLM)</text>
+<path d="M167,1129 L180,1129" fill="none" stroke="#ea580c" stroke-width="1.8" marker-end="url(#ah)" style="color:#ea580c"/>
+<rect x="305" y="1114" width="104" height="30" rx="8" fill="#fed7aa" stroke="none"/>
+<text x="357.0" y="1133.0" class="c" fill="#7c2d12" text-anchor="middle">verify quotes</text>
+<path d="M289,1129 L302,1129" fill="none" stroke="#ea580c" stroke-width="1.8" marker-end="url(#ah)" style="color:#ea580c"/>
+<rect x="427" y="1114" width="104" height="30" rx="8" fill="#fed7aa" stroke="none"/>
+<text x="479.0" y="1133.0" class="c" fill="#7c2d12" text-anchor="middle">retry ≤ 2</text>
+<path d="M411,1129 L424,1129" fill="none" stroke="#ea580c" stroke-width="1.8" marker-end="url(#ah)" style="color:#ea580c"/>
+<rect x="549" y="1114" width="104" height="30" rx="8" fill="#fed7aa" stroke="none"/>
+<text x="601.0" y="1133.0" class="c" fill="#7c2d12" text-anchor="middle">related ≥ 0.4</text>
+<path d="M533,1129 L546,1129" fill="none" stroke="#ea580c" stroke-width="1.8" marker-end="url(#ah)" style="color:#ea580c"/>
+<rect x="671" y="1114" width="104" height="30" rx="8" fill="#fed7aa" stroke="none"/>
+<text x="723.0" y="1133.0" class="c" fill="#7c2d12" text-anchor="middle">summarise</text>
+<path d="M655,1129 L668,1129" fill="none" stroke="#ea580c" stroke-width="1.8" marker-end="url(#ah)" style="color:#ea580c"/>
+<rect x="793" y="1114" width="104" height="30" rx="8" fill="#fed7aa" stroke="none"/>
+<text x="845.0" y="1133.0" class="c" fill="#7c2d12" text-anchor="middle">save impact</text>
+<path d="M777,1129 L790,1129" fill="none" stroke="#ea580c" stroke-width="1.8" marker-end="url(#ah)" style="color:#ea580c"/>
+<text x="61" y="1166" class="d" text-anchor="start">quotes are checked word for word in code · impact: what changed, who is affected, what to do</text>
+<text x="30" y="1200" class="lbl" text-anchor="start">→ shown in the UI &quot;Recent changes&quot;, GET /changes and the MCP tool recent_changes</text>
+<rect x="930" y="970" width="455" height="240" rx="14" fill="#f1f5f9" stroke="#64748b" stroke-width="1.5"/>
+<text x="950" y="996" class="lane" fill="#1e293b">⑤ OPERATIONS</text>
+<rect x="948" y="1010" width="420" height="31" rx="7" fill="#ffffff" stroke="#cbd5e1"/>
+<text x="962" y="1030" class="ct" fill="#1e293b">Prometheus</text>
+<text x="1068" y="1030" class="d" text-anchor="start">/metrics: answers, p95, tokens, cost</text>
+<rect x="948" y="1048" width="420" height="31" rx="7" fill="#ffffff" stroke="#cbd5e1"/>
+<text x="962" y="1068" class="ct" fill="#1e293b">Grafana</text>
+<text x="1068" y="1068" class="d" text-anchor="start">ready-made dashboard, 20 panels</text>
+<rect x="948" y="1086" width="420" height="31" rx="7" fill="#ffffff" stroke="#cbd5e1"/>
+<text x="962" y="1106" class="ct" fill="#1e293b">Evaluation</text>
+<text x="1068" y="1106" class="d" text-anchor="start">retrieval · answers · load reports</text>
+<rect x="948" y="1124" width="420" height="31" rx="7" fill="#ffffff" stroke="#cbd5e1"/>
+<text x="962" y="1144" class="ct" fill="#1e293b">GitHub CI</text>
+<text x="1068" y="1144" class="d" text-anchor="start">ruff · mypy · 222 + 25 tests</text>
+<rect x="948" y="1162" width="420" height="31" rx="7" fill="#ffffff" stroke="#cbd5e1"/>
+<text x="962" y="1182" class="ct" fill="#1e293b">Docker</text>
+<text x="1068" y="1182" class="d" text-anchor="start">whole stack in one command</text>
+</g></svg>
