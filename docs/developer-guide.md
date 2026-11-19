@@ -168,7 +168,9 @@ python -m app.ingestion.cli bench-retrieval       # time per stage vs quality
 python -m app.ingestion.cli load-test             # throughput and p95 of a running API
 ```
 
-Reports go to [`eval/reports/`](../eval/reports). Protocols and caveats:
+Reports go to [`eval/reports/`](../eval/reports). The UI's **Quality** page
+(`/#quality`, API `GET /quality`) shows the newest full reports for the configured
+reranker plus live numbers from `answer_logs`. Protocols and caveats:
 [`eval/README.md`](../eval/README.md), [ADR 0006](adr/0006-retrieval-evaluation.md),
 [ADR 0009](adr/0009-answer-evaluation.md), [ADR 0013](adr/0013-load-testing-and-overload-protection.md).
 

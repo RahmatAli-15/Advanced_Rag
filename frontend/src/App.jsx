@@ -3,6 +3,7 @@ import { askStream, getJSON } from './lib/api.js'
 import { Composer } from './components/Composer.jsx'
 import { EmptyState } from './components/EmptyState.jsx'
 import { Header } from './components/Header.jsx'
+import { Quality } from './components/Quality.jsx'
 import { SourcePanel } from './components/SourcePanel.jsx'
 import { Turn } from './components/Turn.jsx'
 
@@ -58,6 +59,14 @@ export default function App() {
   const corpus = useCorpus(health)
   const [turns, setTurns] = useState([])
   const [asOf, setAsOf] = useState('')
+  // The page is in the URL (#quality), so it can be linked to and survives a reload.
+  const [view, setViewState] = useState(() =>
+    window.location.hash === '#quality' ? 'quality' : 'chat',
+  )
+  const setView = useCallback((next) => {
+    setViewState(next)
+    window.history.replaceState(null, '', next === 'quality' ? '#quality' : ' ')
+  }, [])
   const [active, setActive] = useState(null) // { turnId, citeId }
   const abortRef = useRef(null)
   const endRef = useRef(null)
@@ -114,41 +123,45 @@ export default function App() {
   const panelAsOf = activeTurn?.final?.as_of ?? activeTurn?.resolvedAsOf
 
   return (
-    <div className={`app${activeCitation ? ' has-panel' : ''}`}>
-      <Header corpus={corpus} health={health} />
-      <div className="layout">
-        <main className="thread">
-          {turns.length === 0 ? (
-            <EmptyState onPick={ask} corpus={corpus} />
-          ) : (
-            turns.map((t) => (
-              <Turn
-                key={t.id}
-                turn={t}
-                activeId={active?.turnId === t.id ? active.citeId : null}
-                onCite={(citeId) => setActive({ turnId: t.id, citeId })}
+    <div className={`app${activeCitation && view === 'chat' ? ' has-panel' : ''}`}>
+      <Header corpus={corpus} health={health} view={view} onView={setView} />
+      {view === 'quality' ? (
+        <Quality />
+      ) : (
+        <div className="layout">
+          <main className="thread">
+            {turns.length === 0 ? (
+              <EmptyState onPick={ask} corpus={corpus} />
+            ) : (
+              turns.map((t) => (
+                <Turn
+                  key={t.id}
+                  turn={t}
+                  activeId={active?.turnId === t.id ? active.citeId : null}
+                  onCite={(citeId) => setActive({ turnId: t.id, citeId })}
+                />
+              ))
+            )}
+            <div ref={endRef} />
+            <div className="dock">
+              <Composer
+                busy={busy}
+                onAsk={ask}
+                onStop={stop}
+                asOf={asOf}
+                onAsOfChange={setAsOf}
+                disabledReason={DISABLED_REASON[health]}
               />
-            ))
+              <p className="disclaimer">
+                Not legal advice. Verify against the official RBI publication.
+              </p>
+            </div>
+          </main>
+          {activeCitation && (
+            <SourcePanel citation={activeCitation} asOf={panelAsOf} onClose={closePanel} />
           )}
-          <div ref={endRef} />
-          <div className="dock">
-            <Composer
-              busy={busy}
-              onAsk={ask}
-              onStop={stop}
-              asOf={asOf}
-              onAsOfChange={setAsOf}
-              disabledReason={DISABLED_REASON[health]}
-            />
-            <p className="disclaimer">
-              Not legal advice. Verify against the official RBI publication.
-            </p>
-          </div>
-        </main>
-        {activeCitation && (
-          <SourcePanel citation={activeCitation} asOf={panelAsOf} onClose={closePanel} />
-        )}
-      </div>
+        </div>
+      )}
     </div>
   )
 }

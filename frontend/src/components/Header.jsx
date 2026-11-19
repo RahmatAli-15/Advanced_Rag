@@ -8,7 +8,12 @@ const HEALTH_TEXT = {
   unknown: 'Connecting…',
 }
 
-export function Header({ corpus, health }) {
+const VIEWS = [
+  ['chat', 'Ask'],
+  ['quality', 'Quality'],
+]
+
+export function Header({ corpus, health, view, onView }) {
   return (
     <header className="topbar">
       <div className="brand">
@@ -18,6 +23,19 @@ export function Header({ corpus, health }) {
           <p className="brand-tag">Cited answers from Indian financial regulation</p>
         </div>
       </div>
+      <nav className="tabs" aria-label="Pages">
+        {VIEWS.map(([id, label]) => (
+          <button
+            key={id}
+            type="button"
+            className={`tab${view === id ? ' is-active' : ''}`}
+            aria-current={view === id ? 'page' : undefined}
+            onClick={() => onView(id)}
+          >
+            {label}
+          </button>
+        ))}
+      </nav>
       <div className="topbar-right">
         {corpus && (
           <p className="coverage" title={`${corpus.chunks.toLocaleString('en-IN')} clauses indexed`}>

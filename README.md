@@ -35,6 +35,7 @@ confidently when they do not know.
 | 🔔 **Tracks RBI changes** | Checks RBI daily; an AI agent explains each change: what changed, who it affects, what to do |
 | 🤖 **Works inside AI tools** | Claude, Cursor and VS Code can use it as a tool (MCP) |
 | 📊 **Monitored** | Dashboard of speed, errors, cache hits and cost per answer |
+| 📈 **Shows its own quality** | A Quality page in the app: measured accuracy, accuracy by language, speed before → after, and live usage |
 
 ## How it works
 
@@ -68,7 +69,12 @@ More detail: [system design](docs/design.md).
 | Repeat question answered from cache | **~5 ms** instead of ~3 s, no AI cost |
 | 16 users at once (after adding load protection) | response time **3.8 s** instead of 38 s |
 | Own reranker trained by distillation | **4.8× smaller, 7× faster**, 71% of the accuracy gap closed |
-| Automated tests on every commit | **222 backend + 25 frontend** |
+| Automated tests on every commit | **228 backend + 26 frontend** |
+
+The same numbers are on the app's **Quality** page (`http://localhost:5173/#quality`),
+read straight from the reports and the answer audit log:
+
+![Quality page: accuracy, accuracy by language, speed before and after, live usage](docs/images/quality-page.png)
 
 ## What makes it more than a RAG demo
 

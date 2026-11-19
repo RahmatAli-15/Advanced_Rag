@@ -37,3 +37,16 @@ export function shortTitle(title) {
   const m = /\((?:[^()]*\s[–-]\s+)?([^()]+)\)\s*(Directions?.*)$/.exec(title ?? '')
   return m ? `${m[1].trim()} ${m[2].trim()}` : title
 }
+
+export function formatPct(x, digits = 1) {
+  if (x == null) return '–'
+  const pct = x * 100
+  return `${Number.isInteger(pct) ? pct : pct.toFixed(digits)}%`
+}
+
+export function speedup(before, after) {
+  if (!before || !after) return null
+  const x = before / after
+  // 9.97 shows as "10×", not "10.0×"
+  return x >= 9.95 ? `${Math.round(x)}× faster` : `${x.toFixed(1)}× faster`
+}

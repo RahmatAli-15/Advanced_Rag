@@ -10,7 +10,7 @@ from redis.asyncio import Redis
 
 from app.answer.cache import AnswerCache, CorpusFingerprint
 from app.answer.service import AnswerService
-from app.api import ask, changes, corpus, health, metrics, search
+from app.api import ask, changes, corpus, health, metrics, quality, search
 from app.core.config import Settings, get_settings
 from app.core.logging import configure_logging
 from app.db.session import create_engine, create_session_factory
@@ -78,6 +78,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(ask.router)
     app.include_router(corpus.router)
     app.include_router(changes.router)
+    app.include_router(quality.router)
     app.include_router(metrics.router)
     return app
 
