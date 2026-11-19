@@ -244,7 +244,7 @@ Today: 45 RBI NBFC directions, 96 versions, 3,707 chunks. Vectors take about 15 
 
 Measured latency: retrieval ~750 ms (reranker 650 of it), LLM ~1 s, total ~2.5 s;
 cached ~4 ms. Reranking fewer clauses was measured and rejected: faster, but less
-accurate ([README, "Where the time goes"](../README.md#where-the-time-goes)).
+accurate ([developer guide, "Measure"](developer-guide.md#8-measure)).
 
 ## 9. Not built yet
 
