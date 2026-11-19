@@ -304,6 +304,148 @@ async def _analyse_impact(args: argparse.Namespace) -> int:
     return 0
 
 
+async def _distill_data(args: argparse.Namespace) -> int:
+    from app.distill import data as dd
+
+    s = get_settings()
+    out = s.data_dir / "distill"
+    engine = create_engine(s.database_url)
+    factory = create_session_factory(engine)
+    try:
+        qpath = out / "queries.jsonl"
+        if qpath.exists() and not args.regenerate:
+            queries = dd.load_queries(qpath)  # questions cost LLM calls: reuse them
+        else:
+            exclude: set[tuple[str, str]] = set()
+            for name in ("retrieval_v1.jsonl", "retrieval_v2.jsonl"):
+                exclude |= dd.held_out(dataset.load(s.eval_dir / "datasets" / name))
+            # The smaller model writes training questions: the 120b quota stays for users.
+            gateway, provider = build_gateway(
+                s, s.llm_models[-1:], max_retries=10, max_backoff_s=300
+            )
+            try:
+                queries = await dd.generate_queries(
+                    factory, gateway, exclude, n=args.n, per_document=args.per_document, seed=7
+                )
+            finally:
+                await provider.aclose()
+            dd.save(qpath, queries)
+        print(f"{len(queries)} training questions", flush=True)
+        candidates = HybridRetriever(factory, build_embedder(s), reranker=None)
+        examples = await dd.score_with_teacher(queries, candidates, build_reranker(s))
+        dd.save(out / "examples.jsonl", examples)
+        print(f"{len(examples)} examples with teacher scores -> {out / 'examples.jsonl'}")
+    finally:
+        await engine.dispose()
+    return 0
+
+
+async def _distill_train(args: argparse.Namespace) -> int:
+    from app.distill.data import load_examples, split_by_group
+    from app.distill.train import TrainConfig, baseline_dev_metrics, train
+
+    s = get_settings()
+    examples = load_examples(s.data_dir / "distill" / "examples.jsonl")
+    train_set, dev_set = split_by_group(examples, dev_fraction=0.1, seed=13)
+    cfg = TrainConfig(epochs=args.epochs)
+    out_dir = s.data_dir / "models" / "reranker-student"
+    before = baseline_dev_metrics(dev_set, cfg)
+    print(f"before training: dev loss {before[0]:.4f}, top-1 agreement {before[1]:.3f}")
+    report = train(train_set, dev_set, out_dir, cfg)
+    lines = [
+        "# Reranker distillation: training",
+        "",
+        f"- teacher: {s.reranker_model}; student: {cfg.student}",
+        f"- questions: {report.train_questions} train / {report.dev_questions} dev "
+        "(split by source clause; evaluation-set clauses excluded)",
+        f"- generated: {datetime.now(UTC).strftime('%Y-%m-%d %H:%M UTC')}",
+        "",
+        "| Epoch | Train loss | Dev loss | Dev top-1 agreement | Dev mean prob error | Time |",
+        "|---|---|---|---|---|---|",
+        f"| before training | | {before[0]:.4f} | {before[1]:.3f} | {before[2]:.3f} | |",
+        *(
+            f"| {e.epoch} | {e.train_loss:.4f} | {e.dev_loss:.4f} | {e.dev_top1_agreement:.3f} "
+            f"| {e.dev_mean_abs_prob_error:.3f} | {e.seconds:.0f} s |"
+            for e in report.epochs
+        ),
+        "",
+        f"Best epoch (kept): {report.best_epoch}. Model saved to data/models/reranker-student.",
+    ]
+    path = s.eval_dir / "reports" / f"distill-{datetime.now(UTC).strftime('%Y%m%d-%H%M')}.md"
+    path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    print("\n".join(lines))
+    return 0
+
+
+async def _distill_bench(args: argparse.Namespace) -> int:
+    """Teacher vs student latency for one rerank (30 clauses), on GPU and CPU."""
+    import statistics
+    import time
+
+    from app.distill.data import load_examples
+    from app.embeddings.local import CrossEncoderReranker
+
+    s = get_settings()
+    examples = load_examples(s.data_dir / "distill" / "examples.jsonl")[: args.n]
+    student = str(s.data_dir / "models" / "reranker-student")
+    rows = []
+    for device in () if args.gate_only else ("cuda", "cpu"):
+        for name, model in (("teacher", s.reranker_model), ("student", student)):
+            rr = CrossEncoderReranker(model, device=device)
+            rr.score("warm up", ["warm up"])
+            times = []
+            for ex in examples:
+                t0 = time.perf_counter()
+                rr.score(ex.query, ex.passages)
+                times.append((time.perf_counter() - t0) * 1000)
+            rows.append(
+                (
+                    device,
+                    name,
+                    statistics.median(times),
+                    sorted(times)[int(0.95 * (len(times) - 1))],
+                )
+            )
+            print(f"{device} {name}: p50 {rows[-1][2]:.0f} ms", flush=True)
+            del rr
+    print("| Device | Model | p50 ms | p95 ms |\n|---|---|---|---|")
+    for device, name, p50, p95 in rows:
+        print(f"| {device} | {name} | {p50:.0f} | {p95:.0f} |")
+
+    # The relevance gate (ADR 0007) refuses when the top rerank score is below 0.05.
+    # A student on a different score scale would refuse real questions or answer
+    # off-topic ones; check both against the teacher.
+    from app.answer.service import DEFAULT_MIN_RERANK_SCORE as gate
+    from app.eval.faithfulness import load_unanswerable
+
+    in_domain = [i.question for i in dataset.load(s.eval_dir / "datasets" / "retrieval_v2.jsonl")]
+    off_topic = [
+        u.question for u in load_unanswerable(s.eval_dir / "datasets" / "unanswerable_v1.jsonl")
+    ]
+    engine = create_engine(s.database_url)
+    embedder = build_embedder(s)
+    print(f"\n| Model | In-domain refused (top < {gate}) | Off-topic refused |\n|---|---|---|")
+    try:
+        for name, model in (("teacher", s.reranker_model), ("student", student)):
+            retriever = HybridRetriever(
+                create_session_factory(engine), embedder, CrossEncoderReranker(model)
+            )
+
+            async def top(q: str, r: HybridRetriever = retriever) -> float:
+                hits, _ = await r.search(q, k=1)
+                return (hits[0].rerank_score or 0.0) if hits else 0.0
+
+            refused_in = sum([await top(q) < gate for q in in_domain])
+            refused_off = sum([await top(q) < gate for q in off_topic])
+            print(
+                f"| {name} | {refused_in} / {len(in_domain)} | {refused_off} / {len(off_topic)} |",
+                flush=True,
+            )
+    finally:
+        await engine.dispose()
+    return 0
+
+
 async def _load_test(args: argparse.Namespace) -> int:
     from app.eval.load import render, run
 
@@ -386,6 +528,16 @@ def main() -> int:
     ai.add_argument("--event", help="one change event id (default: every unanalysed one)")
     ai.add_argument("--no-related", action="store_true", help="skip the related-clause search")
 
+    dd = sub.add_parser("distill-data", help="training questions + teacher scores (ADR 0015)")
+    dd.add_argument("-n", type=int, default=300, help="clauses to write questions for")
+    dd.add_argument("--per-document", type=int, default=12)
+    dd.add_argument("--regenerate", action="store_true", help="new questions (LLM calls)")
+    dt = sub.add_parser("distill-train", help="train the student reranker")
+    dt.add_argument("--epochs", type=int, default=3)
+    db = sub.add_parser("distill-bench", help="teacher vs student rerank latency, GPU and CPU")
+    db.add_argument("-n", type=int, default=40, help="questions to time")
+    db.add_argument("--gate-only", action="store_true", help="skip the latency runs")
+
     lt = sub.add_parser("load-test", help="throughput and latency of a running API under load")
     lt.add_argument("--url", default="http://localhost:8000")
     lt.add_argument("--endpoints", default="search,ask-cached", help="search,ask-cached")
@@ -407,6 +559,9 @@ def main() -> int:
         "load-test": _load_test,
         "changes-from-archive": _changes_from_archive,
         "analyse-impact": _analyse_impact,
+        "distill-data": _distill_data,
+        "distill-train": _distill_train,
+        "distill-bench": _distill_bench,
     }
     return asyncio.run(commands[args.command](args))
 

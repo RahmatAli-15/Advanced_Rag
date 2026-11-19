@@ -1,0 +1,642 @@
+{
+  "meta": {
+    "dataset": "retrieval_v2.jsonl (144 questions)",
+    "embedding_model": "BAAI/bge-m3",
+    "reranker_model": "E:\\Advanced_Rag\\data\\models\\reranker-student",
+    "generated": "2026-11-19 02:25 UTC"
+  },
+  "results": {
+    "keyword": {
+      "en": {
+        "n": 48,
+        "hit1": 0.083,
+        "hit5": 0.333,
+        "hit10": 0.458,
+        "mrr10": 0.186,
+        "doc5": 0.708,
+        "latency_p50_ms": 68.2,
+        "latency_p95_ms": 128.7,
+        "misses": [
+          "4a016369-en",
+          "6948efd0-en",
+          "c65ea603-en",
+          "a213fc2a-en",
+          "f00ef377-en",
+          "eeba2de3-en",
+          "774d45a5-en",
+          "60c5e661-en",
+          "572c6a21-en",
+          "f01dee32-en",
+          "b0299ff7-en",
+          "c11406d7-en",
+          "4c4dc0f5-en",
+          "a8dc6bee-en",
+          "7710cca0-en",
+          "b29ba065-en",
+          "20aa0248-en",
+          "571ae058-en",
+          "be92bcd1-en",
+          "c2e67f91-en",
+          "bfbd4d95-en",
+          "76d0e9a0-en",
+          "14ec58cf-en",
+          "14ff591a-en",
+          "e5c09475-en",
+          "99929e72-en"
+        ]
+      },
+      "all": {
+        "n": 144,
+        "hit1": 0.062,
+        "hit5": 0.229,
+        "hit10": 0.347,
+        "mrr10": 0.138,
+        "doc5": 0.542,
+        "latency_p50_ms": 57.1,
+        "latency_p95_ms": 111.5,
+        "misses": [
+          "4a016369-en",
+          "4a016369-hi",
+          "6948efd0-en",
+          "6948efd0-hinglish",
+          "6948efd0-hi",
+          "c65ea603-en",
+          "c65ea603-hinglish",
+          "c65ea603-hi",
+          "a213fc2a-en",
+          "a213fc2a-hinglish",
+          "a213fc2a-hi",
+          "f00ef377-en",
+          "f00ef377-hi",
+          "eeba2de3-en",
+          "eeba2de3-hinglish",
+          "eeba2de3-hi",
+          "42446d26-hi",
+          "5915b831-hi",
+          "c8889d48-hi",
+          "774d45a5-en",
+          "774d45a5-hinglish",
+          "774d45a5-hi",
+          "60c5e661-en",
+          "60c5e661-hinglish",
+          "60c5e661-hi",
+          "572c6a21-en",
+          "572c6a21-hinglish",
+          "572c6a21-hi",
+          "f01dee32-en",
+          "f01dee32-hinglish",
+          "f01dee32-hi",
+          "d5a369d8-hi",
+          "b0299ff7-en",
+          "b0299ff7-hinglish",
+          "b0299ff7-hi",
+          "febaa03d-hi",
+          "c280af24-hi",
+          "370cafbf-hi",
+          "c11406d7-en",
+          "c11406d7-hinglish",
+          "c11406d7-hi",
+          "4c4dc0f5-en",
+          "4c4dc0f5-hinglish",
+          "4c4dc0f5-hi",
+          "a8dc6bee-en",
+          "a8dc6bee-hinglish",
+          "a8dc6bee-hi",
+          "94067bbe-hi",
+          "74aecf7e-hinglish",
+          "74aecf7e-hi",
+          "7710cca0-en",
+          "7710cca0-hinglish",
+          "b29ba065-en",
+          "b29ba065-hinglish",
+          "b29ba065-hi",
+          "f0af830b-hi",
+          "fed17c9f-hi",
+          "20aa0248-en",
+          "20aa0248-hinglish",
+          "4b4f6c16-hi",
+          "571ae058-en",
+          "571ae058-hi",
+          "5a204ab9-hi",
+          "be92bcd1-en",
+          "be92bcd1-hinglish",
+          "be92bcd1-hi",
+          "c2e67f91-en",
+          "c2e67f91-hinglish",
+          "c2e67f91-hi",
+          "bfbd4d95-en",
+          "bfbd4d95-hi",
+          "43ba6fa9-hi",
+          "76d0e9a0-en",
+          "76d0e9a0-hinglish",
+          "76d0e9a0-hi",
+          "14ec58cf-en",
+          "14ec58cf-hinglish",
+          "14ec58cf-hi",
+          "bad161be-hi",
+          "14ff591a-en",
+          "14ff591a-hinglish",
+          "14ff591a-hi",
+          "43a1f757-hi",
+          "31e7acdb-hi",
+          "5f849553-hi",
+          "d176b19e-hi",
+          "39d44b18-hi",
+          "e5c09475-en",
+          "e5c09475-hinglish",
+          "e5c09475-hi",
+          "866eda8c-hi",
+          "99929e72-en",
+          "99929e72-hinglish",
+          "99929e72-hi"
+        ]
+      },
+      "hinglish": {
+        "n": 48,
+        "hit1": 0.104,
+        "hit5": 0.354,
+        "hit10": 0.521,
+        "mrr10": 0.217,
+        "doc5": 0.708,
+        "latency_p50_ms": 77.5,
+        "latency_p95_ms": 113.6,
+        "misses": [
+          "6948efd0-hinglish",
+          "c65ea603-hinglish",
+          "a213fc2a-hinglish",
+          "eeba2de3-hinglish",
+          "774d45a5-hinglish",
+          "60c5e661-hinglish",
+          "572c6a21-hinglish",
+          "f01dee32-hinglish",
+          "b0299ff7-hinglish",
+          "c11406d7-hinglish",
+          "4c4dc0f5-hinglish",
+          "a8dc6bee-hinglish",
+          "74aecf7e-hinglish",
+          "7710cca0-hinglish",
+          "b29ba065-hinglish",
+          "20aa0248-hinglish",
+          "be92bcd1-hinglish",
+          "c2e67f91-hinglish",
+          "76d0e9a0-hinglish",
+          "14ec58cf-hinglish",
+          "14ff591a-hinglish",
+          "e5c09475-hinglish",
+          "99929e72-hinglish"
+        ]
+      },
+      "hi": {
+        "n": 48,
+        "hit1": 0.0,
+        "hit5": 0.0,
+        "hit10": 0.062,
+        "mrr10": 0.009,
+        "doc5": 0.208,
+        "latency_p50_ms": 6.4,
+        "latency_p95_ms": 18.7,
+        "misses": [
+          "4a016369-hi",
+          "6948efd0-hi",
+          "c65ea603-hi",
+          "a213fc2a-hi",
+          "f00ef377-hi",
+          "eeba2de3-hi",
+          "42446d26-hi",
+          "5915b831-hi",
+          "c8889d48-hi",
+          "774d45a5-hi",
+          "60c5e661-hi",
+          "572c6a21-hi",
+          "f01dee32-hi",
+          "d5a369d8-hi",
+          "b0299ff7-hi",
+          "febaa03d-hi",
+          "c280af24-hi",
+          "370cafbf-hi",
+          "c11406d7-hi",
+          "4c4dc0f5-hi",
+          "a8dc6bee-hi",
+          "94067bbe-hi",
+          "74aecf7e-hi",
+          "b29ba065-hi",
+          "f0af830b-hi",
+          "fed17c9f-hi",
+          "4b4f6c16-hi",
+          "571ae058-hi",
+          "5a204ab9-hi",
+          "be92bcd1-hi",
+          "c2e67f91-hi",
+          "bfbd4d95-hi",
+          "43ba6fa9-hi",
+          "76d0e9a0-hi",
+          "14ec58cf-hi",
+          "bad161be-hi",
+          "14ff591a-hi",
+          "43a1f757-hi",
+          "31e7acdb-hi",
+          "5f849553-hi",
+          "d176b19e-hi",
+          "39d44b18-hi",
+          "e5c09475-hi",
+          "866eda8c-hi",
+          "99929e72-hi"
+        ]
+      }
+    },
+    "vector": {
+      "en": {
+        "n": 48,
+        "hit1": 0.792,
+        "hit5": 0.917,
+        "hit10": 0.938,
+        "mrr10": 0.841,
+        "doc5": 1.0,
+        "latency_p50_ms": 112.7,
+        "latency_p95_ms": 149.6,
+        "misses": [
+          "b0299ff7-en",
+          "be92bcd1-en",
+          "e5c09475-en"
+        ]
+      },
+      "all": {
+        "n": 144,
+        "hit1": 0.722,
+        "hit5": 0.91,
+        "hit10": 0.944,
+        "mrr10": 0.802,
+        "doc5": 0.986,
+        "latency_p50_ms": 113.5,
+        "latency_p95_ms": 152.8,
+        "misses": [
+          "f01dee32-hinglish",
+          "b0299ff7-en",
+          "b0299ff7-hi",
+          "20aa0248-hi",
+          "be92bcd1-en",
+          "be92bcd1-hi",
+          "31e7acdb-hinglish",
+          "e5c09475-en"
+        ]
+      },
+      "hinglish": {
+        "n": 48,
+        "hit1": 0.708,
+        "hit5": 0.896,
+        "hit10": 0.958,
+        "mrr10": 0.787,
+        "doc5": 1.0,
+        "latency_p50_ms": 113.4,
+        "latency_p95_ms": 163.0,
+        "misses": [
+          "f01dee32-hinglish",
+          "31e7acdb-hinglish"
+        ]
+      },
+      "hi": {
+        "n": 48,
+        "hit1": 0.667,
+        "hit5": 0.917,
+        "hit10": 0.938,
+        "mrr10": 0.778,
+        "doc5": 0.958,
+        "latency_p50_ms": 114.4,
+        "latency_p95_ms": 152.8,
+        "misses": [
+          "b0299ff7-hi",
+          "20aa0248-hi",
+          "be92bcd1-hi"
+        ]
+      }
+    },
+    "hybrid": {
+      "en": {
+        "n": 48,
+        "hit1": 0.417,
+        "hit5": 0.75,
+        "hit10": 0.833,
+        "mrr10": 0.553,
+        "doc5": 0.938,
+        "latency_p50_ms": 112.1,
+        "latency_p95_ms": 147.6,
+        "misses": [
+          "f01dee32-en",
+          "b0299ff7-en",
+          "4c4dc0f5-en",
+          "a8dc6bee-en",
+          "7710cca0-en",
+          "be92bcd1-en",
+          "14ff591a-en",
+          "e5c09475-en"
+        ]
+      },
+      "all": {
+        "n": 144,
+        "hit1": 0.438,
+        "hit5": 0.785,
+        "hit10": 0.896,
+        "mrr10": 0.582,
+        "doc5": 0.944,
+        "latency_p50_ms": 112.1,
+        "latency_p95_ms": 151.6,
+        "misses": [
+          "f01dee32-en",
+          "f01dee32-hinglish",
+          "b0299ff7-en",
+          "b0299ff7-hinglish",
+          "b0299ff7-hi",
+          "4c4dc0f5-en",
+          "a8dc6bee-en",
+          "7710cca0-en",
+          "7710cca0-hinglish",
+          "be92bcd1-en",
+          "be92bcd1-hinglish",
+          "be92bcd1-hi",
+          "14ff591a-en",
+          "e5c09475-en",
+          "e5c09475-hi"
+        ]
+      },
+      "hinglish": {
+        "n": 48,
+        "hit1": 0.417,
+        "hit5": 0.792,
+        "hit10": 0.917,
+        "mrr10": 0.575,
+        "doc5": 0.958,
+        "latency_p50_ms": 112.2,
+        "latency_p95_ms": 155.5,
+        "misses": [
+          "f01dee32-hinglish",
+          "b0299ff7-hinglish",
+          "7710cca0-hinglish",
+          "be92bcd1-hinglish"
+        ]
+      },
+      "hi": {
+        "n": 48,
+        "hit1": 0.479,
+        "hit5": 0.812,
+        "hit10": 0.938,
+        "mrr10": 0.618,
+        "doc5": 0.938,
+        "latency_p50_ms": 112.0,
+        "latency_p95_ms": 138.5,
+        "misses": [
+          "b0299ff7-hi",
+          "be92bcd1-hi",
+          "e5c09475-hi"
+        ]
+      }
+    },
+    "hybrid kw=0.3": {
+      "en": {
+        "n": 48,
+        "hit1": 0.5,
+        "hit5": 0.875,
+        "hit10": 0.917,
+        "mrr10": 0.656,
+        "doc5": 0.979,
+        "latency_p50_ms": 112.1,
+        "latency_p95_ms": 145.0,
+        "misses": [
+          "f01dee32-en",
+          "b0299ff7-en",
+          "be92bcd1-en",
+          "e5c09475-en"
+        ]
+      },
+      "all": {
+        "n": 144,
+        "hit1": 0.521,
+        "hit5": 0.861,
+        "hit10": 0.931,
+        "mrr10": 0.669,
+        "doc5": 0.958,
+        "latency_p50_ms": 111.8,
+        "latency_p95_ms": 145.0,
+        "misses": [
+          "f01dee32-en",
+          "f01dee32-hinglish",
+          "b0299ff7-en",
+          "b0299ff7-hinglish",
+          "b0299ff7-hi",
+          "20aa0248-hi",
+          "be92bcd1-en",
+          "be92bcd1-hinglish",
+          "be92bcd1-hi",
+          "e5c09475-en"
+        ]
+      },
+      "hinglish": {
+        "n": 48,
+        "hit1": 0.521,
+        "hit5": 0.854,
+        "hit10": 0.938,
+        "mrr10": 0.661,
+        "doc5": 0.958,
+        "latency_p50_ms": 112.2,
+        "latency_p95_ms": 151.5,
+        "misses": [
+          "f01dee32-hinglish",
+          "b0299ff7-hinglish",
+          "be92bcd1-hinglish"
+        ]
+      },
+      "hi": {
+        "n": 48,
+        "hit1": 0.542,
+        "hit5": 0.854,
+        "hit10": 0.938,
+        "mrr10": 0.691,
+        "doc5": 0.938,
+        "latency_p50_ms": 111.5,
+        "latency_p95_ms": 116.9,
+        "misses": [
+          "b0299ff7-hi",
+          "20aa0248-hi",
+          "be92bcd1-hi"
+        ]
+      }
+    },
+    "vector+rerank": {
+      "en": {
+        "n": 48,
+        "hit1": 0.875,
+        "hit5": 0.938,
+        "hit10": 1.0,
+        "mrr10": 0.908,
+        "doc5": 1.0,
+        "latency_p50_ms": 162.7,
+        "latency_p95_ms": 189.9,
+        "misses": []
+      },
+      "all": {
+        "n": 144,
+        "hit1": 0.833,
+        "hit5": 0.924,
+        "hit10": 0.972,
+        "mrr10": 0.879,
+        "doc5": 0.993,
+        "latency_p50_ms": 164.3,
+        "latency_p95_ms": 185.8,
+        "misses": [
+          "4a016369-hinglish",
+          "42446d26-hi",
+          "b0299ff7-hinglish",
+          "be92bcd1-hi"
+        ]
+      },
+      "hinglish": {
+        "n": 48,
+        "hit1": 0.792,
+        "hit5": 0.917,
+        "hit10": 0.958,
+        "mrr10": 0.856,
+        "doc5": 1.0,
+        "latency_p50_ms": 163.8,
+        "latency_p95_ms": 181.3,
+        "misses": [
+          "4a016369-hinglish",
+          "b0299ff7-hinglish"
+        ]
+      },
+      "hi": {
+        "n": 48,
+        "hit1": 0.833,
+        "hit5": 0.917,
+        "hit10": 0.958,
+        "mrr10": 0.874,
+        "doc5": 0.979,
+        "latency_p50_ms": 166.5,
+        "latency_p95_ms": 181.4,
+        "misses": [
+          "42446d26-hi",
+          "be92bcd1-hi"
+        ]
+      }
+    },
+    "hybrid+rerank": {
+      "en": {
+        "n": 48,
+        "hit1": 0.875,
+        "hit5": 0.938,
+        "hit10": 0.979,
+        "mrr10": 0.904,
+        "doc5": 1.0,
+        "latency_p50_ms": 190.7,
+        "latency_p95_ms": 229.7,
+        "misses": [
+          "e5c09475-en"
+        ]
+      },
+      "all": {
+        "n": 144,
+        "hit1": 0.833,
+        "hit5": 0.924,
+        "hit10": 0.951,
+        "mrr10": 0.876,
+        "doc5": 0.993,
+        "latency_p50_ms": 185.4,
+        "latency_p95_ms": 224.5,
+        "misses": [
+          "4a016369-hinglish",
+          "42446d26-hi",
+          "f01dee32-hinglish",
+          "b0299ff7-hinglish",
+          "b0299ff7-hi",
+          "be92bcd1-hi",
+          "e5c09475-en"
+        ]
+      },
+      "hinglish": {
+        "n": 48,
+        "hit1": 0.792,
+        "hit5": 0.917,
+        "hit10": 0.938,
+        "mrr10": 0.853,
+        "doc5": 1.0,
+        "latency_p50_ms": 190.6,
+        "latency_p95_ms": 225.7,
+        "misses": [
+          "4a016369-hinglish",
+          "f01dee32-hinglish",
+          "b0299ff7-hinglish"
+        ]
+      },
+      "hi": {
+        "n": 48,
+        "hit1": 0.833,
+        "hit5": 0.917,
+        "hit10": 0.938,
+        "mrr10": 0.872,
+        "doc5": 0.979,
+        "latency_p50_ms": 173.2,
+        "latency_p95_ms": 207.9,
+        "misses": [
+          "42446d26-hi",
+          "b0299ff7-hi",
+          "be92bcd1-hi"
+        ]
+      }
+    },
+    "hybrid kw=0.3+rerank": {
+      "en": {
+        "n": 48,
+        "hit1": 0.875,
+        "hit5": 0.938,
+        "hit10": 1.0,
+        "mrr10": 0.908,
+        "doc5": 1.0,
+        "latency_p50_ms": 173.7,
+        "latency_p95_ms": 214.7,
+        "misses": []
+      },
+      "all": {
+        "n": 144,
+        "hit1": 0.833,
+        "hit5": 0.924,
+        "hit10": 0.972,
+        "mrr10": 0.879,
+        "doc5": 0.993,
+        "latency_p50_ms": 171.9,
+        "latency_p95_ms": 210.5,
+        "misses": [
+          "4a016369-hinglish",
+          "42446d26-hi",
+          "b0299ff7-hinglish",
+          "be92bcd1-hi"
+        ]
+      },
+      "hinglish": {
+        "n": 48,
+        "hit1": 0.792,
+        "hit5": 0.917,
+        "hit10": 0.958,
+        "mrr10": 0.856,
+        "doc5": 1.0,
+        "latency_p50_ms": 176.5,
+        "latency_p95_ms": 219.4,
+        "misses": [
+          "4a016369-hinglish",
+          "b0299ff7-hinglish"
+        ]
+      },
+      "hi": {
+        "n": 48,
+        "hit1": 0.833,
+        "hit5": 0.917,
+        "hit10": 0.958,
+        "mrr10": 0.874,
+        "doc5": 0.979,
+        "latency_p50_ms": 169.1,
+        "latency_p95_ms": 185.7,
+        "misses": [
+          "42446d26-hi",
+          "be92bcd1-hi"
+        ]
+      }
+    }
+  }
+}

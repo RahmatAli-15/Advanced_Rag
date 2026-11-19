@@ -61,8 +61,21 @@ plugins = ["pydantic.mypy"]
 # The `ml` extra is optional (CI and MODELS_BACKEND=fake run without it). These are
 # imported lazily inside app/embeddings/local.py, so they may be absent at check time.
 [[tool.mypy.overrides]]
-module = ["torch", "torch.*", "sentence_transformers", "sentence_transformers.*"]
+module = [
+    "torch",
+    "torch.*",
+    "sentence_transformers",
+    "sentence_transformers.*",
+    "transformers",
+    "transformers.*",
+]
 ignore_missing_imports = true
+
+# The training loop calls torch/transformers functions that have no type hints when the
+# `ml` extra is installed (and are Any when it is not, as in CI). Allow those calls here.
+[[tool.mypy.overrides]]
+module = ["app.distill.train"]
+disallow_untyped_calls = false
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"

@@ -197,6 +197,7 @@ most), otherwise the paragraph is marked "unverified".
 | **Cost per answer on the dashboard** | About **$0.0004** per uncached answer at list price |
 | Streaming | The user sees sources after ~1 s, not a blank screen for 3 s |
 | Load shedding | With 16 users at once, response time stays at **3.8 s instead of 38 s** |
+| **Distilled reranker** (trained here) | 4.8x smaller, rerank **570 → 80 ms** on GPU and **30 → 3 s** on CPU, keeping 83.3% vs 86.1% "right clause first" |
 
 One thing deliberately *not* done: a "similar question" cache. "Can NBFCs do video KYC?"
 and "Can banks do video KYC?" are similar questions with different answers. In
@@ -281,6 +282,7 @@ Every major decision is written down with its reason and the alternatives consid
 | Why LangGraph for the agent? | The flow has a verify-and-retry loop and a skip branch; a graph makes those explicit and testable. Model calls still go through my gateway |
 | How do you know the agent is right? | Every claim quotes the text word for word, and code checks it. Labels like severity are marked as AI judgement |
 | Why one database? | Postgres + pgvector holds rules, versions, vectors and logs: one backup, one transaction, filters and search in one query |
+| Did you train any model yourself? | Yes: I distilled the 568M reranker into a 118M one in PyTorch, with a loss that matches both the teacher's ranking (KL) and its scores (BCE), because the score also drives the refusal gate. It recovered 71% of the accuracy gap and is 7x faster on GPU |
 | What would you do next? | A human check of the test set, exact-term test questions, cloud deployment, more regulators |
 
 ---

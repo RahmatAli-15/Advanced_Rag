@@ -222,6 +222,28 @@ python -m app.ingestion.cli analyse-impact
 
 The analysis shows under "Recent RBI changes" in the UI and in MCP's `recent_changes`.
 
+### A smaller reranker, trained here (knowledge distillation)
+
+The reranker is the most accurate step and the slowest (30 s per question on CPU). A
+model 4.8x smaller was trained in PyTorch to imitate it, on 21,420 teacher-scored pairs
+from clauses outside the test set ([ADR 0015](docs/adr/0015-reranker-distillation.md)):
+
+| Reranker | Right clause first | In top 5 | Rerank on GPU | Rerank on CPU |
+|---|---|---|---|---|
+| Teacher, 568M | 86.1% | 96.5% | 570 ms | 29.8 s |
+| Small model, untrained | 76.4% | 90.3% | 80 ms | 3.1 s |
+| **Small model, distilled** | **83.3%** | **92.4%** | **80 ms** | **3.1 s** |
+
+Training recovered 71% of the accuracy gap. The teacher stays the default on a GPU; the
+distilled model (`RERANKER_MODEL=../data/models/reranker-student`) makes a CPU-only
+deployment possible.
+
+```bash
+python -m app.ingestion.cli distill-data     # questions + teacher scores
+python -m app.ingestion.cli distill-train    # PyTorch training, ~48 min/epoch on an RTX 3050
+python -m app.ingestion.cli distill-bench    # speed on GPU/CPU + relevance-gate check
+```
+
 ### Capacity and overload protection
 
 `python -m app.ingestion.cli load-test` measured the system on a laptop RTX 3050:
@@ -316,6 +338,7 @@ npm run lint && npm test && npm run build
 - [x] Test set reviewed clause by clause against its gold clauses (AI review; v2)
 - [x] Load test, GPU load shedding (503 + Retry-After) and per-client rate limiting
 - [x] Change-impact agent (LangGraph) with quote verification, tested on a real amendment
+- [x] Reranker distillation (PyTorch): 4.8x smaller, 7x faster on GPU, 71% of the accuracy gap recovered
 
 **Next**
 
